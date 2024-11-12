@@ -18,9 +18,22 @@ public class MyFirstModel : MonoBehaviour
       
          Debug.Log(result);
 
-        int result2 = await Sub(100, 234);
+        result = await Sub(100, 234);
 
-        Debug.Log(result2);
+        Debug.Log(result);
+
+
+       //result = await SumAll(1,0);
+
+        //Debug.Log(result);
+
+        //result = await CalcOperation(1, 7);
+
+        //Debug.Log(result);
+
+        //result = await SumAllNumber(1.1f,12.2f);
+
+        //Debug.Log(result);
 
     }
 
@@ -40,6 +53,40 @@ public class MyFirstModel : MonoBehaviour
         var channel = GrpcChannel.ForAddress(ServerURL, new GrpcChannelOptions() { HttpHandler = handler });
         var client = MagicOnionClient.Create<IMyFirstService>(channel);
         var result = await client.SubAsync(x, y);
+
+        return result;
+    }
+
+    public async UniTask<int> SumAll(int[] numList)
+    {
+        var handler = new YetAnotherHttpHandler() { Http2Only = true };
+        var channel = GrpcChannel.ForAddress(ServerURL, new GrpcChannelOptions() { HttpHandler = handler });
+        var client = MagicOnionClient.Create<IMyFirstService>(channel);
+        var result = await client.SumAllAsync(numList);
+
+        return result;
+    }
+
+    public async UniTask<int> CalcOperation(int x, int y)
+    {
+        var handler = new YetAnotherHttpHandler() { Http2Only = true };
+        var channel = GrpcChannel.ForAddress(ServerURL, new GrpcChannelOptions() { HttpHandler = handler });
+        var client = MagicOnionClient.Create<IMyFirstService>(channel);
+        int[] result = await client.ColcForOperotionAsync(x, y);
+
+        return result[1];
+    }
+
+    public async UniTask<float> SumAllNumber(Number NumArray)
+    {
+        Number nums;
+        nums = new Number {x=NumArray.x,y=NumArray.y};
+        
+
+        var handler = new YetAnotherHttpHandler() { Http2Only = true };
+        var channel = GrpcChannel.ForAddress(ServerURL, new GrpcChannelOptions() { HttpHandler = handler });
+        var client = MagicOnionClient.Create<IMyFirstService>(channel);
+        var result = await client.SumAllNumberAsync(nums);
 
         return result;
     }
