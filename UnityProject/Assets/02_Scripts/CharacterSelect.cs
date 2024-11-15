@@ -90,21 +90,21 @@ public class CharacterSelect : MonoBehaviour
         switch (SelectCharacter)
         {
             case 1:
-                _1PCharacterName.text = "MAMIYA";
+                _1PCharacterName.text = "SHINO";
 
 
                 
                 break;
 
             case 2:
-                _1PCharacterName.text = "ELDE";
+                _1PCharacterName.text = "HIYORI";
 
                 
                
                 break;
 
             case 3:
-                _1PCharacterName.text = "TINA";
+                _1PCharacterName.text = "HIYAME";
                 break;
 
             case 4:
