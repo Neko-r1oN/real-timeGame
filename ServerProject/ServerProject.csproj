@@ -16,7 +16,6 @@
 
   <ItemGroup>
     <Folder Include="Model\Entity\" />
-    <Folder Include="StreamingHubs\" />
   </ItemGroup>
 
   <ItemGroup>

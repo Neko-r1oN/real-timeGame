@@ -30,13 +30,13 @@ public class UserModel : BaseModel
 
         try
         {//“o˜^¬Œ÷
-            Debug.Log("“o˜^’ÊM¬Œ÷");
+            Debug.Log("ƒT[ƒo[Ú‘±¬Œ÷");
             userId = await client.RegistUserAsync(name);
             return true;
         }
         catch (Exception e)
         {//“o˜^¸”s
-            //Debug.Log("“o˜^’ÊM¸”s");
+            Debug.Log("ƒT[ƒo[Ú‘±ƒGƒ‰[");
             Debug.Log(e);
             return false;
         }

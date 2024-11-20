@@ -12,5 +12,9 @@ namespace Shared.Interfaces.StreamingHubs
 
         //サーバーの入室通知
         void OnJoin(JoinedUser user);
+
+        //サーバーの退出通知
+        void Leave(Guid connectionId);
+        
     }
 }

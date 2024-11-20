@@ -23,7 +23,7 @@
 
                 $table->index('id');                //idにindex設定
                 $table->index('name');              //nameにindex設定
-                //$table->unique('name');             //nameにunique制約設定
+                $table->unique('name');             //nameにunique制約設定
             });
         }
 
