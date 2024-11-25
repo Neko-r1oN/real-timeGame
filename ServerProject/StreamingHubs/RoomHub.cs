@@ -2,6 +2,9 @@
 using MagicOnionServer.Model.Context;
 using ServerProject.StreamingHubs;
 using Shared.Interfaces.StreamingHubs;
+using Shared.Model.Entity;
+using System.Diagnostics;
+using System.Numerics;
 
 namespace StreamingHubs
 {
@@ -9,12 +12,14 @@ namespace StreamingHubs
     {
         private IGroup room;
 
+        //private MoveData moveData;
+
         /// <summary>
         /// ユーザー入室処理
         /// </summary>
         /// <param name="roomName">参加ルーム名</param>
         /// <param name="userId">ユーザーID</param>
-        /// <returns></returns>
+        /// <returns>参加者リスト</returns>
         public async Task<JoinedUser[]>JoinAsync(string roomName,int userId)
         {
             //ルームに参加＆ルームを保持
@@ -38,6 +43,7 @@ namespace StreamingHubs
             //参加中のユーザー情報を流す
             JoinedUser[] joinedUserList = new JoinedUser[roomDataList.Length];
 
+            Debug.WriteLine(this.ConnectionId);
             //RoomDataList内のJoinedUserを格納
             for (int i = 0; i < joinedUserList.Length; i++)
             {
@@ -47,6 +53,21 @@ namespace StreamingHubs
             return joinedUserList;
         }
 
+        /// <summary>
+        /// 強制退出(切断)処理
+        /// </summary>
+        /// <returns></returns>
+        protected override ValueTask OnDisconnected()
+        {
+            //ルームデータ削除
+            this.room.GetInMemoryStorage<RoomData>().Remove(this.ConnectionId);
+            //退出したことを全メンバーに通知
+            this.Broadcast(room).Leave(this.ConnectionId);
+            //ルーム内のメンバーから削除
+            room.RemoveAsync(this.Context);
+
+            return CompletedTask;
+        }
 
         /// <summary>
         /// 退出処理
@@ -62,6 +83,18 @@ namespace StreamingHubs
 
             //ルーム参加者全員にユーザーの退出通知を送信
             this.BroadcastExceptSelf(room).Leave(this.ConnectionId);
+
+        }
+
+        /// <summary>
+        /// 移動処理
+        /// </summary>
+        /// <returns></returns>
+        public async Task MoveAsync(MoveData moveData)
+        {
+
+            //ルーム参加者全員にユーザーの移動通知を送信
+            this.BroadcastExceptSelf(room).OnMove(moveData);
 
         }
     }

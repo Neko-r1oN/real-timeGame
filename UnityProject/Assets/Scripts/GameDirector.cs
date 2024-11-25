@@ -6,6 +6,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+using DG.Tweening;                   //DOTweenを使うときはこのusingを入れる
 
 
 public class GameDirector : MonoBehaviour
@@ -23,6 +24,9 @@ public class GameDirector : MonoBehaviour
     //プレイヤー生成位置
     [SerializeField] private Transform spawnPos;
 
+    //プレイヤー存在判定
+    private bool isPlayer;
+
     Dictionary<Guid,GameObject>characterList = new Dictionary<Guid, GameObject>();
 
     async void Start()
@@ -32,9 +36,32 @@ public class GameDirector : MonoBehaviour
 
         roomModel.LeavedUser += this.LeavedUser;
 
+        roomModel.MovedUser += this.MovedUser;
+        
+        isPlayer = false;
         //待機
         await roomModel.ConnectAsync();
+
     }
+
+    private async void FixedUpdate()
+    {
+        if (!isPlayer) return;
+
+        var moveData = new MoveData()
+        {
+            ConnectionId = roomModel.ConnectionId,
+            Pos = characterList[roomModel.ConnectionId].transform.position,
+            Rotate = characterList[roomModel.ConnectionId].transform.eulerAngles,
+
+        };
+
+        //移動
+        await roomModel.MoveAsync(moveData);
+
+    }
+
+
 
     //入室処理
     public async void JoinRoom()
@@ -55,6 +82,15 @@ public class GameDirector : MonoBehaviour
         //characterObject.transform.position = new Vector3(0,0,0);   //座標指定
         //characterObject.transform.parent = spawnObg.transform;
         characterList[user.ConnectionId] = characterObject;        //フィールドで保持
+
+        if (user.ConnectionId == roomModel.ConnectionId)
+        {
+            characterList[roomModel.ConnectionId].gameObject.AddComponent<PlayerManager>();
+
+        }
+        isPlayer = true;
+
+
     }
 
     //切断処理
@@ -72,6 +108,8 @@ public class GameDirector : MonoBehaviour
             Destroy(player.gameObject);
         }
 
+        isPlayer = false;
+
         Debug.Log("退出完了");
     }
 
@@ -82,5 +120,19 @@ public class GameDirector : MonoBehaviour
         Destroy(characterList[connnectionId]);
         //退出したプレイヤーをリストから削除
         characterList.Remove(connnectionId);
+
+        //プレイヤー判定をリセット
+        isPlayer = false;
     }
+
+    //ユーザーが移動したときの処理
+    private async void MovedUser(MoveData moveData)
+    {
+        //移動したプレイヤーの位置変更
+        characterList[moveData.ConnectionId].transform.position = moveData.Pos;
+
+        //移動したプレイヤーの角度変更
+        characterList[moveData.ConnectionId].transform.eulerAngles = moveData.Rotate;
+    }
+
 }

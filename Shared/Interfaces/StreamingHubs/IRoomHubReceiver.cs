@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Numerics;
 using System.Text;
 using MagicOnion;
+using Shared.Model.Entity;
 
 namespace Shared.Interfaces.StreamingHubs
 {
@@ -15,6 +17,10 @@ namespace Shared.Interfaces.StreamingHubs
 
         //サーバーの退出通知
         void Leave(Guid connectionId);
-        
+
+        //ユーザーの移動通知
+        void OnMove(MoveData moveData);
+
+
     }
 }

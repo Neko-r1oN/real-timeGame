@@ -11,6 +11,8 @@ using Cysharp.Threading.Tasks;
 using Grpc.Net.Client;
 using MagicOnion.Client;
 using Shared.Interfaces.Services;
+using Shared.Interfaces.StreamingHubs;
+using Shared.Model.Entity;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -22,6 +24,15 @@ public class UserModel : BaseModel
     private int userId;       //登録ユーザーID
     private string userName;  //登録ユーザー名
 
+
+    //ユーザー移動通知
+    public Action<MoveData> MovedUser { get; set; }
+
+    /// <summary>
+    /// ユーザー登録処理
+    /// </summary>
+    /// <param name="name">ユーザー名</param>
+    /// <returns>登録成功 or 失敗</returns>
     public async UniTask<bool> RegistUserAsync(string name)
     {
         var handler = new YetAnotherHttpHandler() { Http2Only = true };

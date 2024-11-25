@@ -1,6 +1,8 @@
 ﻿using MagicOnion;
+using Shared.Model.Entity;
 using System;
 using System.Collections.Generic;
+using System.Numerics;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -23,5 +25,11 @@ namespace Shared.Interfaces.StreamingHubs
         /// </summary>
         /// <returns></returns>
         Task LeaveAsync();
+
+        /// <summary>
+        /// ユーザー移動関数
+        /// </summary>
+        /// <returns></returns>
+        Task MoveAsync(MoveData moveData);
     }
 }

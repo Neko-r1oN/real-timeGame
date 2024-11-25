@@ -47,11 +47,12 @@ namespace MessagePack.Resolvers
 
         static GeneratedResolverGetFormatterHelper()
         {
-            lookup = new global::System.Collections.Generic.Dictionary<global::System.Type, int>(3)
+            lookup = new global::System.Collections.Generic.Dictionary<global::System.Type, int>(4)
             {
                 { typeof(global::Shared.Interfaces.Services.Number), 0 },
                 { typeof(global::Shared.Interfaces.StreamingHubs.JoinedUser), 1 },
-                { typeof(global::Shared.Model.Entity.User), 2 },
+                { typeof(global::Shared.Model.Entity.MoveData), 2 },
+                { typeof(global::Shared.Model.Entity.User), 3 },
             };
         }
 
@@ -67,7 +68,8 @@ namespace MessagePack.Resolvers
             {
                 case 0: return new MessagePack.Formatters.Shared.Interfaces.Services.NumberFormatter();
                 case 1: return new MessagePack.Formatters.Shared.Interfaces.StreamingHubs.JoinedUserFormatter();
-                case 2: return new MessagePack.Formatters.Shared.Model.Entity.UserFormatter();
+                case 2: return new MessagePack.Formatters.Shared.Model.Entity.MoveDataFormatter();
+                case 3: return new MessagePack.Formatters.Shared.Model.Entity.UserFormatter();
                 default: return null;
             }
         }
@@ -267,6 +269,60 @@ namespace MessagePack.Formatters.Shared.Interfaces.StreamingHubs
 
 namespace MessagePack.Formatters.Shared.Model.Entity
 {
+    public sealed class MoveDataFormatter : global::MessagePack.Formatters.IMessagePackFormatter<global::Shared.Model.Entity.MoveData>
+    {
+
+        public void Serialize(ref global::MessagePack.MessagePackWriter writer, global::Shared.Model.Entity.MoveData value, global::MessagePack.MessagePackSerializerOptions options)
+        {
+            if (value == null)
+            {
+                writer.WriteNil();
+                return;
+            }
+
+            global::MessagePack.IFormatterResolver formatterResolver = options.Resolver;
+            writer.WriteArrayHeader(3);
+            global::MessagePack.FormatterResolverExtensions.GetFormatterWithVerify<global::System.Guid>(formatterResolver).Serialize(ref writer, value.ConnectionId, options);
+            global::MessagePack.FormatterResolverExtensions.GetFormatterWithVerify<global::UnityEngine.Vector3>(formatterResolver).Serialize(ref writer, value.Pos, options);
+            global::MessagePack.FormatterResolverExtensions.GetFormatterWithVerify<global::UnityEngine.Vector3>(formatterResolver).Serialize(ref writer, value.Rotate, options);
+        }
+
+        public global::Shared.Model.Entity.MoveData Deserialize(ref global::MessagePack.MessagePackReader reader, global::MessagePack.MessagePackSerializerOptions options)
+        {
+            if (reader.TryReadNil())
+            {
+                return null;
+            }
+
+            options.Security.DepthStep(ref reader);
+            global::MessagePack.IFormatterResolver formatterResolver = options.Resolver;
+            var length = reader.ReadArrayHeader();
+            var ____result = new global::Shared.Model.Entity.MoveData();
+
+            for (int i = 0; i < length; i++)
+            {
+                switch (i)
+                {
+                    case 0:
+                        ____result.ConnectionId = global::MessagePack.FormatterResolverExtensions.GetFormatterWithVerify<global::System.Guid>(formatterResolver).Deserialize(ref reader, options);
+                        break;
+                    case 1:
+                        ____result.Pos = global::MessagePack.FormatterResolverExtensions.GetFormatterWithVerify<global::UnityEngine.Vector3>(formatterResolver).Deserialize(ref reader, options);
+                        break;
+                    case 2:
+                        ____result.Rotate = global::MessagePack.FormatterResolverExtensions.GetFormatterWithVerify<global::UnityEngine.Vector3>(formatterResolver).Deserialize(ref reader, options);
+                        break;
+                    default:
+                        reader.Skip();
+                        break;
+                }
+            }
+
+            reader.Depth--;
+            return ____result;
+        }
+    }
+
     public sealed class UserFormatter : global::MessagePack.Formatters.IMessagePackFormatter<global::Shared.Model.Entity.User>
     {
 

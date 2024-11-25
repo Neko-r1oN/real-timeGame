@@ -17,10 +17,17 @@ public class RoomModel : BaseModel, IRoomHubReceiver
 
     //接続ID
     public Guid ConnectionId { get; set; }
+
     //ユーザー接続通知
     public Action<JoinedUser> OnJoinedUser {  get; set; }
+
     //ユーザー切断通知
     public Action<Guid> LeavedUser { get; set; }
+
+    //ユーザー切断通知
+    public Action<MoveData> MovedUser { get; set; }
+
+
 
 
     //MoajicOnion接続処理
@@ -52,7 +59,7 @@ public class RoomModel : BaseModel, IRoomHubReceiver
         await DisConnectAsync();
     }
 
-    //入室
+    //入室処理
     public async UniTask JoinAsync(string roomName, int userId)
     {
         //配列に引数で受け取った情報を追加
@@ -64,8 +71,9 @@ public class RoomModel : BaseModel, IRoomHubReceiver
             if (user.UserData.Id == userId)
             {
                 this.ConnectionId = user.ConnectionId;
-                OnJoinedUser(user);
             }
+                OnJoinedUser(user);
+            
         }
     }
 
@@ -87,5 +95,17 @@ public class RoomModel : BaseModel, IRoomHubReceiver
     public void Leave(Guid LeaveId)
     {
         LeavedUser(LeaveId);
+    }
+
+    //プレイヤー移動処理
+    public async Task MoveAsync(MoveData moveData)
+    {
+        await roomHub.MoveAsync(moveData);
+    }
+
+    //移動通知
+    public void OnMove(MoveData moveData)
+    {
+        MovedUser(moveData);
     }
 }
