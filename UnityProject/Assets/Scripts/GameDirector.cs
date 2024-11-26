@@ -26,6 +26,8 @@ public class GameDirector : MonoBehaviour
 
     //プレイヤー存在判定
     private bool isPlayer;
+    //Dotween遷移時間
+    private float dotweenTime = 0.1f;
 
     Dictionary<Guid,GameObject>characterList = new Dictionary<Guid, GameObject>();
 
@@ -44,6 +46,9 @@ public class GameDirector : MonoBehaviour
 
     }
 
+    /// <summary>
+    /// Unityの設定から１秒ごとの通信回数を指定
+    /// </summary>
     private async void FixedUpdate()
     {
         if (!isPlayer) return;
@@ -129,10 +134,16 @@ public class GameDirector : MonoBehaviour
     private async void MovedUser(MoveData moveData)
     {
         //移動したプレイヤーの位置変更
-        characterList[moveData.ConnectionId].transform.position = moveData.Pos;
+        //characterList[moveData.ConnectionId].transform.position = moveData.Pos;
+
+        //Dotweenで移動
+        characterList[moveData.ConnectionId].transform.DOMove(moveData.Pos, dotweenTime).SetEase(Ease.Linear);
 
         //移動したプレイヤーの角度変更
-        characterList[moveData.ConnectionId].transform.eulerAngles = moveData.Rotate;
+        //characterList[moveData.ConnectionId].transform.eulerAngles = moveData.Rotate;
+
+        //Dotweenで回転
+        characterList[moveData.ConnectionId].transform.DORotate(moveData.Rotate, dotweenTime).SetEase(Ease.Linear);
     }
 
 }
