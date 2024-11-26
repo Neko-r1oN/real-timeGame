@@ -128,22 +128,32 @@ public class GameDirector : MonoBehaviour
 
         //プレイヤー判定をリセット
         isPlayer = false;
+
+        Debug.Log("退出ユーザーオブジェクト削除");
     }
 
     //ユーザーが移動したときの処理
     private async void MovedUser(MoveData moveData)
     {
-        //移動したプレイヤーの位置変更
+        //移動したプレイヤーの位置代入
         //characterList[moveData.ConnectionId].transform.position = moveData.Pos;
 
-        //Dotweenで移動
+        //Dotweenで移動補完
         characterList[moveData.ConnectionId].transform.DOMove(moveData.Pos, dotweenTime).SetEase(Ease.Linear);
 
-        //移動したプレイヤーの角度変更
+        //移動したプレイヤーの角度代入
         //characterList[moveData.ConnectionId].transform.eulerAngles = moveData.Rotate;
 
-        //Dotweenで回転
+        //Dotweenで回転補完
         characterList[moveData.ConnectionId].transform.DORotate(moveData.Rotate, dotweenTime).SetEase(Ease.Linear);
+    }
+
+    //ゲームが開始された時の処理
+    private async void StartedGame(bool isStart)
+    {
+        await roomModel.StartGameAsync(isStart);
+
+
     }
 
 }

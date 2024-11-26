@@ -7,5 +7,6 @@ namespace ServerProject.StreamingHubs
     {
         public JoinedUser JoinedUser { get; set; }
 
+        public bool IsStartGame { get; set; }
     }
 }

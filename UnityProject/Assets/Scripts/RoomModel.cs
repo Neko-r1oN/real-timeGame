@@ -27,6 +27,9 @@ public class RoomModel : BaseModel, IRoomHubReceiver
     //ユーザー切断通知
     public Action<MoveData> MovedUser { get; set; }
 
+    //ユーザー切断通知
+    public Action<bool> IsStart { get; set; }
+
 
 
 
@@ -107,5 +110,17 @@ public class RoomModel : BaseModel, IRoomHubReceiver
     public void OnMove(MoveData moveData)
     {
         MovedUser(moveData);
+    }
+
+    //ゲーム開始処理
+    public async Task StartGameAsync(bool isStart)
+    {
+        await roomHub.StartGameAsync(isStart);
+    }
+
+    //ゲーム開始通知
+    public void IsStartGame(bool isStart)
+    {
+        IsStart(true);
     }
 }

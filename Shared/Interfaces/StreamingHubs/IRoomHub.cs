@@ -31,5 +31,12 @@ namespace Shared.Interfaces.StreamingHubs
         /// </summary>
         /// <returns></returns>
         Task MoveAsync(MoveData moveData);
+
+        /// <summary>
+        /// ゲームスタート関数
+        /// </summary>
+        /// <param name="roomName"></param>
+        /// <returns></returns>
+        Task StartGameAsync(bool isStart);
     }
 }

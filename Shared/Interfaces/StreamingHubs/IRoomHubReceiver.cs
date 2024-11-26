@@ -21,6 +21,9 @@ namespace Shared.Interfaces.StreamingHubs
         //ユーザーの移動通知
         void OnMove(MoveData moveData);
 
+        //ゲームの開始通知
+        void IsStartGame(bool isStart);
+
 
     }
 }

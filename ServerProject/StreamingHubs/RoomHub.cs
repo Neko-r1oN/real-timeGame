@@ -33,6 +33,7 @@ namespace StreamingHubs
             var roomStorage = this.room.GetInMemoryStorage<RoomData>();
             var joinedUser = new JoinedUser() { ConnectionId = this.ConnectionId,  UserData = user, JoinOrder = 100};
             var roomData = new RoomData() {JoinedUser = joinedUser};
+            roomData = new RoomData() { IsStartGame = false };
             roomStorage.Set(this.ConnectionId, roomData);
 
             //ルーム参加者全員にユーザーの入室通知を送信
@@ -95,6 +96,44 @@ namespace StreamingHubs
 
             //ルーム参加者全員にユーザーの移動通知を送信
             this.BroadcastExceptSelf(room).OnMove(moveData);
+
+        }
+
+
+        /// <summary>
+        /// ゲーム開始処理
+        /// </summary>
+        /// <param name="isStart"></param>
+        /// <returns></returns>
+        public async Task StartGameAsync(bool isStart)
+        {
+            //準備できたことを自分のRoomDataに保存
+            var roomDataStrage = this.room.GetInMemoryStorage<RoomData>();
+            var roomData = roomDataStrage.Get(this.ConnectionId);
+            roomData = new RoomData() { IsStartGame = true };
+
+            //全員準備できたか判定
+            bool isReady = false;
+
+            var roomDataList = roomDataStrage.AllValues.ToArray<RoomData>();
+
+            foreach (var roomDatas in roomDataList)
+            {
+                //準備が完了していないプレイヤーがいた場合
+                if (!roomDatas.IsStartGame) {
+                    //準備未完了としてbreak
+                    isReady = false;
+                    break;
+                };
+
+                //true
+                isReady = true;
+                
+
+            }
+
+            //ルーム参加者全員に通知を送信
+            this.BroadcastExceptSelf(room).IsStartGame(isReady);
 
         }
     }
