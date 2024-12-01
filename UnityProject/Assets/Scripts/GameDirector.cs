@@ -148,12 +148,13 @@ public class GameDirector : MonoBehaviour
         characterList[moveData.ConnectionId].transform.DORotate(moveData.Rotate, dotweenTime).SetEase(Ease.Linear);
     }
 
-    //ゲームが開始された時の処理
-    private async void StartedGame(bool isStart)
+    //ユーザーが準備完了した時の処理
+    private async void Ready()
     {
-        await roomModel.StartGameAsync(isStart);
+        await roomModel.ReadyAsync();
 
         
     }
 
+    
 }

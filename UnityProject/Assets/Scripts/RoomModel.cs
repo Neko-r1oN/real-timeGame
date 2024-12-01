@@ -24,11 +24,11 @@ public class RoomModel : BaseModel, IRoomHubReceiver
     //ユーザー切断通知
     public Action<Guid> LeavedUser { get; set; }
 
-    //ユーザー切断通知
+    //ユーザー移動通知
     public Action<MoveData> MovedUser { get; set; }
 
-    //ユーザー切断通知
-    public Action<bool> IsStart { get; set; }
+    //ユーザー準備完了通知
+    public Action<JoinedUser> ReadiedUser { get; set; }
 
 
 
@@ -113,14 +113,8 @@ public class RoomModel : BaseModel, IRoomHubReceiver
     }
 
     //ゲーム開始処理
-    public async Task StartGameAsync(bool isStart)
+    public async Task ReadyAsync()
     {
-        await roomHub.StartGameAsync(isStart);
-    }
-
-    //ゲーム開始通知
-    public void IsStartGame(bool isStart)
-    {
-        IsStart(true);
+        await roomHub.ReadyAsync();
     }
 }

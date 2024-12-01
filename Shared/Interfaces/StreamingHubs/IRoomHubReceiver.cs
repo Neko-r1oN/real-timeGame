@@ -22,7 +22,7 @@ namespace Shared.Interfaces.StreamingHubs
         void OnMove(MoveData moveData);
 
         //ゲームの開始通知
-        void IsStartGame(bool isStart);
+        void Ready(JoinedUser user);
 
 
     }
