@@ -117,4 +117,9 @@ public class RoomModel : BaseModel, IRoomHubReceiver
     {
         await roomHub.ReadyAsync();
     }
+    //€”õŠ®—¹’Ê’m
+    public void Ready(JoinedUser user)
+    {
+        ReadiedUser(user);
+    }
 }

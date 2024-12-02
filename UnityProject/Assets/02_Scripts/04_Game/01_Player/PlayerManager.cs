@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.InputSystem;
 
 public class PlayerManager : MonoBehaviour
 {
@@ -8,10 +9,24 @@ public class PlayerManager : MonoBehaviour
     private GameObject[] targets;
     private bool isSwitch = false;
 
+    private float[] PlayersPos;
+
+    //アニメーション
+    public enum DIRECTION_TYPE
+    {
+        STOP,
+        RIGHT,
+        LEFT,
+    }
+
+    DIRECTION_TYPE direction = DIRECTION_TYPE.STOP;
 
     [SerializeField] private Vector3 velocity;              // 移動方向
-    [SerializeField] private float moveSpeed = 5.0f;        // 移動速度
+    [SerializeField] private float moveSpeed = 6.0f;        // 移動速度
 
+
+    FixedJoystick fixedJoystick;
+    Rigidbody rigidbody;
 
     private GameObject closeEnemy;
 
@@ -20,9 +35,13 @@ public class PlayerManager : MonoBehaviour
         // タグを使って画面上の全ての敵の情報を取得
         targets = GameObject.FindGameObjectsWithTag("Player");
 
+        rigidbody = GetComponent<Rigidbody>();
+        fixedJoystick = GameObject.Find("Fixed Joystick").GetComponent<FixedJoystick>();
+
         // 「初期値」の設定
         float closeDist = 1000;
 
+        //ステージ上に存在するプレイヤーの情報を取得
         foreach (GameObject t in targets)
         {
             // コンソール画面での確認用コード
@@ -57,17 +76,25 @@ public class PlayerManager : MonoBehaviour
             //transform.position = Vector3.MoveTowards(transform.position, closeEnemy.transform.position, step);
         }
 
+        Vector3 move = (Camera.main.transform.forward * fixedJoystick.Vertical + Camera.main.transform.right * fixedJoystick.Horizontal)*moveSpeed;
 
-        // WASD入力から、XZ平面(水平な地面)を移動する方向(velocity)を得ます
-        velocity = Vector3.zero;
-        if (Input.GetKey(KeyCode.W))
-            velocity.z += 1;
-        if (Input.GetKey(KeyCode.A))
-            velocity.x -= 1;
-        if (Input.GetKey(KeyCode.S))
-            velocity.z -= 1;
-        if (Input.GetKey(KeyCode.D))
-            velocity.x += 1;
+        move.y = rigidbody.velocity.y;
+
+        rigidbody.velocity = move;
+
+        /*float x = Input.GetAxis("Horizontal");
+        float y = Input.GetAxis("Vertical");
+
+        if (x == 0)
+        {
+            direction = DIRECTION_TYPE.STOP;
+        }else if(x > 0)
+        {
+            direction = DIRECTION_TYPE.RIGHT;
+        }else if(x< 0)
+        {
+            direction= DIRECTION_TYPE.LEFT;
+        }*/
 
         // 速度ベクトルの長さを1秒でmoveSpeedだけ進むように調整します
         velocity = velocity.normalized * moveSpeed * Time.deltaTime;
@@ -79,6 +106,25 @@ public class PlayerManager : MonoBehaviour
             // 移動方向ベクトル(velocity)を足し込みます
             transform.position += velocity;
         }
+    }
+
+    private void FixedUpdate()
+    {
+        /*switch (direction)
+        {
+            case DIRECTION_TYPE.STOP:
+
+                break;
+
+            case DIRECTION_TYPE.RIGHT:
+
+                break;
+
+            case DIRECTION_TYPE.LEFT:
+
+                break;
+        }
+        rigidbody.velocity = new Vector3(speed,rigidbody.velocity.y,rigidbody.velocity.x);*/
     }
 
     void SwitchOn()

@@ -196,9 +196,10 @@ namespace MessagePack.Formatters.Shared.Interfaces.StreamingHubs
             }
 
             global::MessagePack.IFormatterResolver formatterResolver = options.Resolver;
-            writer.WriteArrayHeader(3);
+            writer.WriteArrayHeader(4);
             global::MessagePack.FormatterResolverExtensions.GetFormatterWithVerify<global::System.Guid>(formatterResolver).Serialize(ref writer, value.ConnectionId, options);
             global::MessagePack.FormatterResolverExtensions.GetFormatterWithVerify<global::Shared.Model.Entity.User>(formatterResolver).Serialize(ref writer, value.UserData, options);
+            writer.Write(value.IsReady);
             writer.Write(value.JoinOrder);
         }
 
@@ -225,6 +226,9 @@ namespace MessagePack.Formatters.Shared.Interfaces.StreamingHubs
                         ____result.UserData = global::MessagePack.FormatterResolverExtensions.GetFormatterWithVerify<global::Shared.Model.Entity.User>(formatterResolver).Deserialize(ref reader, options);
                         break;
                     case 2:
+                        ____result.IsReady = reader.ReadBoolean();
+                        break;
+                    case 3:
                         ____result.JoinOrder = reader.ReadInt32();
                         break;
                     default:

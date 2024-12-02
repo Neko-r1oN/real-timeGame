@@ -37,6 +37,6 @@ namespace Shared.Interfaces.StreamingHubs
         /// </summary>
         /// <param name="roomName"></param>
         /// <returns></returns>
-        Task StartGameAsync(bool isStart);
+        Task ReadyAsync();
     }
 }

@@ -33,7 +33,9 @@ namespace StreamingHubs
             var roomStorage = this.room.GetInMemoryStorage<RoomData>();
             var joinedUser = new JoinedUser() { ConnectionId = this.ConnectionId,  UserData = user, JoinOrder = 100};
             var roomData = new RoomData() {JoinedUser = joinedUser};
-            roomData = new RoomData() { GameState = false };
+
+            //roomData = new RoomData() { GameState = false };
+
             roomStorage.Set(this.ConnectionId, roomData);
 
             //ルーム参加者全員にユーザーの入室通知を送信
@@ -133,7 +135,7 @@ namespace StreamingHubs
             }
 
             //ルーム参加者全員に通知を送信
-            this.BroadcastExceptSelf(room).IsStartGame(isReady);
+            //this.BroadcastExceptSelf(room).Ready();
 
         }
     }
