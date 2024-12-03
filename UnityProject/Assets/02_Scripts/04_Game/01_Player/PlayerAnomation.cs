@@ -2,7 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using Unity.VisualScripting;
 using UnityEngine;
-using static UnityEngine.InputManagerEntry;
+
 
 public class PlayerAnomation : MonoBehaviour
 {
@@ -14,7 +14,9 @@ public class PlayerAnomation : MonoBehaviour
 
     void Start()
     {
-        anim = GetComponent<Animator>();
+        GameObject parentObject = GameObject.Find("MyPlay");
+
+        anim = parentObject.transform.GetChild(0).GetComponent<Animator>();
         
         joyStick = GameObject.Find("Fixed Joystick").GetComponent<FixedJoystick>();
 

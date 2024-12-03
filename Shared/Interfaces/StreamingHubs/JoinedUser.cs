@@ -21,6 +21,8 @@ namespace Shared.Interfaces.StreamingHubs
         [Key(2)]
         public bool IsReady { get; set; }       //ゲームスタート準備
         [Key(3)]
+        public bool IsSelf { get; set; }        //自分自身かどうか
+        [Key(4)]
         public int JoinOrder;                   //参加順番
     }
 }

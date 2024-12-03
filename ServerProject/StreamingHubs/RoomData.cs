@@ -1,4 +1,5 @@
 ﻿using Shared.Interfaces.StreamingHubs;
+using Shared.Model.Entity;
 
 namespace ServerProject.StreamingHubs
 {
@@ -7,6 +8,8 @@ namespace ServerProject.StreamingHubs
     {
         public JoinedUser JoinedUser { get; set; }
 
-        public bool GameState { get; set; }
+        public int GameState { get; set; }
+
+        public MoveData MoveData { get; set; }
     }
 }

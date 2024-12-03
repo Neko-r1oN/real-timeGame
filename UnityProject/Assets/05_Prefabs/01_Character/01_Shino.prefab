@@ -13,7 +13,7 @@ GameObject:
   - component: {fileID: 7744421115204253706}
   m_Layer: 0
   m_Name: 01_Shino
-  m_TagString: Player
+  m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -113,7 +113,7 @@ Transform:
   serializedVersion: 2
   m_LocalRotation: {x: 0.647721, y: 0, z: 0, w: 0.76187766}
   m_LocalPosition: {x: -2.94, y: -2.22, z: -0.28}
-  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_LocalScale: {x: 0.74482, y: 0.94722, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 7069760742248081796}

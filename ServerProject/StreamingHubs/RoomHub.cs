@@ -12,8 +12,12 @@ namespace StreamingHubs
     {
         private IGroup room;
 
-        //private MoveData moveData;
+        //プレイヤー番号リスト
+        private int[] numberList = {1,2,3,4};
+        //ルーム最大収容人数
+        private int MAX_PLAYER = 4;
 
+     
         /// <summary>
         /// ユーザー入室処理
         /// </summary>
@@ -31,10 +35,17 @@ namespace StreamingHubs
 
             //グループストレージにユーザー情報を格納
             var roomStorage = this.room.GetInMemoryStorage<RoomData>();
-            var joinedUser = new JoinedUser() { ConnectionId = this.ConnectionId,  UserData = user, JoinOrder = 100};
-            var roomData = new RoomData() {JoinedUser = joinedUser};
 
-            //roomData = new RoomData() { GameState = false };
+            //自身の入室番号を取得
+            int joinOrderNum = GetJoinOrder(roomStorage.AllValues.ToArray<RoomData>());
+
+            //参加ユーザーの情報を挿入
+            var joinedUser = new JoinedUser() { ConnectionId = this.ConnectionId,  
+                UserData = user,IsReady = false,IsSelf = true, JoinOrder = joinOrderNum};
+            //ルームデータにユーザーとゲーム状態を挿入
+            var roomData = new RoomData() {JoinedUser = joinedUser , GameState = 1};
+
+
 
             roomStorage.Set(this.ConnectionId, roomData);
 
@@ -90,11 +101,40 @@ namespace StreamingHubs
         }
 
         /// <summary>
+        /// 入室番号取得処理
+        /// </summary>
+        /// <param name="roomData">ルーム情報</param>
+        /// <returns>対象者の入室番号</returns>
+        int GetJoinOrder(RoomData[] roomData)
+        {
+            int joinOrder = 1;
+
+            int loop = 0;
+            while (loop < roomData.Length)
+            {
+                loop = 0;
+                for (int i = roomData.Length - 1; i >= 0; i--, loop++)
+                {
+                    if (roomData[i].JoinedUser.JoinOrder == joinOrder)
+                    {
+                        joinOrder++;
+                        break;
+                    }
+                }
+            }
+            return joinOrder;
+        }
+        /// <summary>
         /// 移動処理
         /// </summary>
         /// <returns></returns>
         public async Task MoveAsync(MoveData moveData)
         {
+
+            //移動情報を自分のRoomDataに保存
+            var roomStrage = this.room.GetInMemoryStorage<RoomData>();
+            var roomData = roomStrage.Get(this.ConnectionId);
+            roomData = new RoomData() { MoveData = moveData };
 
             //ルーム参加者全員にユーザーの移動通知を送信
             this.BroadcastExceptSelf(room).OnMove(moveData);
@@ -112,30 +152,12 @@ namespace StreamingHubs
             //準備できたことを自分のRoomDataに保存
             var roomDataStrage = this.room.GetInMemoryStorage<RoomData>();
             var roomData = roomDataStrage.Get(this.ConnectionId);
-            roomData = new RoomData() { GameState = true };
+            roomData = new RoomData() { GameState = 3};
 
-            //全員準備できたか判定
-            bool isReady = false;
-
-            var roomDataList = roomDataStrage.AllValues.ToArray<RoomData>();
-
-            foreach (var roomDatas in roomDataList)
-            {
-                //準備が完了していないプレイヤーがいた場合
-                if (!roomDatas.GameState) {
-                    //準備未完了としてbreak
-                    isReady = false;
-                    break;
-                };
-
-                //true
-                isReady = true;
-                
-
-            }
-
+           
+            
             //ルーム参加者全員に通知を送信
-            //this.BroadcastExceptSelf(room).Ready();
+            this.BroadcastExceptSelf(room).Ready(roomData.JoinedUser);
 
         }
     }

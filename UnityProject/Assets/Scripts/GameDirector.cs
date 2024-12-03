@@ -24,10 +24,27 @@ public class GameDirector : MonoBehaviour
     //プレイヤー生成位置
     [SerializeField] private Transform spawnPos;
 
+    //ターゲット用カーソル
+    private GameObject cursor;
+
     //プレイヤー存在判定
     private bool isPlayer;
-    //Dotween遷移時間
+    //Dotween遷移補完時間
     private float dotweenTime = 0.1f;
+
+
+    //ゲーム状態
+    public enum DIRECTION_STATE
+    {
+        STOP = 0,             //停止中
+        PREPARATION = 1,      //準備中
+        READY = 2,            //準備完了中
+        COUNTDOWN = 3,        //開始カウント中
+        START = 4,            //ゲーム中
+    }
+
+    DIRECTION_STATE direction = DIRECTION_STATE.STOP;
+
 
     Dictionary<Guid,GameObject>characterList = new Dictionary<Guid, GameObject>();
 
@@ -39,7 +56,9 @@ public class GameDirector : MonoBehaviour
         roomModel.LeavedUser += this.LeavedUser;
 
         roomModel.MovedUser += this.MovedUser;
-        
+
+        roomModel.ReadiedUser += this.ReadiedUser;
+
         isPlayer = false;
         //待機
         await roomModel.ConnectAsync();
@@ -74,6 +93,7 @@ public class GameDirector : MonoBehaviour
         Debug.Log("ルーム名:"+roomName.text);
         Debug.Log("ユーザーID;" + userId.text);
 
+
         await roomModel.JoinAsync(roomName.text, int.Parse(userId.text));     //ルーム名とユーザーIDを渡して入室
 
         Debug.Log("入室完了");
@@ -87,15 +107,35 @@ public class GameDirector : MonoBehaviour
         //characterObject.transform.position = new Vector3(0,0,0);   //座標指定
         //characterObject.transform.parent = spawnObg.transform;
         characterList[user.ConnectionId] = characterObject;        //フィールドで保持
+        
 
         if (user.ConnectionId == roomModel.ConnectionId)
         {
+            characterObject.name = "MyPlay";
+            //自機用のスクリプト＆タグを追加
             characterList[roomModel.ConnectionId].gameObject.AddComponent<PlayerManager>();
+            characterList[roomModel.ConnectionId].tag = "Player";
 
+            //入室番号
+            Debug.Log("入室番号:"+user.JoinOrder);
+
+            //カーソルオブジェクトにスクリプト追加
+            cursor = GameObject.Find("Cursor");
+            cursor.gameObject.AddComponent<LockOnSystem>();
         }
+        else
+        {
+            characterObject.name = "Enemy";
+            //自機以外用のスクリプト＆タグを追加
+            characterObject.gameObject.AddComponent<EnemyManager>();
+            characterObject.tag = "Enemy";
+
+            
+        }
+
         isPlayer = true;
 
-
+        direction = DIRECTION_STATE.PREPARATION;
     }
 
     //切断処理
@@ -148,13 +188,20 @@ public class GameDirector : MonoBehaviour
         characterList[moveData.ConnectionId].transform.DORotate(moveData.Rotate, dotweenTime).SetEase(Ease.Linear);
     }
 
-    //ユーザーが準備完了した時の処理
-    private async void Ready()
+
+    public async void Ready()
     {
         await roomModel.ReadyAsync();
+
+        direction = DIRECTION_STATE.READY;
+    }
+    //ユーザーが準備完了した時の処理
+    private void ReadiedUser(JoinedUser user)
+    {
+        //準備完了画像表示
 
         
     }
 
-    
+
 }

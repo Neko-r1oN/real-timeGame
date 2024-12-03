@@ -5,21 +5,14 @@ using UnityEngine.InputSystem;
 
 public class PlayerManager : MonoBehaviour
 {
-    public float speed;
-    private GameObject[] targets;
-    private bool isSwitch = false;
+    private string tagName = "Enemy";        // インスペクターで変更可能
 
-    private float[] PlayersPos;
+    private GameObject searchNearObj;         // 最も近いオブジェクト(public修飾子にすることで外部のクラスから参照できる)
+    private GameObject cursor;
 
-    //アニメーション
-    public enum DIRECTION_TYPE
-    {
-        STOP,
-        RIGHT,
-        LEFT,
-    }
+    public bool isHaveBall;       //ボールを所持しているか
 
-    DIRECTION_TYPE direction = DIRECTION_TYPE.STOP;
+    
 
     [SerializeField] private Vector3 velocity;              // 移動方向
     [SerializeField] private float moveSpeed = 6.0f;        // 移動速度
@@ -32,70 +25,32 @@ public class PlayerManager : MonoBehaviour
 
     private void Start()
     {
-        // タグを使って画面上の全ての敵の情報を取得
-        targets = GameObject.FindGameObjectsWithTag("Player");
+        //カーソルオブジェクトを取得
+        cursor = GameObject.Find("Cursor");
+
+        // 指定したタグを持つゲームオブジェクトのうち、このゲームオブジェクトに最も近いゲームオブジェクト１つを取得
+        searchNearObj = EnemySerch();
+
+       
+
+        //玉所持情報初期化
+        isHaveBall = false;
 
         rigidbody = GetComponent<Rigidbody>();
         fixedJoystick = GameObject.Find("Fixed Joystick").GetComponent<FixedJoystick>();
 
-        // 「初期値」の設定
-        float closeDist = 1000;
-
-        //ステージ上に存在するプレイヤーの情報を取得
-        foreach (GameObject t in targets)
-        {
-            // コンソール画面での確認用コード
-            //print(Vector3.Distance(transform.position, t.transform.position));
-
-            // このオブジェクト（砲弾）と敵までの距離を計測
-            float tDist = Vector3.Distance(transform.position, t.transform.position);
-
-            // もしも「初期値」よりも「計測した敵までの距離」の方が近いならば、
-            if (closeDist > tDist)
-            {
-                // 「closeDist」を「tDist（その敵までの距離）」に置き換える。
-                // これを繰り返すことで、一番近い敵を見つけ出すことができる。
-                closeDist = tDist;
-
-                // 一番近い敵の情報をcloseEnemyという変数に格納する（★）
-                closeEnemy = t;
-            }
-        }
-
-        // 砲弾が生成されて0.5秒後に、一番近い敵に向かって移動を開始する。
-        Invoke("SwitchOn", 0.5f);
+       
     }
 
     void Update()
     {
-        if (isSwitch)
-        {
-            float step = speed * Time.deltaTime;
-
-            // ★で得られたcloseEnemyを目的地として設定する。
-            //transform.position = Vector3.MoveTowards(transform.position, closeEnemy.transform.position, step);
-        }
-
         Vector3 move = (Camera.main.transform.forward * fixedJoystick.Vertical + Camera.main.transform.right * fixedJoystick.Horizontal)*moveSpeed;
 
         move.y = rigidbody.velocity.y;
 
         rigidbody.velocity = move;
 
-        /*float x = Input.GetAxis("Horizontal");
-        float y = Input.GetAxis("Vertical");
-
-        if (x == 0)
-        {
-            direction = DIRECTION_TYPE.STOP;
-        }else if(x > 0)
-        {
-            direction = DIRECTION_TYPE.RIGHT;
-        }else if(x< 0)
-        {
-            direction= DIRECTION_TYPE.LEFT;
-        }*/
-
+       
         // 速度ベクトルの長さを1秒でmoveSpeedだけ進むように調整します
         velocity = velocity.normalized * moveSpeed * Time.deltaTime;
 
@@ -106,29 +61,65 @@ public class PlayerManager : MonoBehaviour
             // 移動方向ベクトル(velocity)を足し込みます
             transform.position += velocity;
         }
-    }
 
-    private void FixedUpdate()
-    {
-        /*switch (direction)
+
+        // 指定したタグを持つゲームオブジェクトのうち、このゲームオブジェクトに最も近いゲームオブジェクト１つを取得
+        searchNearObj = EnemySerch();
+
+        if (searchNearObj != null)
         {
-            case DIRECTION_TYPE.STOP:
+            
 
-                break;
+            Debug.Log(searchNearObj.gameObject.transform.position);
 
-            case DIRECTION_TYPE.RIGHT:
-
-                break;
-
-            case DIRECTION_TYPE.LEFT:
-
-                break;
+            cursor.gameObject.transform.position = searchNearObj.gameObject.transform.position;
+            // 計測時間を初期化して、再検索
         }
-        rigidbody.velocity = new Vector3(speed,rigidbody.velocity.y,rigidbody.velocity.x);*/
+
     }
 
-    void SwitchOn()
+    /// <summary>
+    /// 指定されたタグの中で最も近いものを取得
+    /// </summary>
+    /// <returns></returns>
+    private GameObject EnemySerch()
     {
-        isSwitch = true;
+
+        // 最も近いオブジェクトの距離を代入するための変数
+        float nearDistance = 0;
+
+        // 検索された最も近いゲームオブジェクトを代入するための変数
+        GameObject searchTargetObj = null;
+
+        // tagNameで指定されたTagを持つ、すべてのゲームオブジェクトを配列に取得
+        GameObject[] objs = GameObject.FindGameObjectsWithTag(tagName);
+
+        // 取得したゲームオブジェクトが 0 ならnullを戻す(使用する場合にはnullでもエラーにならない処理にしておくこと)
+        if (objs.Length == 0)
+        {
+            return searchTargetObj;
+        }
+
+        // objsから１つずつobj変数に取り出す
+        foreach (GameObject obj in objs)
+        {
+
+            // objに取り出したゲームオブジェクトと、このゲームオブジェクトとの距離を計算して取得
+            float distance = Vector3.Distance(obj.transform.position, transform.position);
+
+            // nearDistanceが0(最初はこちら)、あるいはnearDistanceがdistanceよりも大きい値なら
+            if (nearDistance == 0 || nearDistance > distance)
+            {
+
+                // nearDistanceを更新
+                nearDistance = distance;
+
+                // searchTargetObjを更新
+                searchTargetObj = obj;
+            }
+        }
+
+        //最も近かったオブジェクトを返す
+        return searchTargetObj;
     }
 }
