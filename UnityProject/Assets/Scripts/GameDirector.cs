@@ -47,7 +47,11 @@ public class GameDirector : MonoBehaviour
 
 
     Dictionary<Guid,GameObject>characterList = new Dictionary<Guid, GameObject>();
-
+    void Awake()
+    {
+        //フレームレート設定
+        Application.targetFrameRate = 60; // 初期状態は-1になっている
+    }
     async void Start()
     {
         //ユーザーが入室した際にOnJoinedUserメゾットを実行するようにモデルに登録しておく
@@ -120,8 +124,8 @@ public class GameDirector : MonoBehaviour
             Debug.Log("入室番号:"+user.JoinOrder);
 
             //カーソルオブジェクトにスクリプト追加
-            cursor = GameObject.Find("Cursor");
-            cursor.gameObject.AddComponent<LockOnSystem>();
+            //cursor = GameObject.Find("Cursor");
+            //cursor.gameObject.AddComponent<LockOnSystem>();
         }
         else
         {

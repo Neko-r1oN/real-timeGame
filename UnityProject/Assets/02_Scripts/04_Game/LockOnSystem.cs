@@ -16,7 +16,6 @@ public class LockOnSystem : MonoBehaviour
         searchNearObj = GameObject.Find("MyPlay");
         // 指定したタグを持つゲームオブジェクトのうち、このゲームオブジェクトに最も近いゲームオブジェクト１つを取得
         searchNearObj = Serch();
-        Debug.Log(searchNearObj);
     }
 
     void Update()
@@ -29,9 +28,9 @@ public class LockOnSystem : MonoBehaviour
 
         if (searchNearObj != null)
         {
-            
 
-            Debug.Log(searchNearObj.gameObject.transform.position);
+            Debug.Log(searchNearObj);
+            
 
             // 計測時間を初期化して、再検索
         }

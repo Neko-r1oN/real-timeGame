@@ -26,10 +26,10 @@ public class ImageRotate : MonoBehaviour
 
         cam = GameObject.Find("MainCamera");
         ball = GameObject.Find("Ball");
-        this.GetComponent<SpriteRenderer>().flipX = true;
+        //this.GetComponent<SpriteRenderer>().flipX = true;
 
     }
-    private void Update()
+    private void FixedUpdate()
     {
 
         if (carrentPos < this.transform.position.x)
@@ -54,7 +54,7 @@ public class ImageRotate : MonoBehaviour
             }
         }*/
 
-        nowPos = this.transform.position.x;
+         
         carrentPos = this.transform.position.x;
 
 

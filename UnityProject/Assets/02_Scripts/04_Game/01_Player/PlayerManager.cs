@@ -1,3 +1,5 @@
+using DG.Tweening;
+using Shared.Model.Entity;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -72,7 +74,8 @@ public class PlayerManager : MonoBehaviour
 
             Debug.Log(searchNearObj.gameObject.transform.position);
 
-            cursor.gameObject.transform.position = searchNearObj.gameObject.transform.position;
+           
+            cursor.transform.DOMove(searchNearObj.gameObject.transform.position, 0.1f).SetEase(Ease.Linear);
             // Œv‘ªŠÔ‚ğ‰Šú‰»‚µ‚ÄAÄŒŸõ
         }
 
