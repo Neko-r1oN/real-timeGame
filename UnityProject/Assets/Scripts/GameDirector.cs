@@ -22,7 +22,7 @@ public class GameDirector : MonoBehaviour
     //プレイヤー生成親オブジェクト
     [SerializeField] private GameObject spawnObg;
     //プレイヤー生成位置
-    [SerializeField] private Transform spawnPos;
+    [SerializeField] private Transform[] spawnPosList;
 
     //ターゲット用カーソル
     private GameObject cursor;
@@ -106,7 +106,7 @@ public class GameDirector : MonoBehaviour
     //ユーザーが入室したときの処理
     private void OnJoinedUser(JoinedUser user)
     {
-        GameObject characterObject = Instantiate(characterPrefab, Vector3.zero, Quaternion.identity, spawnPos); //インスタンス生成
+        GameObject characterObject = Instantiate(characterPrefab, Vector3.zero, Quaternion.identity, spawnPosList[user.JoinOrder-1]); //インスタンス生成
 
         //characterObject.transform.position = new Vector3(0,0,0);   //座標指定
         //characterObject.transform.parent = spawnObg.transform;
