@@ -2,33 +2,19 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class MenuCharaImg : MonoBehaviour
+public class NumberImg : MonoBehaviour
 {
     GameObject cam;
-    GameObject ball;
-
-    [SerializeField] private float carrentPos;
-    [SerializeField] private float nowPos;
-
-
 
     private void Start()
     {
-        carrentPos = this.transform.position.x;
-
-        cam = GameObject.Find("MenuCamera");
        
-        //this.GetComponent<SpriteRenderer>().flipX = true;
-
+        cam = GameObject.Find("MainCamera");
+       
     }
     private void FixedUpdate()
     {
-
        
-
-        carrentPos = this.transform.position.x;
-
-
         //カメラに対して平行に画像が表示される処理
 
         // 対象物と自分自身の座標からベクトルを算出

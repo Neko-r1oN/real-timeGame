@@ -72,7 +72,7 @@ public class PlayerManager : MonoBehaviour
         {
             
 
-            Debug.Log(searchNearObj.gameObject.transform.position);
+            //Debug.Log(searchNearObj.gameObject.transform.position);
 
            
             cursor.transform.DOMove(searchNearObj.gameObject.transform.position, 0.1f).SetEase(Ease.Linear);

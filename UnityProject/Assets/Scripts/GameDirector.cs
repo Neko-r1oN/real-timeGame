@@ -13,6 +13,8 @@ public class GameDirector : MonoBehaviour
 {
     //プレイヤープレハブ
     [SerializeField] GameObject characterPrefab;
+
+    [SerializeField] GameObject youPrefab;
     //ルームモデル
     [SerializeField] RoomModel roomModel;
 
@@ -106,7 +108,9 @@ public class GameDirector : MonoBehaviour
     //ユーザーが入室したときの処理
     private void OnJoinedUser(JoinedUser user)
     {
-        GameObject characterObject = Instantiate(characterPrefab, Vector3.zero, Quaternion.identity, spawnPosList[user.JoinOrder-1]); //インスタンス生成
+        //GameObject characterObject = Instantiate(characterPrefab, Vector3.zero, Quaternion.identity, spawnPosList[user.JoinOrder-1]); //インスタンス生成
+
+        GameObject characterObject = Instantiate(characterPrefab,spawnPosList[user.JoinOrder - 1].transform.position, Quaternion.identity, spawnObg.gameObject.transform); //インスタンス生成
 
         //characterObject.transform.position = new Vector3(0,0,0);   //座標指定
         //characterObject.transform.parent = spawnObg.transform;
@@ -115,10 +119,19 @@ public class GameDirector : MonoBehaviour
 
         if (user.ConnectionId == roomModel.ConnectionId)
         {
+
+            GameObject child = characterObject.transform.GetChild(1).gameObject;
+
+            child.SetActive(true);
+
+            //Instantiate(youPrefab, spawnPosList[user.JoinOrder - 1].transform.position, Quaternion.identity, characterList[roomModel.ConnectionId].gameObject.transform); //インスタンス生成
+
             characterObject.name = "MyPlay";
             //自機用のスクリプト＆タグを追加
             characterList[roomModel.ConnectionId].gameObject.AddComponent<PlayerManager>();
             characterList[roomModel.ConnectionId].tag = "Player";
+
+            isPlayer = true;
 
             //入室番号
             Debug.Log("入室番号:"+user.JoinOrder);
@@ -137,7 +150,7 @@ public class GameDirector : MonoBehaviour
             
         }
 
-        isPlayer = true;
+        
 
         direction = DIRECTION_STATE.PREPARATION;
     }
@@ -169,6 +182,8 @@ public class GameDirector : MonoBehaviour
         Destroy(characterList[connnectionId]);
         //退出したプレイヤーをリストから削除
         characterList.Remove(connnectionId);
+
+        Debug.Log("退出した入室番号:"+ connnectionId);
 
         //プレイヤー判定をリセット
         isPlayer = false;

@@ -13,7 +13,6 @@ public class ImageRotate : MonoBehaviour
 {
    
     GameObject cam;
-    GameObject ball;
 
     [SerializeField] private float carrentPos;
     [SerializeField] private float nowPos;
@@ -25,7 +24,7 @@ public class ImageRotate : MonoBehaviour
         carrentPos = this.transform.position.x;
 
         cam = GameObject.Find("MainCamera");
-        ball = GameObject.Find("Ball");
+       
         //this.GetComponent<SpriteRenderer>().flipX = true;
 
     }
@@ -41,19 +40,6 @@ public class ImageRotate : MonoBehaviour
         {
             this.GetComponent<SpriteRenderer>().flipX = false;
         }
-        
-        /*else
-        {
-            if (ball.transform.position.x > this.transform.position.x)
-            {
-                this.GetComponent<SpriteRenderer>().flipX = true;
-            }
-            else
-            {
-                this.GetComponent<SpriteRenderer>().flipX = false;
-            }
-        }*/
-
          
         carrentPos = this.transform.position.x;
 
