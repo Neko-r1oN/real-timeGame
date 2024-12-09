@@ -2,7 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using Unity.VisualScripting;
 using UnityEngine;
-
+using UnityEngine.UI;
 
 public class PlayerAnomation : MonoBehaviour
 {
@@ -10,6 +10,11 @@ public class PlayerAnomation : MonoBehaviour
 
     private FixedJoystick joyStick;
 
+    PlayerManager playerManager;
+
+    Button jumpButton;
+    Button catchButton;
+    Button throwButton;
     float degStop;
 
     void Start()
@@ -20,6 +25,8 @@ public class PlayerAnomation : MonoBehaviour
         
         joyStick = GameObject.Find("Fixed Joystick").GetComponent<FixedJoystick>();
 
+
+       
     }
 
     void Update()
@@ -27,13 +34,23 @@ public class PlayerAnomation : MonoBehaviour
 
         Move();
 
-       
-        // anim.SetBool("isDash", false);
+        /*switch (playerManager.animState)
+        {
+            case 0:    //アイドル状態
+                anim.SetBool("isJump", true); //wait→walkへ
+                break;
+            case 1:    //ダッシュ状態
+                anim.SetBool("isDash", true); //wait→walkへ
+                break;
+            case 2:
 
-
-        // anim.SetBool("isDash", true);
-
+                break;
+            default:
+            
+                break;
+        }*/
     }
+        
     public  void Move()
     {
 

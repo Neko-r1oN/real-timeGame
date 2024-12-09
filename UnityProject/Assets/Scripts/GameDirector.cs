@@ -6,28 +6,50 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
-using DG.Tweening;                   //DOTweenを使うときはこのusingを入れる
-
+using DG.Tweening;                 //DOTweenを使うときはこのusingを入れる
+using UnityEngine.SceneManagement;
 
 public class GameDirector : MonoBehaviour
 {
     //プレイヤープレハブ
     [SerializeField] GameObject characterPrefab;
-
-    [SerializeField] GameObject youPrefab;
     //ルームモデル
     [SerializeField] RoomModel roomModel;
 
+    //ルームデータ(表示用)
+    [SerializeField] Text roomNameText;
+    
+
+    //入室データ(入力用)
     [SerializeField] Text roomName;
     [SerializeField] Text userId;
 
     //プレイヤー生成親オブジェクト
-    [SerializeField] private GameObject spawnObg;
+    [SerializeField] private GameObject spawnObj;
     //プレイヤー生成位置
     [SerializeField] private Transform[] spawnPosList;
 
     //ターゲット用カーソル
     private GameObject cursor;
+
+    //待機中UI
+    [SerializeField] GameObject standByUI;
+
+    //ユーザー待機UI生成親オブジェクト
+    [SerializeField] private GameObject spawnUIObj;
+    //ユーザー別待機UIプレハブ
+    [SerializeField] GameObject StandUIPrefab;
+
+    //ゲームUI
+    [SerializeField] GameObject gameUI;
+
+    public Sprite player1;
+    public Sprite player2;
+    public Sprite player3;
+    public Sprite player4;
+
+    //リザルトUI
+    [SerializeField] GameObject resultUI;
 
     //プレイヤー存在判定
     private bool isPlayer;
@@ -36,7 +58,7 @@ public class GameDirector : MonoBehaviour
 
 
     //ゲーム状態
-    public enum DIRECTION_STATE
+    public enum GAME_STATE
     {
         STOP = 0,             //停止中
         PREPARATION = 1,      //準備中
@@ -45,10 +67,28 @@ public class GameDirector : MonoBehaviour
         START = 4,            //ゲーム中
     }
 
-    DIRECTION_STATE direction = DIRECTION_STATE.STOP;
+    GAME_STATE game_State = GAME_STATE.STOP;
+
+    //ユーザーアニメーション状態
+    public enum ANIM_STATE
+    {
+        IDLE = 0,         //アイドル状態
+        DASH,             //ダッシュ状態
+        CATCH,            //キャッチ状態
+        JUMP,             //ジャンプ状態
+        DOWN,             //ダウン状態
+
+        THROW,            //開始カウント中
+        JUMPTHROW,        //ゲーム中
+
+    }
+
+    ANIM_STATE anim_State = ANIM_STATE.IDLE;
 
 
     Dictionary<Guid,GameObject>characterList = new Dictionary<Guid, GameObject>();
+
+    Dictionary<Guid, GameObject> standUIList = new Dictionary<Guid, GameObject>();
     void Awake()
     {
         //フレームレート設定
@@ -57,13 +97,19 @@ public class GameDirector : MonoBehaviour
     async void Start()
     {
         //ユーザーが入室した際にOnJoinedUserメゾットを実行するようにモデルに登録しておく
-        roomModel.OnJoinedUser += this.OnJoinedUser;
+        roomModel.OnJoinedUser += this.OnJoinedUser;   //ユーザー入室
 
-        roomModel.LeavedUser += this.LeavedUser;
+        roomModel.LeavedUser += this.LeavedUser;       //ユーザー退出
 
-        roomModel.MovedUser += this.MovedUser;
+        roomModel.MovedUser += this.MovedUser;         //ユーザー移動情報
 
-        roomModel.ReadiedUser += this.ReadiedUser;
+        roomModel.ReadyUser += this.ReadyUser;         //ユーザー準備完了
+
+        //roomModel.StartGameCount += this.GameCount;    //ゲーム内カウント開始
+
+        roomModel.StartGameUser += this.GameStart;     //ゲーム開始
+
+        roomModel.FinishGameUser += this.GameFinish;   //ゲーム終了
 
         isPlayer = false;
         //待機
@@ -78,17 +124,33 @@ public class GameDirector : MonoBehaviour
     {
         if (!isPlayer) return;
 
+
+        var userState = new UserState()
+        {
+            /*isReady = ,                     //準備判定
+            isGameCountFinish = ,           //カウントダウン終了判定
+            isGameFinish = ,                //ゲーム終了判定
+            Ranking = ,                     //順位 
+            Score = ,                       //獲得スコア
+            AnimeId = ,                     //アニメーションID
+            //AnimeId = characterList[roomModel.ConnectionId].
+            */
+        };
+
+        //移動情報
         var moveData = new MoveData()
         {
-            ConnectionId = roomModel.ConnectionId,
-            Pos = characterList[roomModel.ConnectionId].transform.position,
-            Rotate = characterList[roomModel.ConnectionId].transform.eulerAngles,
+            ConnectionId = roomModel.ConnectionId,      //接続ID
+            Pos = characterList[roomModel.ConnectionId].transform.position,         //キャラ位置
+            Rotate = characterList[roomModel.ConnectionId].transform.eulerAngles,   //キャラ回転
 
         };
 
         //移動
         await roomModel.MoveAsync(moveData);
 
+        //ユーザー状態 
+        //await roomModel.UpdateUserStateAsync(userState);
     }
 
 
@@ -108,18 +170,23 @@ public class GameDirector : MonoBehaviour
     //ユーザーが入室したときの処理
     private void OnJoinedUser(JoinedUser user)
     {
-        //GameObject characterObject = Instantiate(characterPrefab, Vector3.zero, Quaternion.identity, spawnPosList[user.JoinOrder-1]); //インスタンス生成
+       
+        //キャラクター生成
+        GameObject characterObject = Instantiate(characterPrefab,spawnPosList[user.JoinOrder - 1].transform.position, Quaternion.identity, spawnObj.gameObject.transform); //インスタンス生成
 
-        GameObject characterObject = Instantiate(characterPrefab,spawnPosList[user.JoinOrder - 1].transform.position, Quaternion.identity, spawnObg.gameObject.transform); //インスタンス生成
+        //待機中UI生成
+        GameObject standByCharaUI = Instantiate(StandUIPrefab, Vector3.zero,Quaternion.identity,spawnUIObj.gameObject.transform);
 
-        //characterObject.transform.position = new Vector3(0,0,0);   //座標指定
-        //characterObject.transform.parent = spawnObg.transform;
         characterList[user.ConnectionId] = characterObject;        //フィールドで保持
         
+        standUIList[user.ConnectionId] = standByCharaUI;        //フィールドで保持
+
+
+       
 
         if (user.ConnectionId == roomModel.ConnectionId)
         {
-
+            //自機区別テキスト表示
             GameObject child = characterObject.transform.GetChild(1).gameObject;
 
             child.SetActive(true);
@@ -149,10 +216,35 @@ public class GameDirector : MonoBehaviour
 
             
         }
+        //待機中UI表示
+        standByUI.SetActive(true);
+        //プレイヤーNo取得
+        Image number = standByCharaUI.transform.GetChild(1).gameObject.GetComponent<Image>();
+
+        //プレイヤーナンバー画像差し替え
+        switch (user.JoinOrder)
+        {
+            case 1:
+                number.sprite = player1;
+                break;
+            case 2:
+                number.sprite = player2;
+                break;
+            case 3:
+                number.sprite = player3;
+                break;
+            case 4:
+                standByUI.SetActive(false);
+                number.sprite = player4;
+                break;
+            default:
+                Debug.Log("観戦者");
+                break;
+        }
 
         
 
-        direction = DIRECTION_STATE.PREPARATION;
+        game_State = GAME_STATE.PREPARATION;
     }
 
     //切断処理
@@ -165,10 +257,17 @@ public class GameDirector : MonoBehaviour
         //await roomModel.DisConnectAsync();
 
         // プレイヤーオブジェクトの削除
-        foreach (Transform player in spawnObg.transform)
+        foreach (Transform player in spawnObj.transform)
         {
             Destroy(player.gameObject);
         }
+
+        //UIオブジェクト削除
+        foreach (Transform ui in spawnUIObj.transform)
+        {
+            Destroy(ui.gameObject);
+        }
+
 
         isPlayer = false;
 
@@ -180,13 +279,23 @@ public class GameDirector : MonoBehaviour
     {
         //退出したプレイヤーのオブジェクト削除
         Destroy(characterList[connnectionId]);
+
+        //退出したプレイヤーUIのオブジェクト削除
+        Destroy(standUIList[connnectionId]);
+
         //退出したプレイヤーをリストから削除
         characterList.Remove(connnectionId);
 
-        Debug.Log("退出した入室番号:"+ connnectionId);
+        //退出したプレイヤーUIをリストから削除
+        standUIList.Remove(connnectionId);
+
+        Debug.Log("退出したユーザー番号:"+ connnectionId);
 
         //プレイヤー判定をリセット
         isPlayer = false;
+
+        //待機中UI非表示
+        //standByUI.SetActive(false);
 
         Debug.Log("退出ユーザーオブジェクト削除");
     }
@@ -205,22 +314,65 @@ public class GameDirector : MonoBehaviour
 
         //Dotweenで回転補完
         characterList[moveData.ConnectionId].transform.DORotate(moveData.Rotate, dotweenTime).SetEase(Ease.Linear);
+
+        //アニメーション更新
+        //characterList[moveData.ConnectionId].transform.GetChild(0).GetComponent<PlayerAnomation>().Move(moveData.AnimeId);
+
     }
 
-
-    public async void Ready()
+    //ユーザー情報更新処理
+    public　async void UpdateUserState(Guid connectionId,UserState userState)
     {
-        await roomModel.ReadyAsync();
+        //プレイヤーがいなかったら
+        if (!characterList.ContainsKey(roomModel.ConnectionId))
+        {
+            return;   
+        }
 
-        direction = DIRECTION_STATE.READY;
+
+        //await roomModel.UpdateStateUser(connectionId,userState);
     }
-    //ユーザーが準備完了した時の処理
-    private void ReadiedUser(JoinedUser user)
+    //ユーザー準備完了処理
+    public async void ReadyUser(bool isReady)
     {
-        //準備完了画像表示
+        isReady = true;
+        await roomModel.ReadyAsync(isReady);
+        Debug.Log("準備完了");
+        game_State = GAME_STATE.READY;
+    }
 
+    
+
+    public void  GameCount()
+    {
+        standByUI.SetActive(false);
+        gameUI.SetActive(true);
+        Debug.Log("カウントダウン開始");
+
+        Invoke("GameStart", 4.0f);
+    }
+
+    public async void GameStart()
+    {
         
+        Debug.Log("ゲーム開始");
+        standByUI.SetActive(false);
+        gameUI.SetActive(true);
+        //await roomModel.StartGameAsync();
+    }
+    
+
+    public void GameFinish(Guid connectionId, string userName, bool isFinishAllUser)
+    {
+        Debug.Log("ゲーム終了");
+
+        resultUI.SetActive(true);
     }
 
+   
+    public void OnClickHome()
+    {
+        SceneManager.LoadScene(SceneManager.GetActiveScene().name);
+    }
 
 }

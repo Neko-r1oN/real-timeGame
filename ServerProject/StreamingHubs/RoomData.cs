@@ -6,10 +6,10 @@ namespace ServerProject.StreamingHubs
     //ルーム内に依存するクラス
     public class RoomData
     {
-        public JoinedUser JoinedUser { get; set; }
+        public JoinedUser JoinedUser { get; set; }      //参加ユーザー情報
 
-        public int GameState { get; set; }
+        public UserState UserState { get; set; }        //参加ユーザー状態
 
-        public MoveData MoveData { get; set; }
-    }
+        public MoveData MoveData { get; set; }          //プレイヤー移動情報
+    }  
 }

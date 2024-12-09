@@ -33,10 +33,40 @@ namespace Shared.Interfaces.StreamingHubs
         Task MoveAsync(MoveData moveData);
 
         /// <summary>
-        /// ゲームスタート関数
+        /// 全ユーザー準備状態確認関数
         /// </summary>
-        /// <param name="roomName"></param>
+        /// <param name="isAllUserReady"></param>
         /// <returns></returns>
-        Task ReadyAsync();
+        Task ReadyAsync(bool isAllUserReady);
+
+        /// <summary>
+        /// ユーザー状態更新関数
+        /// </summary>
+        /// <param name="state">ユーザー状態</param>
+        /// <returns></returns>
+        Task UpdateUserStateAsync(UserState state);
+
+        /// <summary>
+        /// ゲームカウント関数
+        /// </summary>
+        /// <param name="currentTime">呼び出した時点での時間</param>
+        /// <returns></returns>
+        Task GameCountAsync(int currentTime);
+
+        /// <summary>
+        /// ゲームにカウント終了関数
+        /// </summary>
+        /// <returns></returns>
+        Task GameCountFinishAsync();
+
+ 
+        /// <summary>
+        /// ゲーム終了関数
+        /// </summary>
+        /// <returns></returns>
+        Task GameFinishAsync();
+
+
+        
     }
 }

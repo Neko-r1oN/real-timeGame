@@ -40,10 +40,12 @@ namespace StreamingHubs
             int joinOrderNum = GetJoinOrder(roomStorage.AllValues.ToArray<RoomData>());
 
             //参加ユーザーの情報を挿入
-            var joinedUser = new JoinedUser() { ConnectionId = this.ConnectionId,  
-                UserData = user,IsReady = false,IsSelf = true, JoinOrder = joinOrderNum};
+            var joinedUser = new JoinedUser() { ConnectionId = this.ConnectionId,
+                UserData = user,IsSelf = true, JoinOrder = joinOrderNum};
+
+
             //ルームデータにユーザーとゲーム状態を挿入
-            var roomData = new RoomData() {JoinedUser = joinedUser , GameState = 1};
+            var roomData = new RoomData() {JoinedUser = joinedUser , UserState = new UserState(), MoveData = new MoveData()};
 
 
 
@@ -58,11 +60,22 @@ namespace StreamingHubs
             JoinedUser[] joinedUserList = new JoinedUser[roomDataList.Length];
 
             Debug.WriteLine(this.ConnectionId);
+
             //RoomDataList内のJoinedUserを格納
             for (int i = 0; i < joinedUserList.Length; i++)
             {
                 joinedUserList[i] = roomDataList[i].JoinedUser;
-            } 
+            }
+
+            //参加者が上限に
+            if (roomDataList.Length == MAX_PLAYER)
+            {
+                
+                Console.WriteLine("ゲーム開始");
+                //ゲーム開始通知
+                //await Task.Delay(1000);
+                this.Broadcast(room).StartGame();    
+            }
 
             return joinedUserList;
         }
@@ -107,9 +120,9 @@ namespace StreamingHubs
         /// <returns>対象者の入室番号</returns>
         int GetJoinOrder(RoomData[] roomData)
         {
-            int joinOrder = 1;
+            int joinOrder = 1;     //参加順変数
 
-            int loop = 0;
+            int loop = 0;          //ループ用変数
             while (loop < roomData.Length)
             {
                 loop = 0;
@@ -143,22 +156,129 @@ namespace StreamingHubs
 
 
         /// <summary>
-        /// ゲーム開始処理
+        /// 準備確認処理
         /// </summary>
-        /// <param name="isStart"></param>
+        /// <param name="isReady">準備状態</param>
         /// <returns></returns>
-        public async Task ReadyAsync()
+        public async Task ReadyAsync(bool isReady)
         {
             //準備できたことを自分のRoomDataに保存
             var roomDataStrage = this.room.GetInMemoryStorage<RoomData>();
             var roomData = roomDataStrage.Get(this.ConnectionId);
-            roomData = new RoomData() { GameState = 3};
+            roomData.UserState.isReady = isReady;
 
-           
+            Console.WriteLine("準備完了");
+
+            bool isAllReady = true;
+
+            RoomData[] roomDataList = roomDataStrage.AllValues.ToArray<RoomData>();
+            //参加ユーザー分準備チェック
+            foreach (var data in roomDataList)
+            {
+                //準備完了していないユーザーがいた場合
+                if (!data.UserState.isReady) isAllReady = false;
+            }
+
+            if (isAllReady)//ルーム参加者全員に準備状態通知を送信
+            this.BroadcastExceptSelf(room).Ready(isAllReady);
             
-            //ルーム参加者全員に通知を送信
-            this.BroadcastExceptSelf(room).Ready(roomData.JoinedUser);
+        }
 
+        /// <summary>
+        /// ユーザー情報更新処理
+        /// </summary>
+        /// <param name="state"></param>
+        /// <returns></returns>
+        public async Task UpdateUserStateAsync(UserState state)
+        {
+            var roomStorage = room.GetInMemoryStorage<RoomData>();
+
+            // ストレージ内のプレイヤー情報を更新する
+            var data = roomStorage.Get(this.ConnectionId);
+            data.UserState = state;
+
+            //ルーム参加者にプレイヤー情報更新通知を送信
+            this.BroadcastExceptSelf(room).UpdateUserState(this.ConnectionId, state);
+        }
+
+        /// <summary>
+        /// ゲーム開始カウント終了処理
+        /// </summary>
+        /// <returns></returns>
+        public async Task GameCountFinishAsync()
+        {
+            //カウントダウンが終わったことを自分のRoomDataに保存
+            var roomStorage = room.GetInMemoryStorage<RoomData>();
+            var roomData = roomStorage.Get(this.ConnectionId);
+            roomData.UserState.isGameCountFinish = true;
+
+            //全員がカウントダウン終了したかどうかチェック
+            bool isAllCountFinish = true;
+
+            RoomData[] roomDataList = roomStorage.AllValues.ToArray<RoomData>();
+            foreach (var data in roomDataList)
+            {
+                if (!data.UserState.isGameCountFinish) isAllCountFinish = false;
+            }
+
+            //ルーム参加者にゲーム開始通知を送信
+            if (isAllCountFinish)
+            {
+                this.Broadcast(room).StartGame();
+            }
+        }
+
+        //ゲーム内時間同期処理
+        public async Task GameCountAsync(int currentTime)
+        {
+            //接続IDが1番のクライアントのみ実行
+            this.Broadcast(room).GameCount(currentTime);
+        }
+
+        
+
+        /// ゲーム終了処理
+        public async Task GameFinishAsync()
+        {
+            var roomStorage = room.GetInMemoryStorage<RoomData>();
+            RoomData[] roomDataList = roomStorage.AllValues.ToArray<RoomData>();
+
+            //送信したユーザーのデータを更新
+            var data = roomStorage.Get(this.ConnectionId);
+            data.UserState.isGameFinish = true;
+            data.UserState.Ranking = GetRanking(roomDataList);
+           
+
+            //全員がゲーム終了したかチェック
+            bool isAllGameFinish = true;
+            foreach (var roomData in roomDataList)
+            {
+                if (!roomData.UserState.isGameFinish) isAllGameFinish = false;
+            }
+
+            //ルーム参加者にゲーム終了通知を送信
+            this.Broadcast(room).FinishGame(this.ConnectionId, data.JoinedUser.UserData.Name, isAllGameFinish);
+        }
+
+        //ランキング取得処理
+        int GetRanking(RoomData[] roomData)
+        {
+            int rankNum = 1;        //ランキング変数
+
+            int loop = 0;           //ループ変数
+            while (loop < roomData.Length)
+            {
+                loop = 0;
+                for (int i = roomData.Length - 1; i >= 0; i--, loop++)
+                {
+                    if (roomData[i].UserState.Ranking == rankNum)
+                    {
+                        rankNum++;
+                        break;
+                    }
+                }
+            }
+            return rankNum;
         }
     }
 }

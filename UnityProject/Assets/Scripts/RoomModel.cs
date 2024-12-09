@@ -9,6 +9,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using UnityEngine;
+using UnityEngine.Playables;
 
 public class RoomModel : BaseModel, IRoomHubReceiver
 {
@@ -27,11 +28,40 @@ public class RoomModel : BaseModel, IRoomHubReceiver
     //ユーザー移動通知
     public Action<MoveData> MovedUser { get; set; }
 
-    //ユーザー準備完了通知
-    public Action<JoinedUser> ReadiedUser { get; set; }
+    //ユーザー準備状態確認通知
+    public Action<bool> ReadyUser { get; set; }
 
+    //ゲームカウント開始通知
+    public Action StartGameCount { get; set; }
 
+    //カウントダウン通知
+    public Action<int> GameCountUser { get; set; }
 
+    //ゲームカウント終了通知
+    public Action FinishGameCount { get; set; }
+
+    //参加者全員のゲーム内カウントダウン終了通知
+    public Action FinishGameCountAllUser { get; set; }
+
+    //ユーザー状態更新通知
+    public Action<Guid,UserState> UpdateStateUser { get; set; }
+
+    //ゲーム終了通知
+    public Action<Guid, string, bool> FinishGameUser { get; set; }
+
+    //ゲーム開始通知
+    public Action StartGameUser { get; set; }
+
+    //ユーザー状態
+    public enum USER_STATE
+    {
+        NONE = 0,             //停止中
+        CONNECT = 1,          //接続中
+        JOIN = 2,             //入室中
+        LEAVE = 3,            //退出中
+    }
+
+    USER_STATE userState = USER_STATE.NONE;
 
     //MoajicOnion接続処理
     public async UniTask ConnectAsync()
@@ -39,6 +69,10 @@ public class RoomModel : BaseModel, IRoomHubReceiver
         var handler = new YetAnotherHttpHandler() {Http2Only = true};
         channel = GrpcChannel.ForAddress(ServerURL,new GrpcChannelOptions() { HttpHandler = handler });
         roomHub = await StreamingHubClient.ConnectAsync<IRoomHub, IRoomHubReceiver>(channel,this);
+    
+        //ユーザー状態を接続中に変更
+        userState = USER_STATE.CONNECT;
+    
     }
 
     //MagicOnion切断処理
@@ -54,6 +88,9 @@ public class RoomModel : BaseModel, IRoomHubReceiver
         }
 
         roomHub = null;channel = null;
+
+        //ユーザー状態を停止中に変更
+        userState = USER_STATE.NONE;
     }
 
     //破棄処理
@@ -78,6 +115,8 @@ public class RoomModel : BaseModel, IRoomHubReceiver
                 OnJoinedUser(user);
             
         }
+        //ユーザー状態を入室中に変更
+        userState = USER_STATE.JOIN;
     }
 
     //入室通知
@@ -112,14 +151,67 @@ public class RoomModel : BaseModel, IRoomHubReceiver
         MovedUser(moveData);
     }
 
-    //ゲーム開始処理
-    public async Task ReadyAsync()
+    //準備完了処理
+    public async Task ReadyAsync(bool isReady)
     {
-        await roomHub.ReadyAsync();
+        await roomHub.ReadyAsync(isReady);
+    }
+
+    public void Ready(bool isStart)
+    {
+        ReadyUser(isStart);
     }
     //準備完了通知
-    public void Ready(JoinedUser user)
+   
+    //ユーザー情報更新処理
+    public async UniTask UpdateUserStateAsync(UserState state)
     {
-        ReadiedUser(user);
+        await roomHub.UpdateUserStateAsync(state);
+    }
+    //ユーザー情報更新通知
+    public void UpdateUserState(Guid connectionId,UserState state)
+    {
+        UpdateStateUser(connectionId, state);
+    }
+
+
+    //自身のゲーム内カウントダウン終了処理
+    public async UniTask FinishGameCountAsync()
+    {
+        await roomHub.GameCountFinishAsync();
+    }
+    //全員のゲーム内カウントダウン終了通知
+    public void GameCountFinish()
+    {
+        FinishGameCountAllUser();
+    }
+
+    //カウントダウン同期処理
+    public async UniTask GameCountAsync(int currentTime)
+    {
+        await roomHub.GameCountAsync(currentTime);
+    }
+    //カウントダウン同期通知
+    public void GameCount(int currentTime)
+    {
+        GameCountUser(currentTime);
+    }
+
+    // ゲーム開始通知
+    public void StartGame()
+    {
+        StartGameUser();
+    }
+    //ゲーム終了処理
+    public async UniTask FinishGameAsync()
+    {
+        await roomHub.GameFinishAsync();
+        Debug.Log("ゲーム終了");
+    }
+    //ゲーム終了通知
+    public void FinishGame(Guid connectionId,string userName,bool isFinishAllUser)
+    {
+        FinishGameUser(connectionId, userName, isFinishAllUser);
     }
 }
+

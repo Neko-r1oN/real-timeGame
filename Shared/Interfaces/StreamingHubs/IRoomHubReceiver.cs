@@ -21,8 +21,23 @@ namespace Shared.Interfaces.StreamingHubs
         //ユーザーの移動通知
         void OnMove(MoveData moveData);
 
-        //ゲームの開始通知
-        void Ready(JoinedUser user);
+        //ユーザー状態更新通知
+        void UpdateUserState(Guid connectionId, UserState state);
+
+        //全ユーザー準備完了通知
+        void Ready(bool isAllUserReady);
+
+        //ゲーム内カウント開始通知
+        //void StartGame();
+
+        //ゲーム内カウント通知
+        void GameCount(int currentTime);
+
+        //ゲーム内カウント通知
+        void StartGame();
+
+        //ゲーム終了通知
+        void FinishGame(Guid connectionId,string userName,bool isFinishAllUser);
 
 
     }

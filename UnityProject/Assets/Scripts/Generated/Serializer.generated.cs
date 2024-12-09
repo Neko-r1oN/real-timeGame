@@ -47,12 +47,14 @@ namespace MessagePack.Resolvers
 
         static GeneratedResolverGetFormatterHelper()
         {
-            lookup = new global::System.Collections.Generic.Dictionary<global::System.Type, int>(4)
+            lookup = new global::System.Collections.Generic.Dictionary<global::System.Type, int>(6)
             {
                 { typeof(global::Shared.Interfaces.Services.Number), 0 },
                 { typeof(global::Shared.Interfaces.StreamingHubs.JoinedUser), 1 },
                 { typeof(global::Shared.Model.Entity.MoveData), 2 },
-                { typeof(global::Shared.Model.Entity.User), 3 },
+                { typeof(global::Shared.Model.Entity.ResultData), 3 },
+                { typeof(global::Shared.Model.Entity.User), 4 },
+                { typeof(global::Shared.Model.Entity.UserState), 5 },
             };
         }
 
@@ -69,7 +71,9 @@ namespace MessagePack.Resolvers
                 case 0: return new MessagePack.Formatters.Shared.Interfaces.Services.NumberFormatter();
                 case 1: return new MessagePack.Formatters.Shared.Interfaces.StreamingHubs.JoinedUserFormatter();
                 case 2: return new MessagePack.Formatters.Shared.Model.Entity.MoveDataFormatter();
-                case 3: return new MessagePack.Formatters.Shared.Model.Entity.UserFormatter();
+                case 3: return new MessagePack.Formatters.Shared.Model.Entity.ResultDataFormatter();
+                case 4: return new MessagePack.Formatters.Shared.Model.Entity.UserFormatter();
+                case 5: return new MessagePack.Formatters.Shared.Model.Entity.UserStateFormatter();
                 default: return null;
             }
         }
@@ -196,10 +200,9 @@ namespace MessagePack.Formatters.Shared.Interfaces.StreamingHubs
             }
 
             global::MessagePack.IFormatterResolver formatterResolver = options.Resolver;
-            writer.WriteArrayHeader(5);
+            writer.WriteArrayHeader(4);
             global::MessagePack.FormatterResolverExtensions.GetFormatterWithVerify<global::System.Guid>(formatterResolver).Serialize(ref writer, value.ConnectionId, options);
             global::MessagePack.FormatterResolverExtensions.GetFormatterWithVerify<global::Shared.Model.Entity.User>(formatterResolver).Serialize(ref writer, value.UserData, options);
-            writer.Write(value.IsReady);
             writer.Write(value.IsSelf);
             writer.Write(value.JoinOrder);
         }
@@ -227,12 +230,9 @@ namespace MessagePack.Formatters.Shared.Interfaces.StreamingHubs
                         ____result.UserData = global::MessagePack.FormatterResolverExtensions.GetFormatterWithVerify<global::Shared.Model.Entity.User>(formatterResolver).Deserialize(ref reader, options);
                         break;
                     case 2:
-                        ____result.IsReady = reader.ReadBoolean();
-                        break;
-                    case 3:
                         ____result.IsSelf = reader.ReadBoolean();
                         break;
-                    case 4:
+                    case 3:
                         ____result.JoinOrder = reader.ReadInt32();
                         break;
                     default:
@@ -331,6 +331,64 @@ namespace MessagePack.Formatters.Shared.Model.Entity
         }
     }
 
+    public sealed class ResultDataFormatter : global::MessagePack.Formatters.IMessagePackFormatter<global::Shared.Model.Entity.ResultData>
+    {
+
+        public void Serialize(ref global::MessagePack.MessagePackWriter writer, global::Shared.Model.Entity.ResultData value, global::MessagePack.MessagePackSerializerOptions options)
+        {
+            if (value == null)
+            {
+                writer.WriteNil();
+                return;
+            }
+
+            global::MessagePack.IFormatterResolver formatterResolver = options.Resolver;
+            writer.WriteArrayHeader(4);
+            global::MessagePack.FormatterResolverExtensions.GetFormatterWithVerify<global::System.Guid>(formatterResolver).Serialize(ref writer, value.ConnectionId, options);
+            writer.Write(value.JoinOrder);
+            writer.Write(value.Ranking);
+            writer.Write(value.Point);
+        }
+
+        public global::Shared.Model.Entity.ResultData Deserialize(ref global::MessagePack.MessagePackReader reader, global::MessagePack.MessagePackSerializerOptions options)
+        {
+            if (reader.TryReadNil())
+            {
+                return null;
+            }
+
+            options.Security.DepthStep(ref reader);
+            global::MessagePack.IFormatterResolver formatterResolver = options.Resolver;
+            var length = reader.ReadArrayHeader();
+            var ____result = new global::Shared.Model.Entity.ResultData();
+
+            for (int i = 0; i < length; i++)
+            {
+                switch (i)
+                {
+                    case 0:
+                        ____result.ConnectionId = global::MessagePack.FormatterResolverExtensions.GetFormatterWithVerify<global::System.Guid>(formatterResolver).Deserialize(ref reader, options);
+                        break;
+                    case 1:
+                        ____result.JoinOrder = reader.ReadInt32();
+                        break;
+                    case 2:
+                        ____result.Ranking = reader.ReadInt32();
+                        break;
+                    case 3:
+                        ____result.Point = reader.ReadInt32();
+                        break;
+                    default:
+                        reader.Skip();
+                        break;
+                }
+            }
+
+            reader.Depth--;
+            return ____result;
+        }
+    }
+
     public sealed class UserFormatter : global::MessagePack.Formatters.IMessagePackFormatter<global::Shared.Model.Entity.User>
     {
 
@@ -381,6 +439,74 @@ namespace MessagePack.Formatters.Shared.Model.Entity
                         break;
                     case 4:
                         ____result.Updated_at = global::MessagePack.FormatterResolverExtensions.GetFormatterWithVerify<global::System.DateTime>(formatterResolver).Deserialize(ref reader, options);
+                        break;
+                    default:
+                        reader.Skip();
+                        break;
+                }
+            }
+
+            reader.Depth--;
+            return ____result;
+        }
+    }
+
+    public sealed class UserStateFormatter : global::MessagePack.Formatters.IMessagePackFormatter<global::Shared.Model.Entity.UserState>
+    {
+
+        public void Serialize(ref global::MessagePack.MessagePackWriter writer, global::Shared.Model.Entity.UserState value, global::MessagePack.MessagePackSerializerOptions options)
+        {
+            if (value == null)
+            {
+                writer.WriteNil();
+                return;
+            }
+
+            writer.WriteArrayHeader(7);
+            writer.Write(value.isReady);
+            writer.Write(value.isGameCountFinish);
+            writer.Write(value.isGameFinish);
+            writer.Write(value.Ranking);
+            writer.Write(value.Score);
+            writer.Write(value.UseCharaId);
+            writer.Write(value.AnimeId);
+        }
+
+        public global::Shared.Model.Entity.UserState Deserialize(ref global::MessagePack.MessagePackReader reader, global::MessagePack.MessagePackSerializerOptions options)
+        {
+            if (reader.TryReadNil())
+            {
+                return null;
+            }
+
+            options.Security.DepthStep(ref reader);
+            var length = reader.ReadArrayHeader();
+            var ____result = new global::Shared.Model.Entity.UserState();
+
+            for (int i = 0; i < length; i++)
+            {
+                switch (i)
+                {
+                    case 0:
+                        ____result.isReady = reader.ReadBoolean();
+                        break;
+                    case 1:
+                        ____result.isGameCountFinish = reader.ReadBoolean();
+                        break;
+                    case 2:
+                        ____result.isGameFinish = reader.ReadBoolean();
+                        break;
+                    case 3:
+                        ____result.Ranking = reader.ReadInt32();
+                        break;
+                    case 4:
+                        ____result.Score = reader.ReadInt32();
+                        break;
+                    case 5:
+                        ____result.UseCharaId = reader.ReadInt32();
+                        break;
+                    case 6:
+                        ____result.AnimeId = reader.ReadInt32();
                         break;
                     default:
                         reader.Skip();

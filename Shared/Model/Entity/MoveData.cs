@@ -16,6 +16,6 @@ namespace Shared.Model.Entity
         public Vector3 Pos { get; set; }                     //位置
         [Key(2)]
         public Vector3 Rotate { get; set; }                  //角度
-        
+       
     }
 }
