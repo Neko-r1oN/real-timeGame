@@ -6,6 +6,7 @@ public class NumberImg : MonoBehaviour
 {
     GameObject cam;
 
+    public bool isY;
     private void Start()
     {
        
@@ -20,7 +21,7 @@ public class NumberImg : MonoBehaviour
         // 対象物と自分自身の座標からベクトルを算出
         Vector3 vector3 = cam.transform.position - this.transform.position;
         // もし上下方向の回転はしない(Baseオブジェクトが床から離れないようにする)ようにしたければ以下のようにする。
-        //vector3.y = 0f;
+        if(isY)vector3.y = 0f;
 
         // Quaternion(回転値)を取得
         Quaternion quaternion = Quaternion.LookRotation(vector3);

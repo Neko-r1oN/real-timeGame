@@ -4,6 +4,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using DG.Tweening;
 using Cinemachine;
+using UnityEngine.InputSystem.XR;
 
 public class CountDown : MonoBehaviour
 {
@@ -14,6 +15,7 @@ public class CountDown : MonoBehaviour
 
     public bool isAnimEnd { get; private set; }
 
+    [SerializeField] GameObject controller;
 
     private int changeCamNum;
 
@@ -38,7 +40,8 @@ public class CountDown : MonoBehaviour
     {
         isAnimEnd = false;
         InitUI();
-       
+
+        controller.SetActive(false);
 
         changeCamNum = 0;
        
@@ -109,15 +112,20 @@ public class CountDown : MonoBehaviour
             int curentIndex = new int();
             curentIndex = i;
 
+            
+
             sequence.Append(imgTextList[i].transform.DOScale(new Vector3(1f, 1f, 1f), animTime * 2).SetEase(Ease.InOutBack))
                 .Join(imgTextList[i].GetComponent<Image>().DOColor(new Color(1f, 1f, 1f, 1f), animTime * 2).SetEase(Ease.InOutBack))
                 .SetDelay(animTime / 1.5f);
 
             if (i == imgTextList.Count - 1)
             {
+                
                 sequence.OnComplete(() =>
                   {
+                     
                       Invoke("HideImgText", animTime);
+                     
                   });
             }
 
@@ -126,11 +134,15 @@ public class CountDown : MonoBehaviour
         }
 
         _tween.OnComplete(() => { isAnimEnd = true; });
+
+        
         _tween.Play();
     }
 
     void HideImgText()
     {
+        
+
         foreach (var img in imgTextList)
         {
             img.SetActive(false);
@@ -206,6 +218,8 @@ public class CountDown : MonoBehaviour
                     Debug.Log("5");
 
                     changeCamNum++;
+
+                    controller.SetActive(true);
                     break;
                 }
             default:

@@ -11,23 +11,36 @@ public class PlayerManager : MonoBehaviour
 
     RoomModel roomModel;
 
-    private string tagName = "Enemy";        // インスペクターで変更可能
+    private string tagName = "Enemy";          //インスペクターで変更可能
 
-    private GameObject searchNearObj;         // 最も近いオブジェクト(public修飾子にすることで外部のクラスから参照できる)
+    private GameObject searchNearObj;          //最も近いオブジェクト(public修飾子にすることで外部のクラスから参照できる)
     private GameObject cursor;
 
-    public bool isHaveBall;       //ボールを所持しているか
+    public bool isHaveBall { get; set; }       //ボールを所持しているか
 
     public bool isGround { get; set; }         //地面に触れているか
     public bool isClickJump;
-    public float velosity = 4.5f;
+
+    public bool isCatch { get; set; }
+
+    public float velosity = 6.0f;
 
     public int animState { get; set; }
+
+    GameObject ballPrefab;
+    public float ballSpeed = 15.0f;
+    
 
     [SerializeField] private Vector3 velocity;              // 移動方向
     [SerializeField] private float moveSpeed = 6.0f;        // 移動速度
 
     Button jumpButton;
+    Button catchButton;
+    Button throwButton;
+    Button feintButton;
+
+    GameObject catchbtn;
+
     FixedJoystick fixedJoystick;
     Rigidbody rigidbody;
 
@@ -35,6 +48,9 @@ public class PlayerManager : MonoBehaviour
 
     private void Start()
     {
+        //ボールプレハブ取得
+        ballPrefab = (GameObject)Resources.Load("Ball");
+
         //カーソルオブジェクトを取得
         cursor = GameObject.Find("Cursor");
 
@@ -53,11 +69,25 @@ public class PlayerManager : MonoBehaviour
         rigidbody = GetComponent<Rigidbody>();
         fixedJoystick = GameObject.Find("Fixed Joystick").GetComponent<FixedJoystick>();
 
+        //ジャンプボタン
         jumpButton = GameObject.Find("JumpButton").GetComponent<Button>();
         jumpButton.onClick.AddListener(() => OnClickJump());
 
+        //キャッチボタン
+        catchButton = GameObject.Find("CatchButton").GetComponent<Button>();
+        catchButton.onClick.AddListener(() => OnClickCatch());
 
-       
+        //フェイントボタン
+        feintButton = GameObject.Find("FeintButton").GetComponent<Button>();
+        catchButton.onClick.AddListener(() => OnClickFeint());
+
+        //投げるボタン
+        throwButton = GameObject.Find("ThrowButton").GetComponent<Button>();
+        throwButton.onClick.AddListener(() => OnClickThrow());
+
+
+        catchbtn = GameObject.Find("CatchButton");
+
         //ルームモデルの取得
         roomModel = GameObject.Find("RoomModel").GetComponent<RoomModel>();
         
@@ -72,23 +102,40 @@ public class PlayerManager : MonoBehaviour
 
         rigidbody.velocity = move;
 
-       
-        // 速度ベクトルの長さを1秒でmoveSpeedだけ進むように調整します
-        velocity = velocity.normalized * moveSpeed * Time.deltaTime;
-
-        // いずれかの方向に移動している場合
-        if (velocity.magnitude > 0)
+        if (isHaveBall)
         {
-            animState = 1;    //ダッシュ
-
-            // プレイヤーの位置(transform.position)の更新
-            // 移動方向ベクトル(velocity)を足し込みます
-            transform.position += velocity;
+            catchbtn.SetActive(false);
+            
+        }else if(!isHaveBall)
+        {
+            catchbtn.SetActive(true);
+          
         }
 
+        //キャッチ状態でない場合のみ移動できる
+        if (isCatch != true)
+        {
+            // 速度ベクトルの長さを1秒でmoveSpeedだけ進むように調整します
+            velocity = velocity.normalized * moveSpeed * Time.deltaTime;
 
+            // いずれかの方向に移動している場合
+            if (velocity.magnitude > 0)
+            {
+                animState = 1;    //ダッシュ
+
+                // プレイヤーの位置(transform.position)の更新
+                // 移動方向ベクトル(velocity)を足し込みます
+                transform.position += velocity;
+            }
+
+        }
         // 指定したタグを持つゲームオブジェクトのうち、このゲームオブジェクトに最も近いゲームオブジェクト１つを取得
         searchNearObj = EnemySerch();
+
+        if (searchNearObj)
+        {
+            transform.LookAt(searchNearObj.transform);
+        }
 
         //フィールドに敵プレイヤーが存在している場合
         if (searchNearObj != null)
@@ -130,6 +177,64 @@ public class PlayerManager : MonoBehaviour
         animState = 2;
         isClickJump = true;
     }
+
+    public void OnClickCatch()
+    {
+        isCatch = true;
+        Debug.Log("キャッチ");
+        animState = 3;
+        //yield return new WaitForSeconds(1);
+
+        isCatch = false;
+        Debug.Log("キャッチ解除");
+
+    }
+
+    public void OnClickThrow()
+    {
+        //ジャンプ状態だったら
+        if (isClickJump)
+        {
+            //ジャンプアニメーション
+            animState = 4;
+        }
+        else
+        {
+            animState = 5;
+        }
+        Shot();
+    }
+
+    //フェイント(投げるふり)処理
+    public void OnClickFeint()
+    {
+        animState = 2;
+    }
+
+
+    void Shot()
+    {
+
+        // shotObj.GetComponent<Rigidbody>().velocity = transform.forward * ballSpeed;
+
+        if (isHaveBall)
+        {
+
+            GameObject newbullet = Instantiate(ballPrefab, new Vector3(this.transform.position.x, this.transform.position.y, this.transform.position.z), Quaternion.identity); //弾を生成
+            Rigidbody bulletRigidbody = newbullet.GetComponent<Rigidbody>();
+            bulletRigidbody.velocity = (transform.forward * ballSpeed); //キャラクターが向いている方向に弾に力を加える
+            //Destroy(newbullet, 10); //10秒後に弾を消す
+
+            //ボール所持状態を解除する
+            isHaveBall = false;
+        }
+        else
+        {
+            Debug.Log("玉持ってないよ");
+        }
+    }
+
+
     void OnCollisionEnter(Collision other)
     {
         animState = 0;
@@ -141,6 +246,30 @@ public class PlayerManager : MonoBehaviour
         {
             // 全ユーザーにゲーム終了通知
             FinishGame();
+        }
+
+        if (other.gameObject.tag == "Ball")
+        {
+            //キャッチ状態でボールに触ったら
+            if(isCatch)
+            {
+                //ボール所持状態にする
+                isHaveBall = true;
+                Destroy(other.gameObject);    //ボール削除
+                Debug.Log("キャッチ成功");
+            }
+            //キャッチ状態じゃなかったら
+            else
+            {
+                //ダウン処理
+            }
+        }
+        if(other.gameObject.tag == "EasyBall")
+        {
+            //ボール所持状態にする
+            isHaveBall = true;
+            Destroy(other.gameObject);    //ボール削除
+            Debug.Log("ゲット");
         }
 
     }

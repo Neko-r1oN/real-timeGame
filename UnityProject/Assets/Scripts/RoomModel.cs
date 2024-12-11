@@ -25,8 +25,20 @@ public class RoomModel : BaseModel, IRoomHubReceiver
     //ユーザー切断通知
     public Action<Guid> LeavedUser { get; set; }
 
+    //ユーザーマッチング通知
+    public Action<string> MatchedUser { get; set; }
+
     //ユーザー移動通知
     public Action<MoveData> MovedUser { get; set; }
+
+    //ユーザー移動通知
+    public Action<MoveData> MovedBall { get; set; }
+
+    //ボール発射通知
+    public Action<ThrowData> ThrowedBall { get; set; }
+
+    //ボール発射通知
+    public Action getBall { get; set; }
 
     //ユーザー準備状態確認通知
     public Action<bool> ReadyUser { get; set; }
@@ -139,16 +151,63 @@ public class RoomModel : BaseModel, IRoomHubReceiver
         LeavedUser(LeaveId);
     }
 
+    //マッチング処理
+    public async UniTask MatchingAsync(string roomName)
+    {
+        //受け取った
+        await roomHub.MatchAsync(roomName);
+    }
+    //マッチング通知
+    public void OnMatch(string roomName)
+    {
+        MatchedUser(roomName);
+    }
+
+
     //プレイヤー移動処理
     public async Task MoveAsync(MoveData moveData)
     {
         await roomHub.MoveAsync(moveData);
     }
-
     //移動通知
     public void OnMove(MoveData moveData)
     {
         MovedUser(moveData);
+    }
+
+    //ボール座標同期処理
+    public async Task MoveBallAsync(MoveData moveBallData)
+    {
+        await roomHub.MoveBallAsync(moveBallData);
+    }
+    //ボール座標同期通知
+    public void OnMoveBall(MoveData moveBallData)
+    {
+        MovedBall(moveBallData);
+    }
+
+    //ボール発射処理
+    public async Task ThrowBallAsync(ThrowData ThrowData)
+    {
+        await roomHub.ThrowBallAsync(ThrowData);
+    }
+
+    //ボール発射通知
+    public void OnThrowBall(ThrowData ThrowData)
+    {
+        ThrowedBall(ThrowData);
+    }
+
+    //ボール取得処理
+    public async Task GetBallAsync()
+    {
+        await roomHub.GetBallAsync();
+    }
+
+    //ボール発射通知
+    public void OnGetBall()
+    {
+        getBall();
     }
 
     //準備完了処理

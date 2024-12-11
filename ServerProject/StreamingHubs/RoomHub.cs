@@ -54,30 +54,49 @@ namespace StreamingHubs
             //ルーム参加者全員にユーザーの入室通知を送信
             this.BroadcastExceptSelf(room).OnJoin(joinedUser);
 
-            RoomData[] roomDataList = roomStorage.AllValues.ToArray<RoomData>();
-
-            //参加中のユーザー情報を流す
-            JoinedUser[] joinedUserList = new JoinedUser[roomDataList.Length];
-
-            Debug.WriteLine(this.ConnectionId);
-
-            //RoomDataList内のJoinedUserを格納
-            for (int i = 0; i < joinedUserList.Length; i++)
+            //同時実行されないように１回だけ実行するよう lock で設定(排他的処理)
+            lock (roomStorage)
             {
-                joinedUserList[i] = roomDataList[i].JoinedUser;
-            }
+                RoomData[] roomDataList = roomStorage.AllValues.ToArray<RoomData>();
 
-            //参加者が上限に
-            if (roomDataList.Length == MAX_PLAYER)
-            {
-                
-                Console.WriteLine("ゲーム開始");
-                //ゲーム開始通知
-                //await Task.Delay(1000);
-                this.Broadcast(room).StartGame();    
-            }
+                //参加中のユーザー情報を流す
+                JoinedUser[] joinedUserList = new JoinedUser[roomDataList.Length];
 
-            return joinedUserList;
+                Debug.WriteLine(this.ConnectionId);
+
+                //RoomDataList内のJoinedUserを格納
+                for (int i = 0; i < joinedUserList.Length; i++)
+                {
+                    joinedUserList[i] = roomDataList[i].JoinedUser;
+                }
+
+                //参加者が上限に
+                if (roomDataList.Length == MAX_PLAYER)
+                {
+                    //await Task.Delay(1000);
+
+                    //ロビーから呼び出された場合
+                    if (roomName == "lobby")
+                    { 
+                        Console.WriteLine("マッチング成立");
+                        //ユーザーIDをルーム名に指定して通知
+                        //this.Broadcast(room).OnMatch(userId.ToString());
+
+                        this.Broadcast(room).StartGame();
+                    }
+                    //その他のルーム名だった場合
+                    else
+                    {
+                        Console.WriteLine("ゲーム開始");
+                        //ゲーム開始通知
+                        this.Broadcast(room).StartGame();
+
+
+                    }
+                }
+
+                return joinedUserList;
+            }
         }
 
         /// <summary>
@@ -137,6 +156,20 @@ namespace StreamingHubs
             }
             return joinOrder;
         }
+
+        /// <summary>
+        /// マッチング処理
+        /// </summary>
+        /// <param name="roomName">4番目に入室したユーザーのID</param>
+        /// <returns></returns>
+        public async Task MatchAsync(string roomName)
+        {
+            //ルーム参加者全員にマッチング通知を送信
+            this.BroadcastExceptSelf(room).OnMatch(roomName);
+
+        }
+
+
         /// <summary>
         /// 移動処理
         /// </summary>
@@ -151,6 +184,52 @@ namespace StreamingHubs
 
             //ルーム参加者全員にユーザーの移動通知を送信
             this.BroadcastExceptSelf(room).OnMove(moveData);
+
+        }
+
+        /// <summary>
+        /// ボール移動処理(接続IDが1番の人のみ実行)
+        /// </summary>
+        /// <returns></returns>
+        public async Task MoveBallAsync(MoveData moveData)
+        {
+
+            //ボール移動情報を自分のRoomDataに保存
+            var roomStrage = this.room.GetInMemoryStorage<RoomData>();
+            var roomData = roomStrage.Get(this.ConnectionId);
+            roomData = new RoomData() { BallMoveData = moveData };
+
+            //自分以外のルーム参加者全員にユーザーの移動通知を送信
+            this.BroadcastExceptSelf(room).OnMoveBall(moveData);
+
+        }
+
+        /// <summary>
+        /// ボール発射処理
+        /// </summary>
+        /// <returns></returns>
+        public async Task ThrowBallAsync(ThrowData throwData)
+        {
+
+            //ボール座標情報を自分のRoomDataに保存
+            var roomStrage = this.room.GetInMemoryStorage<RoomData>();
+            var roomData = roomStrage.Get(this.ConnectionId);
+            roomData = new RoomData() { ThrowData = throwData };
+
+            //自分以外のルーム参加者全員にボールの座標通知を送信
+            this.BroadcastExceptSelf(room).OnThrowBall(throwData);
+
+        }
+
+        /// <summary>
+        /// ボール発射処理
+        /// </summary>
+        /// <returns></returns>
+        public async Task GetBallAsync()
+        {
+
+            //自分以外のルーム参加者全員にボール取得通知を送信
+            this.BroadcastExceptSelf(room).OnGetBall();
 
         }
 
@@ -212,19 +291,23 @@ namespace StreamingHubs
             var roomData = roomStorage.Get(this.ConnectionId);
             roomData.UserState.isGameCountFinish = true;
 
-            //全員がカウントダウン終了したかどうかチェック
-            bool isAllCountFinish = true;
-
-            RoomData[] roomDataList = roomStorage.AllValues.ToArray<RoomData>();
-            foreach (var data in roomDataList)
+            //排他制御
+            lock (roomStorage)
             {
-                if (!data.UserState.isGameCountFinish) isAllCountFinish = false;
-            }
+                //全員がカウントダウン終了したかどうかチェック
+                bool isAllCountFinish = true;
 
-            //ルーム参加者にゲーム開始通知を送信
-            if (isAllCountFinish)
-            {
-                this.Broadcast(room).StartGame();
+                RoomData[] roomDataList = roomStorage.AllValues.ToArray<RoomData>();
+                foreach (var data in roomDataList)
+                {
+                    if (!data.UserState.isGameCountFinish) isAllCountFinish = false;
+                }
+
+                //ルーム参加者にゲーム開始通知を送信
+                if (isAllCountFinish)
+                {
+                    this.Broadcast(room).StartGame();
+                }
             }
         }
 
@@ -247,17 +330,21 @@ namespace StreamingHubs
             var data = roomStorage.Get(this.ConnectionId);
             data.UserState.isGameFinish = true;
             data.UserState.Ranking = GetRanking(roomDataList);
-           
 
-            //全員がゲーム終了したかチェック
-            bool isAllGameFinish = true;
-            foreach (var roomData in roomDataList)
-            {
-                if (!roomData.UserState.isGameFinish) isAllGameFinish = false;
-            }
+            //排他制御
+            //lock (roomStorage)
+            //{
 
-            //ルーム参加者にゲーム終了通知を送信
-            this.Broadcast(room).FinishGame(this.ConnectionId, data.JoinedUser.UserData.Name, isAllGameFinish);
+                //全員がゲーム終了したかチェック
+                bool isAllGameFinish = true;
+                foreach (var roomData in roomDataList)
+                {
+                    if (!roomData.UserState.isGameFinish) isAllGameFinish = false;
+                }
+
+                //ルーム参加者全員にゲーム終了通知を送信
+                this.Broadcast(room).FinishGame(this.ConnectionId, data.JoinedUser.UserData.Name, isAllGameFinish);
+            //}
         }
 
         //ランキング取得処理

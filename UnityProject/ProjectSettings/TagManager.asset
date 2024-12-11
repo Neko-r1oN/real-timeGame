@@ -7,6 +7,8 @@ TagManager:
   - Enemy
   - Ground
   - Clear
+  - Ball
+  - EasyBall
   layers:
   - Default
   - TransparentFX

@@ -17,6 +17,8 @@ public class ImageRotate : MonoBehaviour
     [SerializeField] private float carrentPos;
     [SerializeField] private float nowPos;
 
+    public bool reverseRotate { get; set; }
+
 
 
     private void Start()
@@ -34,11 +36,14 @@ public class ImageRotate : MonoBehaviour
         if (carrentPos < this.transform.position.x)
         {
             this.GetComponent<SpriteRenderer>().flipX = true;
+
+            reverseRotate = true;
         }
 
         if (carrentPos > this.transform.position.x)
         {
             this.GetComponent<SpriteRenderer>().flipX = false;
+            reverseRotate = false;
         }
          
         carrentPos = this.transform.position.x;

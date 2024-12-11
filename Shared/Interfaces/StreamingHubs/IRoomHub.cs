@@ -27,10 +27,37 @@ namespace Shared.Interfaces.StreamingHubs
         Task LeaveAsync();
 
         /// <summary>
+        /// マッチング成立関数
+        /// </summary>
+        /// <param name="roomName">ルーム名(4番目に入室したユーザーのID)</param>
+        
+        /// <returns></returns>
+        Task MatchAsync(string roomName);
+
+        /// <summary>
         /// ユーザー移動関数
         /// </summary>
         /// <returns></returns>
         Task MoveAsync(MoveData moveData);
+
+
+        /// <summary>
+        /// ボール移動関数
+        /// </summary>
+        /// <returns></returns>
+        Task MoveBallAsync(MoveData moveData);
+
+        /// <summary>
+        /// ホール発射関数
+        /// </summary>
+        /// <returns></returns>
+        Task ThrowBallAsync(ThrowData throwData);
+
+        /// <summary>
+        /// ホール取得関数
+        /// </summary>
+        /// <returns></returns>
+        Task GetBallAsync();
 
         /// <summary>
         /// 全ユーザー準備状態確認関数

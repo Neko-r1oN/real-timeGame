@@ -21,6 +21,18 @@ namespace Shared.Interfaces.StreamingHubs
         //ユーザーの移動通知
         void OnMove(MoveData moveData);
 
+        //ボールの移動通知
+        void OnMoveBall(MoveData moveData);
+
+        //ユーザーの移動通知
+        void OnThrowBall(ThrowData throwData);
+
+        //ボール取得通知
+        void OnGetBall();
+
+        //マッチング成立通知
+        void OnMatch(string connectionId);
+
         //ユーザー状態更新通知
         void UpdateUserState(Guid connectionId, UserState state);
 

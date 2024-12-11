@@ -11,5 +11,9 @@ namespace ServerProject.StreamingHubs
         public UserState UserState { get; set; }        //参加ユーザー状態
 
         public MoveData MoveData { get; set; }          //プレイヤー移動情報
+
+        public MoveData BallMoveData { get; set; }     //ボール座標同期情報
+
+        public ThrowData ThrowData { get; set; }       //ボール発射情報
     }  
 }
