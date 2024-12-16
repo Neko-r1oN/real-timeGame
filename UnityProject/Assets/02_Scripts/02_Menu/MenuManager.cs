@@ -26,7 +26,7 @@ public class MenuManager : MonoBehaviour
         charaCam.Priority = 0;
 
         roomMenu.SetActive(false);
-        controller.SetActive(false);
+        //controller.SetActive(false);
     }
 
     // Update is called once per frame
@@ -54,7 +54,7 @@ public class MenuManager : MonoBehaviour
         roomMenu.SetActive(true);
         roomName.text = "lobby";     //デフォルトはロビー行
         
-        controller.SetActive(true);
+        //controller.SetActive(true);
         menuCam.Priority = 0;
         charaCam.Priority = 0;
     }
@@ -67,7 +67,7 @@ public class MenuManager : MonoBehaviour
     public void OnClickButtleBack()
     {
         //カメラ優先度設定
-        controller.SetActive(false);
+       // controller.SetActive(false);
         roomMenu.SetActive(false);
         //カメラ優先度設定
         menuCam.Priority = 50;

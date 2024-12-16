@@ -21,8 +21,27 @@ using UnityEngine;
 
 public class UserModel : BaseModel
 {
-    private int userId;       //登録ユーザーID
-    private string userName;  //登録ユーザー名
+    public int userId { get; set; }       //登録ユーザーID
+    public string userName { get; set; }   //登録ユーザー名
+
+    private static UserModel instance;
+
+    public static UserModel Instance
+    {
+        get
+        {
+            if (instance == null)
+            {
+                GameObject gameObj = new GameObject("UserModel");
+                //GameObject生成、NetworkManagerコンポーネントを追加
+                instance = gameObj.AddComponent<UserModel>();
+                //シーン移動時に削除しないようにする
+                DontDestroyOnLoad(gameObj);
+
+            }
+            return instance;
+        }
+    }
 
 
     //ユーザー移動通知
@@ -47,7 +66,7 @@ public class UserModel : BaseModel
         }
         catch (Exception e)
         {//登録失敗
-            Debug.Log("サーバー接続エラー");
+            Debug.Log("サーバー接続エラーか既に登録されてる名前です");
             Debug.Log(e);
             return false;
         }

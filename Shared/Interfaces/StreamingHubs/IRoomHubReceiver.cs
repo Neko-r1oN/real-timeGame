@@ -15,6 +15,9 @@ namespace Shared.Interfaces.StreamingHubs
         //サーバーの入室通知
         void OnJoin(JoinedUser user);
 
+        //マッチング成立通知
+        void OnMatch(string roomName);
+
         //サーバーの退出通知
         void Leave(Guid connectionId);
 
@@ -30,8 +33,7 @@ namespace Shared.Interfaces.StreamingHubs
         //ボール取得通知
         void OnGetBall();
 
-        //マッチング成立通知
-        void OnMatch(string connectionId);
+       
 
         //ユーザー状態更新通知
         void UpdateUserState(Guid connectionId, UserState state);

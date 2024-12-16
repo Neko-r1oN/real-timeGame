@@ -10,6 +10,8 @@ public class CountDown : MonoBehaviour
 {
     [SerializeField] List<GameObject> imgNumberList;
     [SerializeField] List<GameObject> imgTextList;
+
+    [SerializeField] GameObject guard;
     public float animTime;
     public float initScale;
 
@@ -27,21 +29,26 @@ public class CountDown : MonoBehaviour
     public CinemachineVirtualCameraBase pCam3;
     public CinemachineVirtualCameraBase pCam4;
 
-   
-   
+
+
+    public CinemachineVirtualCameraBase menuCam1;
+    public CinemachineVirtualCameraBase menuCam2;
 
 
 
-    
 
 
     // Start is called before the first frame update
     void Start()
     {
+        menuCam1.Priority = 0;
+        menuCam2.Priority = 0;
+
         isAnimEnd = false;
         InitUI();
 
-        controller.SetActive(false);
+        guard.SetActive(true);
+        // controller.SetActive(false);
 
         changeCamNum = 0;
        
@@ -219,6 +226,7 @@ public class CountDown : MonoBehaviour
 
                     changeCamNum++;
 
+                    guard.SetActive(false);
                     controller.SetActive(true);
                     break;
                 }

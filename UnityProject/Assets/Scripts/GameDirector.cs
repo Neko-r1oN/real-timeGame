@@ -18,8 +18,9 @@ public class GameDirector : MonoBehaviour
 
     //ルームデータ(表示用)
     [SerializeField] Text roomNameText;
+    [SerializeField] Text userName;
 
-
+    private UserModel userModel;
 
 
     //入室データ(入力用)
@@ -134,6 +135,8 @@ public class GameDirector : MonoBehaviour
 
         roomModel.FinishGameUser += this.GameFinish;   //ゲーム終了
 
+        roomModel.MatchedUser += this.MatchedUser;
+
         isPlayer = false;
 
         isBall = false;
@@ -141,6 +144,9 @@ public class GameDirector : MonoBehaviour
         isJoinFirst = false;
 
         cursor.SetActive(false);
+
+        //ユーザーID表示
+        //userName.text = userModel.userId.ToString();
 
         //待機
         await roomModel.ConnectAsync();
@@ -188,13 +194,14 @@ public class GameDirector : MonoBehaviour
         //ボールが取れたら
         if (ballObj) isBall = true;
 
+        
         Debug.Log(isJoinFirst);
 
         //ボールが存在している&マスタークライアント
         if (isBall && isJoinFirst)
         {
 
-            Debug.Log("マスターボールあるお");
+            Debug.Log("マスター ボールあるお");
 
 
             //ボール情報
@@ -219,6 +226,13 @@ public class GameDirector : MonoBehaviour
     //入室処理
     public async void JoinRoom()
     {
+        //isJoinFirst = false;
+
+        if (!userId)
+        {
+            return;
+        }
+
         Debug.Log("ルーム名:"+roomName.text);
         Debug.Log("ユーザーID;" + userId.text);
 
@@ -226,12 +240,49 @@ public class GameDirector : MonoBehaviour
 
 
         await roomModel.JoinAsync(roomName.text, int.Parse(userId.text));     //ルーム名とユーザーIDを渡して入室
+        //await roomModel.JoinAsync(roomName.text, userModel.userId);
+       
 
-        
+
 
         Debug.Log("入室完了");
     }
 
+    //入室処理
+    public async void JoinLobby()
+    {
+
+       // isJoinFirst = false;
+
+        if (!userId)
+        {
+            return;
+        }
+
+        Debug.Log("ロビー入室");
+        Debug.Log("ユーザーID;" + userId.text);
+
+        cursor.SetActive(true);
+
+
+        await roomModel.JoinLobbyAsync(int.Parse(userId.text));     //ルーム名とユーザーIDを渡して入室
+
+
+
+        Debug.Log("入室完了");
+    }
+
+    //入室処理
+    private async void OnMatchingUser(string roomName)
+    {
+        Debug.Log(roomName);
+        //ロビー退出
+        //退出
+        await roomModel.LeaveAsync();
+
+        await roomModel.JoinAsync(roomName, int.Parse(userId.text));
+        
+    }
     //ユーザーが入室したときの処理
     private void OnJoinedUser(JoinedUser user)
     {
@@ -283,17 +334,21 @@ public class GameDirector : MonoBehaviour
             case 2:
                 number.sprite = player2;
                 charaNum.sprite = player2;
+                //isJoinFirst = false;
 
                 break;
             case 3:
                 number.sprite = player3;
                 charaNum.sprite = player3;
+                //isJoinFirst = false;
 
                 break;
             case 4:
                 standByUI.SetActive(false);
                 number.sprite = player4;
                 charaNum.sprite = player4;
+
+               // isJoinFirst = false;
 
                 break;
             default:
@@ -333,7 +388,8 @@ public class GameDirector : MonoBehaviour
         }
         else
         {
-            characterObject.name = "Enemy";
+            string enemy = "Enemy"/* + user.JoinOrder*/;
+            characterObject.name = enemy;
             //自機以外用のスクリプト＆タグを追加
             characterObject.gameObject.AddComponent<EnemyManager>();
             characterObject.tag = "Enemy";
@@ -417,10 +473,18 @@ public class GameDirector : MonoBehaviour
     private async void MatchedUser(string roomName)
     {
         //退出処理
-        await roomModel.LeaveAsync();
+        //DisConnectRoom();
+
+        
+
+        Debug.Log(roomName);
+
 
         //受け取ったユーザーIDをルーム名に渡して入室
-        await roomModel.JoinAsync(roomName, int.Parse(userId.text));     
+        await roomModel.JoinAsync(roomName, int.Parse(userId.text));
+
+        //待機中UI表示
+        standByUI.SetActive(false);
 
         Debug.Log("マッチング入室完了");
     }

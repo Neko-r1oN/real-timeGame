@@ -51,8 +51,12 @@ namespace StreamingHubs
 
             roomStorage.Set(this.ConnectionId, roomData);
 
-            //ルーム参加者全員にユーザーの入室通知を送信
-            this.BroadcastExceptSelf(room).OnJoin(joinedUser);
+            //プライベートマッチで入室した際
+            if (roomName != "Lobby")
+            {
+                //ルーム参加者全員にユーザーの入室通知を送信
+                this.BroadcastExceptSelf(room).OnJoin(joinedUser);
+            }
 
             //同時実行されないように１回だけ実行するよう lock で設定(排他的処理)
             lock (roomStorage)
@@ -75,29 +79,48 @@ namespace StreamingHubs
                 {
                     //await Task.Delay(1000);
 
-                    //ロビーから呼び出された場合
-                    if (roomName == "lobby")
+                   /* //ロビーから呼び出された場合
+                    if (roomName == "Lobby")
                     { 
                         Console.WriteLine("マッチング成立");
                         //ユーザーIDをルーム名に指定して通知
-                        //this.Broadcast(room).OnMatch(userId.ToString());
+                        this.Broadcast(room).OnMatch(userId.ToString());
 
-                        this.Broadcast(room).StartGame();
+                        //this.Broadcast(room).StartGame();
                     }
                     //その他のルーム名だった場合
-                    else
-                    {
+                    else if (roomName == "Lobby")*/
+                    //{
                         Console.WriteLine("ゲーム開始");
                         //ゲーム開始通知
                         this.Broadcast(room).StartGame();
 
 
-                    }
+                    //}
                 }
 
                 return joinedUserList;
             }
         }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="userId">参加ユーザーID</param>
+        /// <returns></returns>
+        public async Task/*<JoinedUser[]>*/ JoinLobbyAsync(int userId)
+        {
+            JoinedUser[] joinedUserList = await JoinAsync("Lobby", userId);
+
+            //参加人数が４人になったら
+            if (joinedUserList.Length == MAX_PLAYER)
+            {
+                //書式を桁無し指定にして再入室
+                this.Broadcast(room).OnMatch(Guid.NewGuid().ToString("N"));
+            }
+            //return joinedUserList;
+        }
+
 
         /// <summary>
         /// 強制退出(切断)処理

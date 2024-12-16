@@ -19,9 +19,9 @@ public class PlayerAnomation : MonoBehaviour
 
     void Start()
     {
-        GameObject parentObject = GameObject.Find("MyPlay");
+        //GameObject parentObject = GameObject.Find("MyPlay");
 
-        anim = parentObject.transform.GetChild(0).GetComponent<Animator>();
+        anim = this.gameObject.GetComponent<Animator>();
         
         joyStick = GameObject.Find("Fixed Joystick").GetComponent<FixedJoystick>();
 

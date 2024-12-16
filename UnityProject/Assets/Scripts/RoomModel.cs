@@ -16,6 +16,7 @@ public class RoomModel : BaseModel, IRoomHubReceiver
     private GrpcChannel channel;
     private IRoomHub roomHub;
 
+    private int userId;
     //接続ID
     public Guid ConnectionId { get; set; }
 
@@ -137,6 +138,21 @@ public class RoomModel : BaseModel, IRoomHubReceiver
         OnJoinedUser(user);
     }
 
+    //ロビー入室
+    public async UniTask JoinLobbyAsync(int userId)
+    {
+        this.userId = userId;   // ユーザーIDの保存
+        await roomHub.JoinLobbyAsync(userId);
+
+
+    }
+
+    //マッチング通知
+    public void OnMatch(string roomName)
+    {
+        MatchedUser(roomName);
+    }
+
 
     //退出処理
     public async UniTask LeaveAsync()
@@ -151,18 +167,7 @@ public class RoomModel : BaseModel, IRoomHubReceiver
         LeavedUser(LeaveId);
     }
 
-    //マッチング処理
-    public async UniTask MatchingAsync(string roomName)
-    {
-        //受け取った
-        await roomHub.MatchAsync(roomName);
-    }
-    //マッチング通知
-    public void OnMatch(string roomName)
-    {
-        MatchedUser(roomName);
-    }
-
+   
 
     //プレイヤー移動処理
     public async Task MoveAsync(MoveData moveData)
