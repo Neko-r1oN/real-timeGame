@@ -10,6 +10,7 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.Playables;
+using static UnityEngine.UIElements.UxmlAttributeDescription;
 
 public class RoomModel : BaseModel, IRoomHubReceiver
 {
@@ -17,6 +18,9 @@ public class RoomModel : BaseModel, IRoomHubReceiver
     private IRoomHub roomHub;
 
     private int userId;
+
+    public bool isMaster;
+
     //接続ID
     public Guid ConnectionId { get; set; }
 
@@ -28,6 +32,10 @@ public class RoomModel : BaseModel, IRoomHubReceiver
 
     //ユーザーマッチング通知
     public Action<string> MatchedUser { get; set; }
+
+    //マスターチェック
+    public Action MasterCheckedUser { get; set; }
+
 
     //ユーザー移動通知
     public Action<MoveData> MovedUser { get; set; }
@@ -85,7 +93,9 @@ public class RoomModel : BaseModel, IRoomHubReceiver
     
         //ユーザー状態を接続中に変更
         userState = USER_STATE.CONNECT;
-    
+
+        //マスタークライアント判定
+        isMaster = false;
     }
 
     //MagicOnion切断処理
@@ -124,40 +134,76 @@ public class RoomModel : BaseModel, IRoomHubReceiver
             if (user.UserData.Id == userId)
             {
                 this.ConnectionId = user.ConnectionId;
+
+                Debug.Log(this.ConnectionId);
             }
-                OnJoinedUser(user);
+            OnMasterCheck(user);
+
+            OnJoinedUser(user);
             
         }
+
+       
         //ユーザー状態を入室中に変更
         userState = USER_STATE.JOIN;
+
+        Debug.Log("入室中");
     }
 
     //入室通知
     public void OnJoin(JoinedUser user)
     {
+
+
         OnJoinedUser(user);
     }
 
+   
     //ロビー入室
     public async UniTask JoinLobbyAsync(int userId)
     {
-        this.userId = userId;   // ユーザーIDの保存
-        await roomHub.JoinLobbyAsync(userId);
+        //配列に引数で受け取った情報を追加
+        JoinedUser[] users = await roomHub.JoinAsync("Lobby", userId);
 
+        //配列の要素分ループ
+        foreach (var user in users)
+        {
+            if (user.UserData.Id == userId)
+            {
+                //コネクションID保存
+                this.ConnectionId = user.ConnectionId;
+            }
+            OnMasterCheck(user);
 
+            OnJoinedUser(user);
+        }
+        
+        Debug.Log("ロビー入室");
+
+    }
+    //入室通知
+    public void OnJoinLobby(JoinedUser user)
+    {
+
+        OnJoinedUser(user);
     }
 
     //マッチング通知
     public void OnMatch(string roomName)
     {
         MatchedUser(roomName);
+
+        Debug.Log("マッチング成立:"+  roomName);
     }
 
 
     //退出処理
     public async UniTask LeaveAsync()
     {
-       　await roomHub.LeaveAsync();
+       
+        //マスター判定削除
+        isMaster = false;
+        await roomHub.LeaveAsync();
 
     }
 
@@ -167,7 +213,28 @@ public class RoomModel : BaseModel, IRoomHubReceiver
         LeavedUser(LeaveId);
     }
 
-   
+
+    //マスタークライアント判定処理
+    public void OnMasterCheck(JoinedUser user)
+    {
+        Debug.Log("保ID:" + this.ConnectionId);
+        Debug.Log("貰ID:" + user.ConnectionId);
+
+        //マスタークライアント判定
+        if (user.ConnectionId == this.ConnectionId && user.JoinOrder == 1)
+        {
+            Debug.Log(user.UserData.Name + "マスター");
+            isMaster = true;
+        }
+
+        else
+        {
+            Debug.Log(user.UserData.Name + "マスターじゃない");
+            //isMaster = false;
+        }
+
+
+    }
 
     //プレイヤー移動処理
     public async Task MoveAsync(MoveData moveData)

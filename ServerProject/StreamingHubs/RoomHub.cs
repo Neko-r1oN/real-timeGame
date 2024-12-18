@@ -1,5 +1,6 @@
 ﻿using MagicOnion.Server.Hubs;
 using MagicOnionServer.Model.Context;
+using Newtonsoft.Json.Linq;
 using ServerProject.StreamingHubs;
 using Shared.Interfaces.StreamingHubs;
 using Shared.Model.Entity;
@@ -55,8 +56,13 @@ namespace StreamingHubs
             if (roomName != "Lobby")
             {
                 //ルーム参加者全員にユーザーの入室通知を送信
+               
+                //通常通り通知
                 this.BroadcastExceptSelf(room).OnJoin(joinedUser);
             }
+
+            //一秒待つ
+            Thread.Sleep(1000);
 
             //同時実行されないように１回だけ実行するよう lock で設定(排他的処理)
             lock (roomStorage)
@@ -79,28 +85,27 @@ namespace StreamingHubs
                 {
                     //await Task.Delay(1000);
 
-                   /* //ロビーから呼び出された場合
-                    if (roomName == "Lobby")
-                    { 
-                        Console.WriteLine("マッチング成立");
-                        //ユーザーIDをルーム名に指定して通知
-                        this.Broadcast(room).OnMatch(userId.ToString());
-
-                        //this.Broadcast(room).StartGame();
-                    }
+                    
                     //その他のルーム名だった場合
-                    else if (roomName == "Lobby")*/
-                    //{
+                    if (roomName != "Lobby")
+                    {
+
+                        Console.WriteLine("プラべ:"+roomName);
                         Console.WriteLine("ゲーム開始");
                         //ゲーム開始通知
                         this.Broadcast(room).StartGame();
 
 
-                    //}
+                    }
                 }
 
                 return joinedUserList;
             }
+        }
+
+        public async Task MastaerCheckAsync(JoinedUser user)
+        {
+            this.Broadcast(room).OnMasterCheck(user);
         }
 
         /// <summary>
@@ -112,11 +117,14 @@ namespace StreamingHubs
         {
             JoinedUser[] joinedUserList = await JoinAsync("Lobby", userId);
 
+            
+
             //参加人数が４人になったら
             if (joinedUserList.Length == MAX_PLAYER)
             {
                 //書式を桁無し指定にして再入室
                 this.Broadcast(room).OnMatch(Guid.NewGuid().ToString("N"));
+
             }
             //return joinedUserList;
         }

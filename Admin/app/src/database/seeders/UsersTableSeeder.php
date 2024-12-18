@@ -17,30 +17,43 @@
             User::create([
 
                 'id' => 1,
-                'name' => 'r1oN',
-                'password' => 'r1oN.22',
-                'level' => 29,
-                'exp' => 290,
-                'life' => 1000,
+                'name' => 'test1',
+                'token' => uniqid(),
+
             ]);
             User::create([
                 'id' => 2,
-                'name' => 'SyuEn',
-                'password' => 'SyuEn7',
-                'level' => 44,
-                'exp' => 777,
-                'life' => 4649,
+                'name' => 'test2',
+                'token' => uniqid(),
+
             ]);
             User::create([
                 'id' => 3,
-                'name' => 'GOD',
-                'password' => 'XxGODxX',
-                'level' => 999,
-                'exp' => 9999,
-                'life' => 99999,
+                'name' => 'test3',
+                'token' => uniqid(),
+
+            ]);
+            User::create([
+
+                'id' => 4,
+                'name' => 'test4',
+                'token' => uniqid(),
+
+            ]);
+            User::create([
+                'id' => 5,
+                'name' => 'test5',
+                'token' => uniqid(),
+
+            ]);
+            User::create([
+                'id' => 6,
+                'name' => 'test6',
+                'token' => uniqid(),
+
             ]);
 
-            User::factory(100)->create();
+
         }
 
     }

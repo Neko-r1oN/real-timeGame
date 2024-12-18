@@ -15,6 +15,12 @@ namespace Shared.Interfaces.StreamingHubs
         //サーバーの入室通知
         void OnJoin(JoinedUser user);
 
+        //ロビー入室通知
+        void OnJoinLobby(JoinedUser user);
+
+        //マスターチェック通知
+        void OnMasterCheck(JoinedUser user);
+
         //マッチング成立通知
         void OnMatch(string roomName);
 

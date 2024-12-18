@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace Shared.Interfaces.StreamingHubs
 {
-    public interface IRoomHub : IStreamingHub<IRoomHub,IRoomHubReceiver>
+    public interface IRoomHub : IStreamingHub<IRoomHub, IRoomHubReceiver>
     {
         //ここにクライアント側からサーバー側を呼び出す関数定義を作成
 
@@ -18,8 +18,9 @@ namespace Shared.Interfaces.StreamingHubs
         /// <param name="roomName">ルーム名</param>
         /// <param name="userId">ユーザーID</param>
         /// <returns>入室処理</returns>
-        Task<JoinedUser[]> JoinAsync(string roomName,int userId);
+        Task<JoinedUser[]> JoinAsync(string roomName, int userId);
 
+        Task MastaerCheckAsync(JoinedUser user);
         /// <summary>
         /// ロビー入室処理
         /// </summary>
@@ -27,6 +28,7 @@ namespace Shared.Interfaces.StreamingHubs
         /// <returns></returns>
         Task/*<JoinedUser[]>*/ JoinLobbyAsync(int userId);
 
+        
         /// <summary>
         /// ユーザー退出関数
         /// </summary>

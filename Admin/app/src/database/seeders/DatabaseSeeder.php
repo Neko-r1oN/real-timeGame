@@ -14,9 +14,9 @@
         public function run(): void
         {
 
-            //$this->call(UsersTableSeeder::class);
-            //$this->call(ItemTableSeeder::class);
-            //$this->call(PosItemTableSeeder::class);
+            $this->call(AccountsTableSeeder::class);
+            $this->call(UsersTableSeeder::class);
+            
             //$this->call(MailTableSeeder::class);
             //$this->call(OpenMailsTableSeeder::class);
             //$this->call(FollowsTableSeeder::class);
