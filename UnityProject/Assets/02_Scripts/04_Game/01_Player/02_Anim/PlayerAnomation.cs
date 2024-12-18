@@ -10,8 +10,9 @@ public class PlayerAnomation : MonoBehaviour
 
     private FixedJoystick joyStick;
 
-    PlayerManager playerManager;
+    private string animState;
 
+    private PlayerManager player;
     Button jumpButton;
     Button catchButton;
     Button throwButton;
@@ -22,7 +23,10 @@ public class PlayerAnomation : MonoBehaviour
         //GameObject parentObject = GameObject.Find("MyPlay");
 
         anim = this.gameObject.GetComponent<Animator>();
-        
+
+        player = GetComponentInParent<PlayerManager>();//一番上の親についているコンポーネントを取得する
+
+
         joyStick = GameObject.Find("Fixed Joystick").GetComponent<FixedJoystick>();
 
 
@@ -32,47 +36,60 @@ public class PlayerAnomation : MonoBehaviour
     void Update()
     {
 
-        Move();
+        //Move();
 
-        /*switch (playerManager.animState)
+        switch (player.animState)
         {
-            case 0:    //アイドル状態
-                anim.SetBool("isJump", true); //wait→walkへ
+            case 0://アイドル状態
+
+                //anim.SetBool(animState, false); //アニメーション停止
                 break;
             case 1:    //ダッシュ状態
-                anim.SetBool("isDash", true); //wait→walkへ
+                
+                animState = "isDash";
                 break;
-            case 2:
+            case 2:    //ジャンプ状態
+                animState = "isJump";
 
+                break;
+            case 3:    //キャッチ
+                animState = "isCatch";
+                break;
+            case 4:    //投げる
+                animState = "isThrow"; //wait→walkへ
+                break;
+            case 5:   //ダウン
+                animState = "isDown";
                 break;
             default:
-            
+
+                animState = "";
                 break;
-        }*/
+        }
+
+        if(animState != null)
+        {
+            if (player.animState == 2)
+            {
+                SetTrigger();
+            }
+            else
+            {
+                SetBool();
+            }
+        }
     }
         
-    public  void Move()
+   
+
+    public void SetTrigger()
     {
 
-        float dx = joyStick.Horizontal; //joystickの水平方向の動きの値、-1~1の値をとります
-        float dy = joyStick.Vertical; //joystickの垂直方向の動きの値、-1~1の値をとります
+        anim.SetTrigger(animState); //wait→walkへ
+    }
+    public void SetBool()
+    {
 
-        float rad = Mathf.Atan2(dx - 0, dy - 0); //　 原点(0,0)と点（dx,dy)の距離から角度をとってくれる便利な関数
-
-        float deg = rad * Mathf.Rad2Deg; //radianからdegreenに変換します
-
-       
-
-        if (deg != 0) //joystickの原点と(dx,dy)の２点がなす角度が０ではないとき = joystickを動かしている時
-        {
-            anim.SetBool("isDash", true); //wait→walkへ
-
-            degStop = deg; //停止前のプレイヤーの向きを保存
-        }
-        else //joystickの原点と(dx,dy)の２点がなす角度が０の時 = joystickが止まっている時
-        {
-            anim.SetBool("isDash", false); //walk→waitへ
-
-        }
+        anim.SetBool(animState,true); //wait→walkへ
     }
 }

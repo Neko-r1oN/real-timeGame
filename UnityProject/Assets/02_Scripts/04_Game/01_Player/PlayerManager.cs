@@ -90,8 +90,9 @@ public class PlayerManager : MonoBehaviour
 
         //ルームモデルの取得
         roomModel = GameObject.Find("RoomModel").GetComponent<RoomModel>();
-        
 
+        //プレイヤー移動を呼び出し、以降は0.02fごとに実行
+        InvokeRepeating(nameof(SendData), 0.0f, 0.02f);
     }
 
     void Update()
@@ -101,6 +102,8 @@ public class PlayerManager : MonoBehaviour
         move.y = rigidbody.velocity.y;
 
         rigidbody.velocity = move;
+
+       // Move();
 
         if (isHaveBall)
         {
@@ -126,6 +129,10 @@ public class PlayerManager : MonoBehaviour
                 // プレイヤーの位置(transform.position)の更新
                 // 移動方向ベクトル(velocity)を足し込みます
                 transform.position += velocity;
+            }
+            else
+            {
+                animState=0;
             }
 
         }
@@ -172,6 +179,34 @@ public class PlayerManager : MonoBehaviour
 
     }
 
+
+   
+
+        public void Move()
+    {
+
+        float dx = fixedJoystick.Horizontal; //joystickの水平方向の動きの値、-1~1の値をとります
+        float dy = fixedJoystick.Vertical; //joystickの垂直方向の動きの値、-1~1の値をとります
+
+        float rad = Mathf.Atan2(dx - 0, dy - 0); //　 原点(0,0)と点（dx,dy)の距離から角度をとってくれる便利な関数
+
+        float deg = rad * Mathf.Rad2Deg; //radianからdegreenに変換します
+
+
+
+        if (deg != 0) //joystickの原点と(dx,dy)の２点がなす角度が０ではないとき = joystickを動かしている時
+        {
+            animState = 1; //wait→walkへ
+
+            //degStop = deg; //停止前のプレイヤーの向きを保存
+        }
+        else //joystickの原点と(dx,dy)の２点がなす角度が０の時 = joystickが止まっている時
+        {
+            animState = 0; //walk→waitへ
+
+        }
+    }
+
     public void OnClickJump()
     {
         animState = 2;
@@ -200,7 +235,7 @@ public class PlayerManager : MonoBehaviour
         }
         else
         {
-            animState = 5;
+            animState = 4;
         }
         Shot();
     }
@@ -208,8 +243,9 @@ public class PlayerManager : MonoBehaviour
     //フェイント(投げるふり)処理
     public void OnClickFeint()
     {
-        animState = 2;
+        animState = 4;
     }
+
 
 
     void Shot()

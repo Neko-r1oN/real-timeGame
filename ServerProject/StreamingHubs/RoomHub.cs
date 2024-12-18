@@ -5,7 +5,7 @@ using ServerProject.StreamingHubs;
 using Shared.Interfaces.StreamingHubs;
 using Shared.Model.Entity;
 using System.Diagnostics;
-using System.Numerics;
+
 
 namespace StreamingHubs
 {
@@ -56,13 +56,12 @@ namespace StreamingHubs
             if (roomName != "Lobby")
             {
                 //ルーム参加者全員にユーザーの入室通知を送信
-               
+                //await Task.Delay(1000);
                 //通常通り通知
                 this.BroadcastExceptSelf(room).OnJoin(joinedUser);
             }
 
-            //一秒待つ
-            Thread.Sleep(1000);
+            //await Task.Delay(1000);
 
             //同時実行されないように１回だけ実行するよう lock で設定(排他的処理)
             lock (roomStorage)
@@ -81,22 +80,18 @@ namespace StreamingHubs
                 }
 
                 //参加者が上限に
-                if (roomDataList.Length == MAX_PLAYER)
+                if (roomDataList.Length == MAX_PLAYER && roomName != "Lobby")
                 {
-                    //await Task.Delay(1000);
+                   
 
-                    
-                    //その他のルーム名だった場合
-                    if (roomName != "Lobby")
-                    {
-
+                   
                         Console.WriteLine("プラべ:"+roomName);
                         Console.WriteLine("ゲーム開始");
                         //ゲーム開始通知
                         this.Broadcast(room).StartGame();
 
 
-                    }
+                   
                 }
 
                 return joinedUserList;
@@ -117,13 +112,18 @@ namespace StreamingHubs
         {
             JoinedUser[] joinedUserList = await JoinAsync("Lobby", userId);
 
-            
+            Console.WriteLine("参加");
+
+            Console.WriteLine(joinedUserList.Length);
 
             //参加人数が４人になったら
             if (joinedUserList.Length == MAX_PLAYER)
             {
+               
                 //書式を桁無し指定にして再入室
                 this.Broadcast(room).OnMatch(Guid.NewGuid().ToString("N"));
+
+              
 
             }
             //return joinedUserList;
@@ -196,7 +196,7 @@ namespace StreamingHubs
         public async Task MatchAsync(string roomName)
         {
             //ルーム参加者全員にマッチング通知を送信
-            this.BroadcastExceptSelf(room).OnMatch(roomName);
+           // this.BroadcastExceptSelf(room).OnMatch(roomName);
 
         }
 

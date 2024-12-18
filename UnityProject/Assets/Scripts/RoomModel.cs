@@ -163,21 +163,9 @@ public class RoomModel : BaseModel, IRoomHubReceiver
     public async UniTask JoinLobbyAsync(int userId)
     {
         //配列に引数で受け取った情報を追加
-        JoinedUser[] users = await roomHub.JoinAsync("Lobby", userId);
+        await roomHub.JoinLobbyAsync(userId);
 
-        //配列の要素分ループ
-        foreach (var user in users)
-        {
-            if (user.UserData.Id == userId)
-            {
-                //コネクションID保存
-                this.ConnectionId = user.ConnectionId;
-            }
-            OnMasterCheck(user);
-
-            OnJoinedUser(user);
-        }
-        
+       
         Debug.Log("ロビー入室");
 
     }
@@ -191,6 +179,7 @@ public class RoomModel : BaseModel, IRoomHubReceiver
     //マッチング通知
     public void OnMatch(string roomName)
     {
+
         MatchedUser(roomName);
 
         Debug.Log("マッチング成立:"+  roomName);
