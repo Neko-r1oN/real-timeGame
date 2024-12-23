@@ -72,11 +72,13 @@ public class GameDirector : MonoBehaviour
 
     //マスタークライアントかどうか
     private bool isJoinFirst;
+
     //Dotween遷移補完時間
     private float dotweenTime = 0.1f;
 
     private float commuTime = 0.02f;
 
+    private int animNum;
 
     //ゲーム状態
     public enum GAME_STATE
@@ -90,26 +92,12 @@ public class GameDirector : MonoBehaviour
 
     GAME_STATE game_State = GAME_STATE.STOP;
 
-    //ユーザーアニメーション状態
-    public enum ANIM_STATE
-    {
-        IDLE = 0,         //アイドル状態
-        DASH,             //ダッシュ状態
-        CATCH,            //キャッチ状態
-        JUMP,             //ジャンプ状態
-        DOWN,             //ダウン状態
-
-        THROW,            //開始カウント中
-        JUMPTHROW,        //ゲーム中
-
-    }
-
-    ANIM_STATE anim_State = ANIM_STATE.IDLE;
-
-
-    Dictionary<Guid,GameObject>characterList = new Dictionary<Guid, GameObject>();
     
+    //キャラクターリスト
+    Dictionary<Guid,GameObject>characterList = new Dictionary<Guid, GameObject>();
+    //待機UIリスト
     Dictionary<Guid, GameObject> standUIList = new Dictionary<Guid, GameObject>();
+
     void Awake()
     {
         //フレームレート設定
@@ -117,7 +105,7 @@ public class GameDirector : MonoBehaviour
     }
     async void Start()
     {
-        
+       
 
         //ユーザーが入室した際にOnJoinedUserメゾットを実行するようにモデルに登録しておく
         roomModel.OnJoinedUser += this.OnJoinedUser;   //ユーザー入室
@@ -130,9 +118,9 @@ public class GameDirector : MonoBehaviour
 
         roomModel.MovedBall += this.MovedBall;         //ボール移動情報
 
-        roomModel.ThrowedBall += this.ThrowedBall;
+        roomModel.ThrowedBall += this.ThrowedBall;     //ボール投げ
 
-        roomModel.getBall += this.GetBall;
+        roomModel.getBall += this.GetBall;             //ボール取得
 
         roomModel.ReadyUser += this.ReadyUser;         //ユーザー準備完了
 
@@ -161,10 +149,7 @@ public class GameDirector : MonoBehaviour
 
     }
 
-    /// <summary>
-    /// Unityの設定から１秒ごとの通信回数を指定
-    /// </summary>
-    private async void FixedUpdate()
+    void Update()
     {
         if (!isPlayer) return;
         /*
@@ -203,10 +188,8 @@ public class GameDirector : MonoBehaviour
         //await roomModel.JoinAsync(roomName.text, userModel.userId);
 
 
-        //プレイヤー移動を呼び出し、以降は0.02fごとに実行
-        InvokeRepeating(nameof(SendData), 0.0f, 0.02f);
-
-       
+        //同期通信呼び出し、以降は0.02fごとに実行
+        InvokeRepeating(nameof(SendData), 0.0f, commuTime);
 
         Debug.Log("入室完了");
     }
@@ -271,8 +254,8 @@ public class GameDirector : MonoBehaviour
 
        
 
-         //プレイヤーNo取得(UI)
-         Image number = standByCharaUI.transform.GetChild(1).gameObject.GetComponent<Image>();
+        //プレイヤーNo取得(UI)
+        Image number = standByCharaUI.transform.GetChild(1).gameObject.GetComponent<Image>();
 
 
         //プレイヤー名取得
@@ -293,28 +276,30 @@ public class GameDirector : MonoBehaviour
             case 1:
                 number.sprite = player1;
                 charaNum.sprite = player1;
-
+                characterObject.name = "player1";
 
 
                 break;
             case 2:
                 number.sprite = player2;
                 charaNum.sprite = player2;
-                
+                characterObject.name = "player2";
+
 
                 break;
             case 3:
                 number.sprite = player3;
                 charaNum.sprite = player3;
-                
+                characterObject.name = "player3";
 
                 break;
             case 4:
                
                 number.sprite = player4;
                 charaNum.sprite = player4;
-                standByUI.SetActive(false);
-                game_State = GAME_STATE.START;
+                characterObject.name = "player3";
+                /*standByUI.SetActive(false);
+                game_State = GAME_STATE.START;*/
                 Debug.Log("4人目通貨");
 
                 break;
@@ -350,7 +335,7 @@ public class GameDirector : MonoBehaviour
             string enemy = "Enemy"/* + user.JoinOrder*/;
             characterObject.name = enemy;
             //自機以外用のスクリプト＆タグを追加
-            characterObject.gameObject.AddComponent<EnemyManager>();
+            //characterObject.gameObject.AddComponent<PlayerManager>();
             characterObject.tag = "Enemy";
 
             
@@ -392,9 +377,7 @@ public class GameDirector : MonoBehaviour
         {
             Destroy(ui.gameObject);
         }
-        //ボール削除
-        //Destroy(ballObj);
-
+       
 
         isPlayer = false;
 
@@ -441,20 +424,43 @@ public class GameDirector : MonoBehaviour
 
     private async void SendData()
     {
+        /*if(roomModel.isMaster)
+        {
+            animNum = characterList[roomModel.ConnectionId].transform.GetChild(0).gameObject.GetComponent<PlayerManager>().animState;
+        
+            Debug.Log(animNum.ToString());
+        }*/
         //移動情報
         var moveData = new MoveData()
         {
             ConnectionId = roomModel.ConnectionId,      //接続ID
             Pos = characterList[roomModel.ConnectionId].transform.position,         //キャラ位置
             Rotate = characterList[roomModel.ConnectionId].transform.eulerAngles,   //キャラ回転
-
+            AnimId = characterList[roomModel.ConnectionId].transform.GetChild(0).gameObject.GetComponent<PlayerAnimation>().GetAnimId(),      //アニメーションID
         };
 
+        //Debug.Log(moveData.AnimId);
         //プレイヤー移動
         await roomModel.MoveAsync(moveData);
 
 
 
+        /* var userState = new UserState()
+        {
+            isReady = false,                     //準備判定
+            isGameCountFinish = false,           //カウントダウン終了判定
+            isGameFinish = false,                //ゲーム終了判定
+            Ranking = 0,                         //順位 
+            Score = 0,                           //獲得スコア
+           
+
+        };
+
+        //ユーザー状態 
+        await roomModel.UpdateUserStateAsync(userState);*/
+
+
+        //フィールド上のボール検索
         ballObj = GameObject.Find("Ball");
 
         if (!ballObj) return;
@@ -462,16 +468,9 @@ public class GameDirector : MonoBehaviour
         //ボールが取れたら
         if (ballObj) isBall = true;
 
-
-        //Debug.Log(roomModel.isMaster);
-
         //ボールが存在している&マスタークライアント
         if (isBall && roomModel.isMaster)
         {
-
-            //Debug.Log("マスタークライアントあるよ");
-
-
             //ボール情報
             var moveBallData = new MoveData()
             {
@@ -498,19 +497,17 @@ public class GameDirector : MonoBehaviour
         //移動したプレイヤーの位置代入
         //characterList[moveData.ConnectionId].transform.position = moveData.Pos;
 
-        //Dotweenで移動補完
-        characterList[moveData.ConnectionId].transform.DOMove(moveData.Pos, dotweenTime).SetEase(Ease.Linear);
-
-        //移動したプレイヤーの角度代入
+        //移動したプレイヤーの角度代入a
         //characterList[moveData.ConnectionId].transform.eulerAngles = moveData.Rotate;
 
+        //Dotweenで移動補完
+        characterList[moveData.ConnectionId].transform.DOMove(moveData.Pos, dotweenTime).SetEase(Ease.Linear);
         //Dotweenで回転補完
         characterList[moveData.ConnectionId].transform.DORotate(moveData.Rotate, dotweenTime).SetEase(Ease.Linear);
-
         //アニメーション更新
-        //characterList[moveData.ConnectionId].transform.GetChild(0).GetComponent<PlayerAnomation>().Move(moveData.AnimeId);
+        characterList[moveData.ConnectionId].transform.GetChild(0).GetComponent<PlayerAnimation>().SetAnim(moveData.AnimId);
 
-    }
+    } 
 
     //ユーザーが移動したときの処理
     private async void MovedBall(MoveData moveBallData)
@@ -521,28 +518,38 @@ public class GameDirector : MonoBehaviour
             return;
         }
        
-
         //Dotweenで移動補完
         ballObj.transform.DOMove(moveBallData.Pos, dotweenTime).SetEase(Ease.Linear);
-
-
-
         //Dotweenで回転補完
         ballObj.transform.DORotate(moveBallData.Rotate, dotweenTime).SetEase(Ease.Linear);
-
-        
-
     }
 
     //ボール発射処理
     private async void ThrowedBall(ThrowData throwData)
     {
+        //投げた座標に玉を生成
+        Vector3 pos = characterList[throwData.ConnectionId].transform.position;
+        GameObject newbullet = Instantiate(ballPrefab, new Vector3(pos.x, pos.y, pos.z), Quaternion.identity); //弾を生成
 
+
+        //最後に投げた人にマスタークライアント権を譲渡する予定
+
+
+
+        //ボール発射
+        Rigidbody bulletRigidbody = newbullet.GetComponent<Rigidbody>();
+        bulletRigidbody.velocity = (throwData.GoalPos * 6.0f); //キャラクターが向いている方向に弾に力を加える
+
+        Debug.Log("ボール通知受けたよ");
     }
 
     //ボール取得処理
     private async void GetBall()
     {
+        //フィールド上のボール検索
+        ballObj = GameObject.Find("Ball");
+
+        Destroy(ballObj.gameObject);    //ボール削除
 
     }
 
@@ -601,8 +608,11 @@ public class GameDirector : MonoBehaviour
     }
 
    
-    public void OnClickHome()
+    public async void OnClickHome()
     {
+        //退出
+        await roomModel.LeaveAsync();
+
         SceneManager.LoadScene(SceneManager.GetActiveScene().name);
     }
 

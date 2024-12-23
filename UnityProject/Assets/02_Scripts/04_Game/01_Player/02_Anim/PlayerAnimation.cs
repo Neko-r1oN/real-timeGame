@@ -4,19 +4,23 @@ using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.UI;
 
-public class PlayerAnomation : MonoBehaviour
+public class PlayerAnimation : MonoBehaviour
 {
     private Animator anim = null;
 
     private FixedJoystick joyStick;
 
-    private string animState;
+    private string animState;   //アニメステート
+    private bool animJudge;     //アニメ判定
 
     private PlayerManager player;
+    private EnemyManager enemy;
+  
     Button jumpButton;
     Button catchButton;
     Button throwButton;
     float degStop;
+
 
     void Start()
     {
@@ -26,11 +30,14 @@ public class PlayerAnomation : MonoBehaviour
 
         player = GetComponentInParent<PlayerManager>();//一番上の親についているコンポーネントを取得する
 
+        //
+        if(player == null)
+        {
+            enemy = GetComponentInParent<EnemyManager>();//一番上の親についているコンポーネントを取得する
 
-        joyStick = GameObject.Find("Fixed Joystick").GetComponent<FixedJoystick>();
+        }
 
 
-       
     }
 
     void Update()
@@ -67,17 +74,7 @@ public class PlayerAnomation : MonoBehaviour
                 break;
         }
 
-        if(animState != null)
-        {
-            if (player.animState == 2)
-            {
-                SetTrigger();
-            }
-            else
-            {
-                SetBool();
-            }
-        }
+      
     }
         
    
@@ -91,5 +88,29 @@ public class PlayerAnomation : MonoBehaviour
     {
 
         anim.SetBool(animState,true); //wait→walkへ
+    }
+
+     
+    public void ResetJump()
+    {
+        anim.SetBool("isJump",false);
+    }
+    public void ResetAnim()
+    {
+        anim.SetBool(animState,false);
+        Debug.Log("キャンセル呼ばれた");
+
+        Debug.Log(animState);
+
+    }
+
+   public int GetAnimId()
+    {
+        return 0;
+
+    }
+    public void SetAnim(int animName)
+    {
+
     }
 }

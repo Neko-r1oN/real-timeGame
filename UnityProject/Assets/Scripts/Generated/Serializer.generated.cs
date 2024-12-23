@@ -47,14 +47,15 @@ namespace MessagePack.Resolvers
 
         static GeneratedResolverGetFormatterHelper()
         {
-            lookup = new global::System.Collections.Generic.Dictionary<global::System.Type, int>(6)
+            lookup = new global::System.Collections.Generic.Dictionary<global::System.Type, int>(7)
             {
                 { typeof(global::Shared.Interfaces.Services.Number), 0 },
                 { typeof(global::Shared.Interfaces.StreamingHubs.JoinedUser), 1 },
                 { typeof(global::Shared.Model.Entity.MoveData), 2 },
                 { typeof(global::Shared.Model.Entity.ResultData), 3 },
-                { typeof(global::Shared.Model.Entity.User), 4 },
-                { typeof(global::Shared.Model.Entity.UserState), 5 },
+                { typeof(global::Shared.Model.Entity.ThrowData), 4 },
+                { typeof(global::Shared.Model.Entity.User), 5 },
+                { typeof(global::Shared.Model.Entity.UserState), 6 },
             };
         }
 
@@ -72,8 +73,9 @@ namespace MessagePack.Resolvers
                 case 1: return new MessagePack.Formatters.Shared.Interfaces.StreamingHubs.JoinedUserFormatter();
                 case 2: return new MessagePack.Formatters.Shared.Model.Entity.MoveDataFormatter();
                 case 3: return new MessagePack.Formatters.Shared.Model.Entity.ResultDataFormatter();
-                case 4: return new MessagePack.Formatters.Shared.Model.Entity.UserFormatter();
-                case 5: return new MessagePack.Formatters.Shared.Model.Entity.UserStateFormatter();
+                case 4: return new MessagePack.Formatters.Shared.Model.Entity.ThrowDataFormatter();
+                case 5: return new MessagePack.Formatters.Shared.Model.Entity.UserFormatter();
+                case 6: return new MessagePack.Formatters.Shared.Model.Entity.UserStateFormatter();
                 default: return null;
             }
         }
@@ -289,10 +291,11 @@ namespace MessagePack.Formatters.Shared.Model.Entity
             }
 
             global::MessagePack.IFormatterResolver formatterResolver = options.Resolver;
-            writer.WriteArrayHeader(3);
+            writer.WriteArrayHeader(4);
             global::MessagePack.FormatterResolverExtensions.GetFormatterWithVerify<global::System.Guid>(formatterResolver).Serialize(ref writer, value.ConnectionId, options);
             global::MessagePack.FormatterResolverExtensions.GetFormatterWithVerify<global::UnityEngine.Vector3>(formatterResolver).Serialize(ref writer, value.Pos, options);
             global::MessagePack.FormatterResolverExtensions.GetFormatterWithVerify<global::UnityEngine.Vector3>(formatterResolver).Serialize(ref writer, value.Rotate, options);
+            writer.Write(value.AnimId);
         }
 
         public global::Shared.Model.Entity.MoveData Deserialize(ref global::MessagePack.MessagePackReader reader, global::MessagePack.MessagePackSerializerOptions options)
@@ -319,6 +322,9 @@ namespace MessagePack.Formatters.Shared.Model.Entity
                         break;
                     case 2:
                         ____result.Rotate = global::MessagePack.FormatterResolverExtensions.GetFormatterWithVerify<global::UnityEngine.Vector3>(formatterResolver).Deserialize(ref reader, options);
+                        break;
+                    case 3:
+                        ____result.AnimId = reader.ReadInt32();
                         break;
                     default:
                         reader.Skip();
@@ -377,6 +383,60 @@ namespace MessagePack.Formatters.Shared.Model.Entity
                         break;
                     case 3:
                         ____result.Point = reader.ReadInt32();
+                        break;
+                    default:
+                        reader.Skip();
+                        break;
+                }
+            }
+
+            reader.Depth--;
+            return ____result;
+        }
+    }
+
+    public sealed class ThrowDataFormatter : global::MessagePack.Formatters.IMessagePackFormatter<global::Shared.Model.Entity.ThrowData>
+    {
+
+        public void Serialize(ref global::MessagePack.MessagePackWriter writer, global::Shared.Model.Entity.ThrowData value, global::MessagePack.MessagePackSerializerOptions options)
+        {
+            if (value == null)
+            {
+                writer.WriteNil();
+                return;
+            }
+
+            global::MessagePack.IFormatterResolver formatterResolver = options.Resolver;
+            writer.WriteArrayHeader(3);
+            global::MessagePack.FormatterResolverExtensions.GetFormatterWithVerify<global::System.Guid>(formatterResolver).Serialize(ref writer, value.ConnectionId, options);
+            global::MessagePack.FormatterResolverExtensions.GetFormatterWithVerify<global::UnityEngine.Vector3>(formatterResolver).Serialize(ref writer, value.ThorwPos, options);
+            global::MessagePack.FormatterResolverExtensions.GetFormatterWithVerify<global::UnityEngine.Vector3>(formatterResolver).Serialize(ref writer, value.GoalPos, options);
+        }
+
+        public global::Shared.Model.Entity.ThrowData Deserialize(ref global::MessagePack.MessagePackReader reader, global::MessagePack.MessagePackSerializerOptions options)
+        {
+            if (reader.TryReadNil())
+            {
+                return null;
+            }
+
+            options.Security.DepthStep(ref reader);
+            global::MessagePack.IFormatterResolver formatterResolver = options.Resolver;
+            var length = reader.ReadArrayHeader();
+            var ____result = new global::Shared.Model.Entity.ThrowData();
+
+            for (int i = 0; i < length; i++)
+            {
+                switch (i)
+                {
+                    case 0:
+                        ____result.ConnectionId = global::MessagePack.FormatterResolverExtensions.GetFormatterWithVerify<global::System.Guid>(formatterResolver).Deserialize(ref reader, options);
+                        break;
+                    case 1:
+                        ____result.ThorwPos = global::MessagePack.FormatterResolverExtensions.GetFormatterWithVerify<global::UnityEngine.Vector3>(formatterResolver).Deserialize(ref reader, options);
+                        break;
+                    case 2:
+                        ____result.GoalPos = global::MessagePack.FormatterResolverExtensions.GetFormatterWithVerify<global::UnityEngine.Vector3>(formatterResolver).Deserialize(ref reader, options);
                         break;
                     default:
                         reader.Skip();
