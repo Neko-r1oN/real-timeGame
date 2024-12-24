@@ -12,7 +12,7 @@ namespace ServerProject.Services
     public class UserService:ServiceBase<IUserService>, IUserService
     {        
         //ユーザー登録
-        public async UnaryResult<int>RegistUserAsync(string name) 
+        public async UnaryResult<User>RegistUserAsync(string name) 
         {
             using var context = new GameDbContext();
 
@@ -38,7 +38,7 @@ namespace ServerProject.Services
             await context.SaveChangesAsync();
 
             //作成したユーザーのIDを返す
-            return user.Id;
+            return user;
         }
 
 

@@ -14,7 +14,7 @@ namespace Shared.Interfaces.Services
         /// </summary>
         /// <param name="name">ユーザー名</param>
         /// <returns>ユーザーID</returns>
-        UnaryResult<int> RegistUserAsync(string name);
+        UnaryResult<User> RegistUserAsync(string name);
 
         /// <summary>
         /// 指定ユーザー情報取得処理

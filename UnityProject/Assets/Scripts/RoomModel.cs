@@ -26,10 +26,8 @@ public class RoomModel : BaseModel, IRoomHubReceiver
 
     //ユーザー接続通知
     public Action<JoinedUser> OnJoinedUser {  get; set; }
-
     //ユーザー切断通知
     public Action<Guid> LeavedUser { get; set; }
-
     //ユーザーマッチング通知
     public Action<string> MatchedUser { get; set; }
 
@@ -39,8 +37,7 @@ public class RoomModel : BaseModel, IRoomHubReceiver
 
     //ユーザー移動通知
     public Action<MoveData> MovedUser { get; set; }
-
-    //ユーザー移動通知
+    //ボール移動通知
     public Action<MoveData> MovedBall { get; set; }
 
     //ボール発射通知

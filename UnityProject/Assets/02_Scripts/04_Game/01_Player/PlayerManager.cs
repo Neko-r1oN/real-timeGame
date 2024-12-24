@@ -150,27 +150,32 @@ public class PlayerManager : MonoBehaviour
             }
 
         }
-        // 指定したタグを持つゲームオブジェクトのうち、このゲームオブジェクトに最も近いゲームオブジェクト１つを取得
-        searchNearObj = EnemySerch();
 
-        if (searchNearObj)
+        if (roomModel.isMaster)
         {
-            transform.LookAt(searchNearObj.transform);
+            // 指定したタグを持つゲームオブジェクトのうち、このゲームオブジェクトに最も近いゲームオブジェクト１つを取得
+            searchNearObj = EnemySerch();
+
+            if (searchNearObj)
+            {
+                transform.LookAt(searchNearObj.transform);
+            }
+
+            //フィールドに敵プレイヤーが存在している場合
+            if (searchNearObj != null)
+            {
+                //カーソルを最も近い敵の座標に移動
+                cursor.transform.DOMove(searchNearObj.gameObject.transform.position, 0.1f).SetEase(Ease.Linear);
+            }
+            //フィールドに敵プレイヤーが存在していない場合
+            else
+            {
+                //カーソルを初期位置に移動
+                cursor.transform.DOMove(new Vector3(10.714f, -1.94f, 12.87f), 0.1f).SetEase(Ease.Linear);
+            }
         }
 
-        //フィールドに敵プレイヤーが存在している場合
-        if (searchNearObj != null)
-        {
-            //カーソルを最も近い敵の座標に移動
-            cursor.transform.DOMove(searchNearObj.gameObject.transform.position, 0.1f).SetEase(Ease.Linear);
-        }
-        //フィールドに敵プレイヤーが存在していない場合
-        else
-        {
-            //カーソルを初期位置に移動
-            cursor.transform.DOMove(new Vector3(10.714f, -1.94f,12.87f), 0.1f).SetEase(Ease.Linear);
-        }
-
+        
         //着地しているかを判定
         if (isGround == true)
         {

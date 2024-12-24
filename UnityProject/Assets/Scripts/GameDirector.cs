@@ -24,7 +24,7 @@ public class GameDirector : MonoBehaviour
     [SerializeField] Text userName;
 
     private UserModel userModel;
-
+    //private UserModel userModel;
 
     //入室データ(入力用)
     [SerializeField] Text roomName;
@@ -139,8 +139,16 @@ public class GameDirector : MonoBehaviour
 
         cursor.SetActive(false);
 
+        //ユーザーモデルを取得
+        userModel = GameObject.Find("UserModel").GetComponent<UserModel>();
+
         //ユーザーID表示
-        //userName.text = userModel.userId.ToString();
+        if (userModel.userName != "")
+        {
+            Debug.Log(userModel.userName);
+            userName.text = userModel.userName;
+        }
+
 
         //待機
         await roomModel.ConnectAsync();
@@ -178,13 +186,13 @@ public class GameDirector : MonoBehaviour
         }
 
         Debug.Log("ルーム名:"+roomName.text);
-        Debug.Log("ユーザーID;" + userId.text);
+        Debug.Log("ユーザーID;" + userModel.userId);
 
         cursor.SetActive(true);
 
         game_State = GAME_STATE.PREPARATION;
 
-        await roomModel.JoinAsync(roomName.text, int.Parse(userId.text));     //ルーム名とユーザーIDを渡して入室
+        await roomModel.JoinAsync(roomName.text, userModel.userId);     //ルーム名とユーザーIDを渡して入室
         //await roomModel.JoinAsync(roomName.text, userModel.userId);
 
 
@@ -210,7 +218,7 @@ public class GameDirector : MonoBehaviour
         
 
 
-        await roomModel.JoinLobbyAsync(int.Parse(userId.text));     //ルーム名とユーザーIDを渡して入室
+        await roomModel.JoinLobbyAsync(userModel.userId);     //ルーム名とユーザーIDを渡して入室
 
         game_State = GAME_STATE.PREPARATION;
 
@@ -228,7 +236,7 @@ public class GameDirector : MonoBehaviour
         
 
         //受け取ったユーザーIDをルーム名に渡して入室
-        await roomModel.JoinAsync(roomName, int.Parse(userId.text));
+        await roomModel.JoinAsync(roomName, userModel.userId);
 
        
 
