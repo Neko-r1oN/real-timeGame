@@ -527,18 +527,14 @@ public class GameDirector : MonoBehaviour
     //ボール発射処理
     private async void ThrowedBall(ThrowData throwData)
     {
+       
+
         //投げた座標に玉を生成
         Vector3 pos = characterList[throwData.ConnectionId].transform.position;
         GameObject newbullet = Instantiate(ballPrefab, new Vector3(pos.x, pos.y, pos.z), Quaternion.identity); //弾を生成
 
 
         //最後に投げた人にマスタークライアント権を譲渡する予定
-
-
-
-        //ボール発射
-        Rigidbody bulletRigidbody = newbullet.GetComponent<Rigidbody>();
-        bulletRigidbody.velocity = (throwData.GoalPos * 6.0f); //キャラクターが向いている方向に弾に力を加える
 
         Debug.Log("ボール通知受けたよ");
     }
@@ -551,6 +547,8 @@ public class GameDirector : MonoBehaviour
 
         Destroy(ballObj.gameObject);    //ボール削除
 
+        //マスタークライアントリセット
+        roomModel.isMaster = false;
     }
 
     //ユーザー情報更新処理

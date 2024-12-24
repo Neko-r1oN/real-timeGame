@@ -281,9 +281,10 @@ public class PlayerManager : MonoBehaviour
 
         if (isHaveBall)
         {
-           
+            //自クライアントのみマスタークライアント
+            roomModel.isMaster = true;
 
-            
+
             GameObject newbullet = Instantiate(ballPrefab, new Vector3(this.transform.position.x, this.transform.position.y, this.transform.position.z), Quaternion.identity); //弾を生成
             Rigidbody bulletRigidbody = newbullet.GetComponent<Rigidbody>();
             bulletRigidbody.velocity = (transform.forward * ballSpeed); //キャラクターが向いている方向に弾に力を加える
@@ -338,6 +339,7 @@ public class PlayerManager : MonoBehaviour
             //キャッチ状態じゃなかったら
             else
             {
+                Debug.Log("ヒット");
                 //ダウン処理
             }
         }
