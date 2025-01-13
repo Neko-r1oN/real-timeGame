@@ -56,13 +56,15 @@ namespace StreamingHubs
             if (roomName != "Lobby")
             {
                 //ルーム参加者全員にユーザーの入室通知を送信
-                //await Task.Delay(1000);
+                
                 //通常通り通知
                 this.BroadcastExceptSelf(room).OnJoin(joinedUser);
             }
 
-            //await Task.Delay(1000);
+            Console.WriteLine("参加者名:" + joinedUser.UserData.Name);
+            //Console.WriteLine("スコア:" + joinedUser.UserState.Score);
 
+            //await Task.Delay(1000);
             //同時実行されないように１回だけ実行するよう lock で設定(排他的処理)
             lock (roomStorage)
             {
@@ -71,7 +73,7 @@ namespace StreamingHubs
                 //参加中のユーザー情報を流す
                 JoinedUser[] joinedUserList = new JoinedUser[roomDataList.Length];
 
-                Debug.WriteLine(this.ConnectionId);
+                Debug.WriteLine("接続ID"+this.ConnectionId);
 
                 //RoomDataList内のJoinedUserを格納
                 for (int i = 0; i < joinedUserList.Length; i++)
@@ -82,10 +84,10 @@ namespace StreamingHubs
                 //参加者が上限に
                 if (roomDataList.Length == MAX_PLAYER && roomName != "Lobby")
                 {
-                   
+
 
                    
-                        Console.WriteLine("プラべ:"+roomName);
+                    Console.WriteLine("プラべ:"+roomName);
                         Console.WriteLine("ゲーム開始");
                         //ゲーム開始通知
                         this.Broadcast(room).StartGame();
@@ -196,7 +198,7 @@ namespace StreamingHubs
         public async Task MatchAsync(string roomName)
         {
             //ルーム参加者全員にマッチング通知を送信
-           // this.BroadcastExceptSelf(room).OnMatch(roomName);
+           this.BroadcastExceptSelf(room).OnMatch(roomName);
 
         }
 
@@ -255,16 +257,22 @@ namespace StreamingHubs
         /// <summary>
         /// ボール発射処理
         /// </summary>
+        /// <param name="getUserId">取得したユーザーID</param>
         /// <returns></returns>
-        public async Task GetBallAsync()
+        public async Task GetBallAsync(Guid getUserId)
         {
 
             //自分以外のルーム参加者全員にボール取得通知を送信
-            this.BroadcastExceptSelf(room).OnGetBall();
+            this.BroadcastExceptSelf(room).OnGetBall(getUserId);
+            //this.Broadcast(room).OnGetBall();
 
         }
 
-
+        public async Task HitBallAsync(HitData hitData)
+        {
+            //自分含め全員に通知
+            this.Broadcast(room).OnHitBall(hitData);
+        }
         /// <summary>
         /// 準備確認処理
         /// </summary>

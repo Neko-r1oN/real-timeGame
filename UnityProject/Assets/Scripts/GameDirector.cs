@@ -10,6 +10,7 @@ using DG.Tweening;                 //DOTweenを使うときはこのusingを入れる
 using UnityEngine.SceneManagement;
 using System.Xml.Serialization;
 using System.Threading.Tasks;
+using Cysharp.Threading.Tasks.Triggers;
 
 
 public class GameDirector : MonoBehaviour
@@ -18,6 +19,7 @@ public class GameDirector : MonoBehaviour
     [SerializeField] GameObject characterPrefab;
     //ルームモデル
     [SerializeField] RoomModel roomModel;
+
 
     //ルームデータ(表示用)
     [SerializeField] Text roomNameText;
@@ -43,10 +45,25 @@ public class GameDirector : MonoBehaviour
     //待機中UI
     [SerializeField] GameObject standByUI;
 
-    //ユーザー待機UI生成親オブジェクト
+    //ユーザー待機中UI生成親オブジェクト
     [SerializeField] private GameObject spawnUIObj;
+
+
+    //ユーザースコア表示UIプレハブ
+    [SerializeField] GameObject playerUIPrefab;
+    //ユーザースコア表示UIオブジェクト
+    [SerializeField] GameObject spawnPlayerUIObj;
+
+    //ライフプレハブ
+    [SerializeField] GameObject lifePrefab;
+
     //ユーザー別待機UIプレハブ
-    [SerializeField] GameObject StandUIPrefab;
+    [SerializeField] GameObject standUIPrefab;
+    //スコア表示UI生成親オブジェクト
+    [SerializeField] GameObject spawnStandUIObj;
+
+
+   
 
     //ゲームUI
     [SerializeField] GameObject gameUI;
@@ -70,15 +87,23 @@ public class GameDirector : MonoBehaviour
 
     [SerializeField] GameObject ballPrefab;
 
-    //マスタークライアントかどうか
+    //マスタークライアント判定
     private bool isJoinFirst;
 
-    //Dotween遷移補完時間
+    //オブジェクト移動遷移補完時間
     private float dotweenTime = 0.1f;
-
+    //サーバー通信時間
     private float commuTime = 0.02f;
 
     private int animNum;
+
+    public Guid enemyId;     //敵ID保存用
+    public int point;
+
+    PlayerManager playerManager;
+
+    //自打球防止用変数
+    public Guid getUserId;
 
     //ゲーム状態
     public enum GAME_STATE
@@ -97,6 +122,8 @@ public class GameDirector : MonoBehaviour
     Dictionary<Guid,GameObject>characterList = new Dictionary<Guid, GameObject>();
     //待機UIリスト
     Dictionary<Guid, GameObject> standUIList = new Dictionary<Guid, GameObject>();
+    //スコアUIリスト
+    Dictionary<Guid, GameObject> scoreUIList = new Dictionary<Guid, GameObject>();
 
     void Awake()
     {
@@ -120,7 +147,9 @@ public class GameDirector : MonoBehaviour
 
         roomModel.ThrowedBall += this.ThrowedBall;     //ボール投げ
 
-        roomModel.getBall += this.GetBall;             //ボール取得
+        roomModel.GetBall += this.GetBall;             //ボール取得
+
+        roomModel.HitBall += this.HitBall;             //ボールヒット
 
         roomModel.ReadyUser += this.ReadyUser;         //ユーザー準備完了
 
@@ -160,8 +189,8 @@ public class GameDirector : MonoBehaviour
     void Update()
     {
         if (!isPlayer) return;
-        /*
-        if(game_State == GAME_STATE.PREPARATION)
+        
+       /* if(game_State == GAME_STATE.PREPARATION)
         {
             standByUI.SetActive(true);
         }
@@ -253,24 +282,42 @@ public class GameDirector : MonoBehaviour
         GameObject characterObject = Instantiate(characterPrefab,spawnPosList[user.JoinOrder - 1].transform.position, Quaternion.identity, spawnObj.gameObject.transform); //インスタンス生成
 
         //待機中UI生成
-        GameObject standByCharaUI = Instantiate(StandUIPrefab, Vector3.zero,Quaternion.identity,spawnUIObj.gameObject.transform);
+        GameObject standByCharaUI = Instantiate(standUIPrefab, Vector3.zero,Quaternion.identity,spawnUIObj.gameObject.transform);
 
-       
+        //プレイヤースコアUI生成
+        GameObject charaInfoUI = Instantiate(playerUIPrefab, Vector3.zero, Quaternion.identity, spawnPlayerUIObj.gameObject.transform);
+
         characterList[user.ConnectionId] = characterObject;        //フィールドで保持
         
         standUIList[user.ConnectionId] = standByCharaUI;        //フィールドで保持
 
-       
+        scoreUIList[user.ConnectionId] = charaInfoUI;        //フィールドで保持
+
+
 
         //プレイヤーNo取得(UI)
         Image number = standByCharaUI.transform.GetChild(1).gameObject.GetComponent<Image>();
-
 
         //プレイヤー名取得
         Text name = standByCharaUI.transform.GetChild(3).gameObject.GetComponent<Text>();
         name.text = user.UserData.Name;
 
+        //プレイヤー情報UI取得(UI)
+        Image scoreUINumber = charaInfoUI.transform.GetChild(3).gameObject.GetComponent<Image>();
+        Text infoName = charaInfoUI.transform.GetChild(1).gameObject.GetComponent<Text>();
+        infoName.text = user.UserData.Name;
 
+        //ライフ生成
+        /*GameObject lifePos = charaInfoUI.transform.GetChild(5).gameObject.GetComponent<GameObject>();
+
+        for(int i = 1;i <= playerManager.hp; i++)
+        {//設定分UI生成
+            lifePos = Instantiate(lifePrefab, Vector3.zero, Quaternion.identity, lifePos.gameObject.transform);
+        }
+        */
+        /*//HP(デフォルト)
+        Text playerPoint = charaInfoUI.transform.GetChild(4).gameObject.GetComponent<Text>();
+        playerPoint.text = playerManager.hp.ToString();*/
         //自機区別テキスト表示
         GameObject child = characterObject.transform.GetChild(1).gameObject;
 
@@ -283,32 +330,38 @@ public class GameDirector : MonoBehaviour
         {
             case 1:
                 number.sprite = player1;
+                scoreUINumber.sprite = player1;
                 charaNum.sprite = player1;
                 characterObject.name = "player1";
+                standByCharaUI.name = "UI1";
 
 
                 break;
             case 2:
                 number.sprite = player2;
+                scoreUINumber.sprite = player2;
                 charaNum.sprite = player2;
                 characterObject.name = "player2";
-
+                standByCharaUI.name = "UI2";
 
                 break;
             case 3:
                 number.sprite = player3;
+                scoreUINumber.sprite = player3;
                 charaNum.sprite = player3;
                 characterObject.name = "player3";
-
+                standByCharaUI.name = "UI3";
                 break;
             case 4:
                
                 number.sprite = player4;
+                scoreUINumber.sprite = player4;
                 charaNum.sprite = player4;
                 characterObject.name = "player3";
                 /*standByUI.SetActive(false);
                 game_State = GAME_STATE.START;*/
                 Debug.Log("4人目通貨");
+                standByCharaUI.name = "UI4";
 
                 break;
             default:
@@ -343,22 +396,14 @@ public class GameDirector : MonoBehaviour
             string enemy = "Enemy"/* + user.JoinOrder*/;
             characterObject.name = enemy;
             //自機以外用のスクリプト＆タグを追加
-            //characterObject.gameObject.AddComponent<PlayerManager>();
+            characterObject.gameObject.AddComponent<EnemyManager>();
             characterObject.tag = "Enemy";
 
             
         }
        
-
-
         child.SetActive(true);
 
-
-
-
-
-
-        
     }
 
     //切断処理
@@ -513,7 +558,7 @@ public class GameDirector : MonoBehaviour
         //Dotweenで回転補完
         characterList[moveData.ConnectionId].transform.DORotate(moveData.Rotate, dotweenTime).SetEase(Ease.Linear);
         //アニメーション更新
-        characterList[moveData.ConnectionId].transform.GetChild(0).GetComponent<PlayerAnimation>().SetAnim(moveData.AnimId);
+        characterList[moveData.ConnectionId].transform.GetChild(0).GetComponent<PlayerAnimation>().SetEnemyAnim(moveData.AnimId);
 
     } 
 
@@ -535,7 +580,8 @@ public class GameDirector : MonoBehaviour
     //ボール発射処理
     private async void ThrowedBall(ThrowData throwData)
     {
-       
+        //投げたユーザーのIDを保存
+        enemyId = throwData.ConnectionId;
 
         //投げた座標に玉を生成
         Vector3 pos = characterList[throwData.ConnectionId].transform.position;
@@ -548,8 +594,17 @@ public class GameDirector : MonoBehaviour
     }
 
     //ボール取得処理
-    private async void GetBall()
+    private async void GetBall(Guid getUserId)
     {
+        Debug.Log(getUserId);
+
+        //取得者IDを更新
+        this.getUserId = getUserId;
+
+        
+        Debug.Log(this.getUserId);
+       
+        Debug.Log("取得者ID更新");
         //フィールド上のボール検索
         ballObj = GameObject.Find("Ball");
 
@@ -558,6 +613,28 @@ public class GameDirector : MonoBehaviour
         //マスタークライアントリセット
         roomModel.isMaster = false;
     }
+
+    public async void HitBall(HitData hitData)
+    {
+        //残機リスト
+        GameObject lifeList = scoreUIList[hitData.ConnectionId].transform.GetChild(5).gameObject ;
+        //残機削除
+        Destroy(lifeList.transform.GetChild(0).gameObject);
+
+        //ポイント反映
+        Text playerPoint = scoreUIList[hitData.EnemyId].transform.GetChild(4).gameObject.GetComponent<Text>();
+
+        point = int.Parse(playerPoint.text);
+
+        point += hitData.Point;
+        playerPoint.text = point.ToString();
+
+        Debug.Log("獲得ポイント:" + hitData.Point);
+        //当てたユーザーの得点加算
+
+        Debug.Log("ヒット");
+    }
+        
 
     //ユーザー情報更新処理
     public　async void UpdateUserState(Guid connectionId,UserState userState)
@@ -610,6 +687,7 @@ public class GameDirector : MonoBehaviour
     {
         Debug.Log("ゲーム終了");
 
+        
         resultUI.SetActive(true);
     }
 

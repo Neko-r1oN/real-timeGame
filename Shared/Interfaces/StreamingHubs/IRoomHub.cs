@@ -66,7 +66,13 @@ namespace Shared.Interfaces.StreamingHubs
         /// ホール取得関数
         /// </summary>
         /// <returns></returns>
-        Task GetBallAsync();
+        Task GetBallAsync(Guid getUserId);
+        
+        /// <summary>
+        /// ヒット関数
+        /// </summary>
+        /// <returns></returns>
+        Task HitBallAsync(HitData hitData);
 
         /// <summary>
         /// 全ユーザー準備状態確認関数

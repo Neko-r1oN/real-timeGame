@@ -6,7 +6,7 @@ using System.Text;
 namespace Shared.Model.Entity
 {
     /// <summary>
-    /// 移動データクラス
+    /// ユーザー状態クラス
     /// </summary>
     [MessagePackObject]
     public class UserState
@@ -22,8 +22,9 @@ namespace Shared.Model.Entity
         [Key(4)]
         public int Score { get; set; }                       //獲得スコア
         [Key(5)]
-        public int UseCharaId { get; set; }                  //使用キャラクターID
+        public int Life { get; set; }                       //体力
         [Key(6)]
-        public int AnimeId { get; set; }                     //アニメーションID
+        public int UseCharaId { get; set; }                  //使用キャラクターID
+       
     }
 }

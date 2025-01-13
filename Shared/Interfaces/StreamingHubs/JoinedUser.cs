@@ -19,8 +19,10 @@ namespace Shared.Interfaces.StreamingHubs
         [Key(1)]
         public User UserData { get; set; }      //ユーザー情報
         [Key(2)]
-        public bool IsSelf { get; set; }        //自分自身かどうか
+        public UserState UserState { get; set; }      //ユーザー状態
         [Key(3)]
+        public bool IsSelf { get; set; }        //自分自身かどうか
+        [Key(4)]
         public int JoinOrder;                   //参加順番
     }
 }

@@ -37,9 +37,11 @@ namespace Shared.Interfaces.StreamingHubs
         void OnThrowBall(ThrowData throwData);
 
         //ボール取得通知
-        void OnGetBall();
+        void OnGetBall(Guid getUserId);
+        
+        //ヒット通知
+        void OnHitBall(HitData hitData);
 
-       
 
         //ユーザー状態更新通知
         void UpdateUserState(Guid connectionId, UserState state);

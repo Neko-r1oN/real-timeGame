@@ -41,17 +41,32 @@ public class PlayerAnimation : MonoBehaviour
         //自機だった場合
         if (GetComponentInParent<PlayerManager>())
         {
+            //animator.SetInteger("animation", (int)ANIM_STATE.IDLE);
+        }
+        //自機だった場合
+        if (GetComponentInParent<EnemyManager>()) 
+        {
 
         }
     }
 
+    /// <summary>
+    /// アニメーションID取得
+    /// </summary>
+    /// <returns>アニメーションID</returns>
    public int GetAnimId()
     {
         return animator.GetInteger("animation");
     }
 
-    public void SetAnim(int animId)
+    public void SetAnim(ANIM_STATE animId)
     {
-        animator.SetInteger("animation", animId);
+        animator.SetInteger("animation", (int)animId);
+    }
+
+    //敵アニメーション関数
+    public void SetEnemyAnim(int id)
+    {
+        animator.SetInteger("animation", id);
     }
 }

@@ -44,7 +44,10 @@ public class RoomModel : BaseModel, IRoomHubReceiver
     public Action<ThrowData> ThrowedBall { get; set; }
 
     //ボール発射通知
-    public Action getBall { get; set; }
+    public Action<Guid> GetBall { get; set; }
+
+    //ボールヒット通知
+    public Action<HitData> HitBall { get; set; }
 
     //ユーザー準備状態確認通知
     public Action<bool> ReadyUser { get; set; }
@@ -257,15 +260,27 @@ public class RoomModel : BaseModel, IRoomHubReceiver
     }
 
     //ボール取得処理
-    public async Task GetBallAsync()
+    public async Task GetBallAsync(Guid getUserId)
     {
-        await roomHub.GetBallAsync();
+        //自身の接続IDを通知
+        await roomHub.GetBallAsync(getUserId); 
     }
 
     //ボール発射通知
-    public void OnGetBall()
+    public void OnGetBall(Guid getUserId)
     {
-        getBall();
+        GetBall(getUserId);
+    }
+
+    //ヒット処理
+    public async Task HitBallAsync(HitData hitData)
+    {
+        await roomHub.HitBallAsync(hitData);
+    }
+    //ヒット通知
+    public void OnHitBall(HitData hitData)
+    {
+        HitBall(hitData);
     }
 
     //準備完了処理
