@@ -27,11 +27,11 @@ public class PlayerManager : MonoBehaviour
     public bool isCatch { get; set; }          //キャッチ状態であるか
     public bool isDash { get; set; }           //ダッシュ状態であるか
 
-    public float velosity = 6.0f;              //ジャンプの強さ
+    public float velosity = 13f;              //ジャンプの強さ
 
    
     GameObject ballPrefab;
-    public float ballSpeed = 15.0f;
+    public float ballSpeed = 18.0f;
     
 
     [SerializeField] private Vector3 velocity;              // 移動方向
