@@ -355,10 +355,11 @@ namespace MessagePack.Formatters.Shared.Model.Entity
             }
 
             global::MessagePack.IFormatterResolver formatterResolver = options.Resolver;
-            writer.WriteArrayHeader(4);
+            writer.WriteArrayHeader(5);
             global::MessagePack.FormatterResolverExtensions.GetFormatterWithVerify<global::System.Guid>(formatterResolver).Serialize(ref writer, value.ConnectionId, options);
             global::MessagePack.FormatterResolverExtensions.GetFormatterWithVerify<global::UnityEngine.Vector3>(formatterResolver).Serialize(ref writer, value.Pos, options);
             global::MessagePack.FormatterResolverExtensions.GetFormatterWithVerify<global::UnityEngine.Vector3>(formatterResolver).Serialize(ref writer, value.Rotate, options);
+            writer.Write(value.Angle);
             writer.Write(value.AnimId);
         }
 
@@ -388,6 +389,9 @@ namespace MessagePack.Formatters.Shared.Model.Entity
                         ____result.Rotate = global::MessagePack.FormatterResolverExtensions.GetFormatterWithVerify<global::UnityEngine.Vector3>(formatterResolver).Deserialize(ref reader, options);
                         break;
                     case 3:
+                        ____result.Angle = reader.ReadBoolean();
+                        break;
+                    case 4:
                         ____result.AnimId = reader.ReadInt32();
                         break;
                     default:

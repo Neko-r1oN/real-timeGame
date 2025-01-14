@@ -393,10 +393,10 @@ public class GameDirector : MonoBehaviour
         }
         else
         {
-            string enemy = "Enemy"/* + user.JoinOrder*/;
+            string enemy = "Enemy";
             characterObject.name = enemy;
             //自機以外用のスクリプト＆タグを追加
-            characterObject.gameObject.AddComponent<EnemyManager>();
+
             characterObject.tag = "Enemy";
 
             
@@ -489,28 +489,13 @@ public class GameDirector : MonoBehaviour
             ConnectionId = roomModel.ConnectionId,      //接続ID
             Pos = characterList[roomModel.ConnectionId].transform.position,         //キャラ位置
             Rotate = characterList[roomModel.ConnectionId].transform.eulerAngles,   //キャラ回転
+            Angle = characterList[roomModel.ConnectionId].transform.GetChild(0).gameObject.GetComponent<AngleManager> ().GetAngle(),  //キャラクターの向き
             AnimId = characterList[roomModel.ConnectionId].transform.GetChild(0).gameObject.GetComponent<PlayerAnimation>().GetAnimId(),      //アニメーションID
         };
 
         //Debug.Log(moveData.AnimId);
         //プレイヤー移動
         await roomModel.MoveAsync(moveData);
-
-
-
-        /* var userState = new UserState()
-        {
-            isReady = false,                     //準備判定
-            isGameCountFinish = false,           //カウントダウン終了判定
-            isGameFinish = false,                //ゲーム終了判定
-            Ranking = 0,                         //順位 
-            Score = 0,                           //獲得スコア
-           
-
-        };
-
-        //ユーザー状態 
-        await roomModel.UpdateUserStateAsync(userState);*/
 
 
         //フィールド上のボール検索
@@ -559,7 +544,8 @@ public class GameDirector : MonoBehaviour
         characterList[moveData.ConnectionId].transform.DORotate(moveData.Rotate, dotweenTime).SetEase(Ease.Linear);
         //アニメーション更新
         characterList[moveData.ConnectionId].transform.GetChild(0).GetComponent<PlayerAnimation>().SetEnemyAnim(moveData.AnimId);
-
+        //キャラクターの向き更新
+        characterList[moveData.ConnectionId].transform.GetChild(0).GetComponent<AngleManager>().SetAngle(moveData.Angle);
     } 
 
     //ユーザーが移動したときの処理

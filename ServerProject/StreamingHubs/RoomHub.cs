@@ -273,6 +273,7 @@ namespace StreamingHubs
             //自分含め全員に通知
             this.Broadcast(room).OnHitBall(hitData);
         }
+
         /// <summary>
         /// 準備確認処理
         /// </summary>

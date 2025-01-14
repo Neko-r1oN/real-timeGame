@@ -22,17 +22,14 @@ public class PlayerManager : MonoBehaviour
     private GameObject cursor;
 
     public bool isHaveBall { get; set; }       //ボールを所持しているか
-
     public bool isGround { get; set; }         //地面に触れているか
+    public bool isJump;                        //ジャンプしているか
+    public bool isCatch { get; set; }          //キャッチ状態であるか
+    public bool isDash { get; set; }           //ダッシュ状態であるか
 
-    public bool isJump;
-    public bool isCatch { get; set; }
-    public bool isDash { get; set; }
+    public float velosity = 6.0f;              //ジャンプの強さ
 
-    public float velosity = 6.0f;
-
-    public int animState { get; set; }
-
+   
     GameObject ballPrefab;
     public float ballSpeed = 15.0f;
     
@@ -53,8 +50,8 @@ public class PlayerManager : MonoBehaviour
 
 
     //プレイヤーアニメーション
-    //Animator playerAnim;
     PlayerAnimation playerAnim;
+    private bool isLeft;     //画像の向き
 
     
 
@@ -66,7 +63,10 @@ public class PlayerManager : MonoBehaviour
 
     private void Start()
     {
-        // isCatch = true;
+        //画像の向き
+        isLeft = false;
+
+        //キャッチ状態
         isCatch = false;
 
         //HP設定
@@ -129,6 +129,10 @@ public class PlayerManager : MonoBehaviour
 
     void Update()
     {
+        //向き判定更新
+        this.gameObject.transform.GetChild(0).gameObject.GetComponent<AngleManager>().isLeft = this.isLeft;
+
+
         Vector3 move = (Camera.main.transform.forward * fixedJoystick.Vertical + Camera.main.transform.right * fixedJoystick.Horizontal)*moveSpeed;
 
         move.y = rigidbody.velocity.y;
@@ -156,8 +160,7 @@ public class PlayerManager : MonoBehaviour
             // いずれかの方向に移動している場合
             if (velocity.magnitude > 0)
             {
-               // animState = 1;    //ダッシュ
-
+            
                 // プレイヤーの位置(transform.position)の更新
                 // 移動方向ベクトル(velocity)を足し込みます
                 transform.position += velocity;
@@ -194,6 +197,7 @@ public class PlayerManager : MonoBehaviour
             }
         }
 
+        //地面についた状態で移動
         if(isDash && isGround)
         {
             playerAnim.SetAnim(PlayerAnimation.ANIM_STATE.DASH);
@@ -203,6 +207,7 @@ public class PlayerManager : MonoBehaviour
             playerAnim.SetAnim(PlayerAnimation.ANIM_STATE.IDLE);
         }
 
+        //ジャンプ
         if (isJump && !isDash)
         {
             playerAnim.SetAnim(PlayerAnimation.ANIM_STATE.JUMP);
@@ -233,7 +238,7 @@ public class PlayerManager : MonoBehaviour
 
    
 
-        public void Move()
+    public void Move()
     {
 
         float dx = fixedJoystick.Horizontal; //joystickの水平方向の動きの値、-1~1の値をとります
@@ -244,48 +249,48 @@ public class PlayerManager : MonoBehaviour
         float deg = rad * Mathf.Rad2Deg; //radianからdegreenに変換します
 
 
-
-        if (deg != 0) //joystickの原点と(dx,dy)の２点がなす角度が０ではないとき = joystickを動かしている時
+        //移動パッドが動かされている場合
+        if (deg != 0)
         {
-            //animState = 1; //wait→walkへ
             isDash = true;
-            //playerAnim.SetBool("isDash", true);
-            //playerAnim.SetAnim(PlayerAnimation.ANIM_STATE.DASH);
+            
         }
-        else //joystickの原点と(dx,dy)の２点がなす角度が０の時 = joystickが止まっている時
+        //移動パッドが触られていない状態
+        else 
         {
             isDash = false;
 
             if (/*isDash &&*/ !isJump)
             {
-                animState = 0; //walk→waitへ
-                //playerAnim.SetBool("isDash",false);
-                //playerAnim.SetAnim(PlayerAnimation.ANIM_STATE.IDLE);
                 isDash = false;
             }
         }
+
+        //右向きに
+        if (deg > 0) isLeft = false;
+
+        //左向きに
+        else if (deg < 0) isLeft = true;
+
     }
 
     public void OnClickJump()
     {
-        animState = 2;
-        //.SetBool("isJump", true);
-        
+        playerAnim.SetAnim(PlayerAnimation.ANIM_STATE.JUMP);
         Debug.Log("ジャンプ");
         isDash = false;
         isJump = true;
-        playerAnim.SetAnim(PlayerAnimation.ANIM_STATE.JUMP);
     }
 
     public void OnClickCatch()
     {
+        playerAnim.SetAnim(PlayerAnimation.ANIM_STATE.CATCH);
+
         isDash = false;
         isCatch = true;
         Debug.Log("キャッチ");
-        animState = 3;
-        //playerAnim.SetTrigger("isCatch");
-        playerAnim.SetAnim(PlayerAnimation.ANIM_STATE.CATCH);
-        //yield return new WaitForSeconds(1);
+        
+       
 
         isCatch = false;
         Debug.Log("キャッチ解除");
@@ -297,17 +302,16 @@ public class PlayerManager : MonoBehaviour
         //ジャンプ状態だったら
         if (isJump)
         {
-            //ジャンプアニメーション
-            animState = 4;
-            //playerAnim.SetBool("isThrow", true);
+            //ジャンプ投げアニメーション
+           
             playerAnim.SetAnim(PlayerAnimation.ANIM_STATE.AIRTHROW);
         }
         else
         {
-            animState = 4;
-            //playerAnim.SetBool("isThrow", true);
+            //投げアニメーション
             playerAnim.SetAnim(PlayerAnimation.ANIM_STATE.THROW);
         }
+
         Invoke("isThrowOut", 2.0f);
         Shot();
     }
@@ -315,29 +319,26 @@ public class PlayerManager : MonoBehaviour
     //フェイント(投げるふり)処理
     public  void OnClickFeint()
     {
-        animState = 4;
+        //フェイントアニメーション
         playerAnim.SetAnim(PlayerAnimation.ANIM_STATE.THROW);
-        //playerAnim.SetBool("isThrow", true);
+        
         Invoke("isThrowOut", 1.0f);
     }
 
 
-
+    /// <summary>
+    /// ボール発射処理
+    /// </summary>
     void Shot()
     {
-
-        // shotObj.GetComponent<Rigidbody>().velocity = transform.forward * ballSpeed;
-
         if (isHaveBall)
         {
-            //自クライアントのみマスタークライアント
+            //マスタークライアントに変更
             roomModel.isMaster = true;
-
 
             GameObject newbullet = Instantiate(ballPrefab, new Vector3(this.transform.position.x, this.transform.position.y, this.transform.position.z), Quaternion.identity); //弾を生成
             Rigidbody bulletRigidbody = newbullet.GetComponent<Rigidbody>();
             bulletRigidbody.velocity = (transform.forward * ballSpeed); //キャラクターが向いている方向に弾に力を加える
-            //Destroy(newbullet, 10); //10秒後に弾を消す
 
             ThrowBall();
 
@@ -353,33 +354,26 @@ public class PlayerManager : MonoBehaviour
 
     void OnCollisionEnter(Collision other)
     {
-        //animState = 0;
-       
-
+      
         //着地を検出したので着地状態を書き換え
         if (!isGround)
         {
-            //Debug.Log(animState);
-            animState = 0;
-            //playerAnim.SetBool("isJump", false);
             playerAnim.SetAnim(PlayerAnimation.ANIM_STATE.IDLE);
 
             isJump = false;
             isGround = true;
         }
       
-        
-
+        //クリア判定オブジェクト(デバッグ用)
         if (other.gameObject.tag == "Clear")
         {
             // 全ユーザーにゲーム終了通知
-
             FinishGame();
         }
 
+        //ボールオブジェクト
         if (other.gameObject.tag == "Ball")
         {
-            
             //キャッチ状態でボールに触ったら
             if (isCatch)
             {
@@ -387,18 +381,19 @@ public class PlayerManager : MonoBehaviour
                 isHaveBall = true;
                 Destroy(other.gameObject);    //ボール削除
                 Debug.Log("キャッチ成功");
+
+                GetBall();
             }
             //キャッチ状態じゃなかったら
             else
             {
                 HitBall();
 
-                
             }
             
         }
 
-        //ダメージ性のない状態だったら
+        //ダメージ性のない状態のボール
         if(other.gameObject.tag == "EasyBall")
         {
             //ボール所持状態にする
@@ -415,7 +410,7 @@ public class PlayerManager : MonoBehaviour
     //ボール取得処理
     private async void GetBall()
     {
-        //
+        //ボール所持者変更
         gameDirector.getUserId = roomModel.ConnectionId;
         Debug.Log("ボール取得");
 
@@ -425,7 +420,6 @@ public class PlayerManager : MonoBehaviour
     //ボール取得処理
     private async void ThrowBall()
     {
-        
         //ボール情報
         var throwData = new ThrowData()
         {
@@ -561,4 +555,8 @@ public class PlayerManager : MonoBehaviour
         playerAnim.SetAnim(PlayerAnimation.ANIM_STATE.IDLE);
     }
 
+    public bool GetAngle()
+    {
+        return isLeft;
+    }
 }

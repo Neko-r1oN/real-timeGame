@@ -10,6 +10,8 @@ public class PlayerAnimation : MonoBehaviour
 
     private FixedJoystick joyStick;
 
+    public bool isLeft;
+
     //private PlayerManager player;
     //private EnemyManager enemy;
   
@@ -34,20 +36,23 @@ public class PlayerAnimation : MonoBehaviour
     {
         animator = this.gameObject.GetComponent<Animator>();
 
+        isLeft = false;
+
     }
 
     void Update()
     {
-        //é©ã@ÇæÇ¡ÇΩèÍçá
-        if (GetComponentInParent<PlayerManager>())
+        if (isLeft)
         {
-            //animator.SetInteger("animation", (int)ANIM_STATE.IDLE);
-        }
-        //é©ã@ÇæÇ¡ÇΩèÍçá
-        if (GetComponentInParent<EnemyManager>()) 
-        {
+            this.gameObject.transform.gameObject.GetComponent<SpriteRenderer>().flipX = false;
 
         }
+        if (!isLeft)
+        {
+            this.gameObject.transform.gameObject.GetComponent<SpriteRenderer>().flipX = true;
+        }
+
+
     }
 
     /// <summary>
@@ -68,5 +73,10 @@ public class PlayerAnimation : MonoBehaviour
     public void SetEnemyAnim(int id)
     {
         animator.SetInteger("animation", id);
+    }
+
+    public bool GetAngle()
+    {
+        return isLeft;
     }
 }
