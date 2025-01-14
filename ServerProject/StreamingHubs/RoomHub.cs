@@ -270,6 +270,15 @@ namespace StreamingHubs
 
         public async Task HitBallAsync(HitData hitData)
         {
+            //準備できたことを自分のRoomDataに保存
+            var roomDataStrage = this.room.GetInMemoryStorage<RoomData>();
+            var roomData = roomDataStrage.Get(hitData.ConnectionId);
+            roomData.UserState.Score += hitData.Point;
+
+            Console.WriteLine("このクライアントID:"+this.ConnectionId);
+            Console.WriteLine("当てたID:" + hitData.ConnectionId);
+            Console.WriteLine(roomData.UserState.Score);
+
             //自分含め全員に通知
             this.Broadcast(room).OnHitBall(hitData);
         }
@@ -360,8 +369,11 @@ namespace StreamingHubs
 
         
 
-        /// ゲーム終了処理
-        public async Task GameFinishAsync()
+        /// <summary>
+        /// ユーザーゲームオーバー処理
+        /// </summary>
+        /// <returns></returns>
+        public async Task DeadUserAsync()
         {
             var roomStorage = room.GetInMemoryStorage<RoomData>();
             RoomData[] roomDataList = roomStorage.AllValues.ToArray<RoomData>();
@@ -372,8 +384,8 @@ namespace StreamingHubs
             data.UserState.Ranking = GetRanking(roomDataList);
 
             //排他制御
-            //lock (roomStorage)
-            //{
+            lock (roomStorage)
+            {
 
                 //全員がゲーム終了したかチェック
                 bool isAllGameFinish = true;
@@ -384,7 +396,7 @@ namespace StreamingHubs
 
                 //ルーム参加者全員にゲーム終了通知を送信
                 this.Broadcast(room).FinishGame(this.ConnectionId, data.JoinedUser.UserData.Name, isAllGameFinish);
-            //}
+            }
         }
 
         //ランキング取得処理

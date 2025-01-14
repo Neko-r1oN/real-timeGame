@@ -104,10 +104,10 @@ namespace Shared.Interfaces.StreamingHubs
 
  
         /// <summary>
-        /// ゲーム終了関数
+        /// ユーザーゲームオーバー関数
         /// </summary>
         /// <returns></returns>
-        Task GameFinishAsync();
+        Task DeadUserAsync();
 
 
         

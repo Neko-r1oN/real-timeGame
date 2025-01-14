@@ -75,8 +75,10 @@ public class GameDirector : MonoBehaviour
 
     public Sprite you;
 
+    //リザルトUIプレハブ
+    [SerializeField] GameObject resultUIPrefab;
     //リザルトUI
-    [SerializeField] GameObject resultUI;
+    [SerializeField] GameObject resultUIObj;
 
     //プレイヤー存在判定
     private bool isPlayer;
@@ -102,7 +104,7 @@ public class GameDirector : MonoBehaviour
 
     PlayerManager playerManager;
 
-    //自打球防止用変数
+    //自滅防止用変数
     public Guid getUserId;
 
     //ゲーム状態
@@ -124,6 +126,8 @@ public class GameDirector : MonoBehaviour
     Dictionary<Guid, GameObject> standUIList = new Dictionary<Guid, GameObject>();
     //スコアUIリスト
     Dictionary<Guid, GameObject> scoreUIList = new Dictionary<Guid, GameObject>();
+    //リザルトUIリスト
+    Dictionary<Guid, GameObject> resultUIList = new Dictionary<Guid, GameObject>();
 
     void Awake()
     {
@@ -157,7 +161,7 @@ public class GameDirector : MonoBehaviour
 
         roomModel.StartGameUser += this.GameStart;     //ゲーム開始
 
-        roomModel.FinishGameUser += this.GameFinish;   //ゲーム終了
+        roomModel.FinishGameUser += this.FinishGameUser;   //ゲーム終了
 
 
         isPlayer = false;
@@ -669,12 +673,12 @@ public class GameDirector : MonoBehaviour
     }
     
 
-    public void GameFinish(Guid connectionId, string userName, bool isFinishAllUser)
+    public void FinishGameUser(Guid connectionId, string userName, bool isFinishAllUser)
     {
         Debug.Log("ゲーム終了");
 
         
-        resultUI.SetActive(true);
+        resultUIObj.SetActive(true);
     }
 
    

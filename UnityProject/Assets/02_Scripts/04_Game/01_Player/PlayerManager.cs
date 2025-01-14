@@ -367,8 +367,7 @@ public class PlayerManager : MonoBehaviour
         //クリア判定オブジェクト(デバッグ用)
         if (other.gameObject.tag == "Clear")
         {
-            // 全ユーザーにゲーム終了通知
-            FinishGame();
+            DeadUser();
         }
 
         //ボールオブジェクト
@@ -475,6 +474,9 @@ public class PlayerManager : MonoBehaviour
             Debug.Log("デッティ");
             //死亡処理
             playerAnim.SetAnim(PlayerAnimation.ANIM_STATE.DEAD);
+
+
+            await roomModel.DeadUserAsync();
         }
 
 
@@ -493,11 +495,11 @@ public class PlayerManager : MonoBehaviour
         //整数化してreturn
         return (int)point;
     }
-    // ゲーム終了通知送信処理
-    private async void FinishGame()
+    //自機ゲームオーバー通知送信処理
+    private async void DeadUser()
     {
        
-        await roomModel.FinishGameAsync();
+        
     }
 
 

@@ -334,10 +334,10 @@ public class RoomModel : BaseModel, IRoomHubReceiver
     {
         StartGameUser();
     }
-    //ゲーム終了処理
-    public async UniTask FinishGameAsync()
+    //ユーザーゲームオーバー処理
+    public async UniTask DeadUserAsync()
     {
-        await roomHub.GameFinishAsync();
+        await roomHub.DeadUserAsync();
         Debug.Log("ゲーム終了");
     }
     //ゲーム終了通知

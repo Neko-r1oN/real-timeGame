@@ -14294,7 +14294,8 @@ MonoBehaviour:
   player3: {fileID: 21300000, guid: 302d0d2ccf8241c45a77968d29b11fd5, type: 3}
   player4: {fileID: 21300000, guid: 419f92e85e6bff84eabf62451999490e, type: 3}
   you: {fileID: 21300000, guid: 27f15b56367a8a04babd6a2cad96e5ea, type: 3}
-  resultUI: {fileID: 594414696}
+  resultUIPrefab: {fileID: 0}
+  resultUIObj: {fileID: 594414696}
   ballPrefab: {fileID: 5839582734758495781, guid: f0fafca8199e73e45813f86c78479e3e, type: 3}
   point: 0
 --- !u!1 &2151839132868184441
