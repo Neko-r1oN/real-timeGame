@@ -23,7 +23,6 @@ public class RoomModel : BaseModel, IRoomHubReceiver
 
     //接続ID
     public Guid ConnectionId { get; set; }
-
     //ユーザー接続通知
     public Action<JoinedUser> OnJoinedUser {  get; set; }
     //ユーザー切断通知
@@ -39,11 +38,9 @@ public class RoomModel : BaseModel, IRoomHubReceiver
     public Action<MoveData> MovedUser { get; set; }
     //ボール移動通知
     public Action<MoveData> MovedBall { get; set; }
-
     //ボール発射通知
     public Action<ThrowData> ThrowedBall { get; set; }
-
-    //ボール発射通知
+    //ボール獲得通知
     public Action<Guid> GetBall { get; set; }
 
     //ボールヒット通知
@@ -67,8 +64,11 @@ public class RoomModel : BaseModel, IRoomHubReceiver
     //ユーザー状態更新通知
     public Action<Guid,UserState> UpdateStateUser { get; set; }
 
+    //ユーザー死亡通知
+    public Action<DeadData, int> UserDead { get; set; }
+
     //ゲーム終了通知
-    public Action<Guid, string, bool> FinishGameUser { get; set; }
+    public Action FinishGameUser { get; set; }
 
     //ゲーム開始通知
     public Action StartGameUser { get; set; }
@@ -334,16 +334,23 @@ public class RoomModel : BaseModel, IRoomHubReceiver
     {
         StartGameUser();
     }
-    //ユーザーゲームオーバー処理
-    public async UniTask DeadUserAsync()
+
+    //ユーザー死亡処理
+    public async UniTask DeadUserAsync(DeadData deadData,int deadNum)
     {
-        await roomHub.DeadUserAsync();
-        Debug.Log("ゲーム終了");
+        await roomHub.DeadUserAsync(deadData,deadNum);
     }
-    //ゲーム終了通知
-    public void FinishGame(Guid connectionId,string userName,bool isFinishAllUser)
+    //ユーザー死亡通知
+    public void DeadUser(DeadData deadData, int deadNum)
     {
-        FinishGameUser(connectionId, userName, isFinishAllUser);
+        UserDead(deadData, deadNum);
+    }
+
+    //ゲーム終了通知
+    public void FinishGame()
+    {
+        Debug.Log("終了通知受け取り");
+        FinishGameUser();
     }
 }
 

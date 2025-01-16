@@ -9,6 +9,8 @@ TagManager:
   - Clear
   - Ball
   - EasyBall
+  - Dead
+  - BallPlayer
   layers:
   - Default
   - TransparentFX

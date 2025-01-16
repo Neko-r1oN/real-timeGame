@@ -102,12 +102,20 @@ namespace Shared.Interfaces.StreamingHubs
         /// <returns></returns>
         Task GameCountFinishAsync();
 
- 
+
         /// <summary>
-        /// ユーザーゲームオーバー関数
+        ///  ユーザーゲームオーバー関数
+        /// </summary>
+        /// <param name="deadData">死亡時のデータ</param>
+        /// <param name="deadNum">死亡者数</param>
+        /// <returns></returns>
+        Task DeadUserAsync(DeadData deadData,int deadNum);
+
+        /// <summary>
+        /// ゲーム終了関数
         /// </summary>
         /// <returns></returns>
-        Task DeadUserAsync();
+        Task FinishGameAsync();
 
 
         

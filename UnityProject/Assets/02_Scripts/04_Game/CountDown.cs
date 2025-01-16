@@ -15,6 +15,8 @@ public class CountDown : MonoBehaviour
     public float animTime;
     public float initScale;
 
+    GameDirector gameDirector;
+
     public bool isAnimEnd { get; private set; }
 
     [SerializeField] GameObject controller;
@@ -225,6 +227,9 @@ public class CountDown : MonoBehaviour
                     Debug.Log("5");
 
                     changeCamNum++;
+
+                   
+                    
 
                     guard.SetActive(false);
                     controller.SetActive(true);

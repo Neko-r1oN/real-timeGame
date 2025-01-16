@@ -16,7 +16,7 @@ namespace StreamingHubs
         //プレイヤー番号リスト
         private int[] numberList = {1,2,3,4};
         //ルーム最大収容人数
-        private int MAX_PLAYER = 4;
+        private int MAX_PLAYER = 2;
 
      
         /// <summary>
@@ -275,7 +275,6 @@ namespace StreamingHubs
             var roomData = roomDataStrage.Get(hitData.ConnectionId);
             roomData.UserState.Score += hitData.Point;
 
-            Console.WriteLine("このクライアントID:"+this.ConnectionId);
             Console.WriteLine("当てたID:" + hitData.ConnectionId);
             Console.WriteLine(roomData.UserState.Score);
 
@@ -367,13 +366,20 @@ namespace StreamingHubs
             this.Broadcast(room).GameCount(currentTime);
         }
 
-        
+
+        public async Task FinishGameAsync()
+        {
+            //接続IDが1番のクライアントのみ実行
+            this.Broadcast(room).FinishGame();
+        }
 
         /// <summary>
         /// ユーザーゲームオーバー処理
         /// </summary>
+        /// <param name="deadData">死亡時のデータ</param>
+        /// <param name="deadNum">死亡者数</param>
         /// <returns></returns>
-        public async Task DeadUserAsync()
+        public async Task DeadUserAsync(DeadData deadData,int deadNum)
         {
             var roomStorage = room.GetInMemoryStorage<RoomData>();
             RoomData[] roomDataList = roomStorage.AllValues.ToArray<RoomData>();
@@ -381,21 +387,36 @@ namespace StreamingHubs
             //送信したユーザーのデータを更新
             var data = roomStorage.Get(this.ConnectionId);
             data.UserState.isGameFinish = true;
+            data.UserState.Score = deadData.Point;
             data.UserState.Ranking = GetRanking(roomDataList);
+
+            //死亡者加算
+            int dead = deadNum + 1;
 
             //排他制御
             lock (roomStorage)
             {
+                Console.WriteLine("死亡者:" + deadData.Name);
+                Console.WriteLine("死亡人数:" + dead);
+
+                //ルーム参加者全員に死亡通知を送信
+                this.Broadcast(room).DeadUser(deadData, dead);
+
+                //一人以外やられた場合
+                if(dead >= MAX_PLAYER)
+                {
+                    Console.WriteLine("全員でっでぃ");
+                    //ルーム参加者全員にゲーム終了通知を送信
+                    this.Broadcast(room).FinishGame();
+                }
 
                 //全員がゲーム終了したかチェック
-                bool isAllGameFinish = true;
+                /*bool isAllGameFinish = true;
                 foreach (var roomData in roomDataList)
                 {
                     if (!roomData.UserState.isGameFinish) isAllGameFinish = false;
-                }
-
-                //ルーム参加者全員にゲーム終了通知を送信
-                this.Broadcast(room).FinishGame(this.ConnectionId, data.JoinedUser.UserData.Name, isAllGameFinish);
+                }*/
+               
             }
         }
 

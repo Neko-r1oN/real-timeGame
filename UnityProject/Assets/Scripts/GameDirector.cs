@@ -63,7 +63,10 @@ public class GameDirector : MonoBehaviour
     [SerializeField] GameObject spawnStandUIObj;
 
 
-   
+    public bool isStart;
+    public float time;              //生存時間
+
+
 
     //ゲームUI
     [SerializeField] GameObject gameUI;
@@ -77,8 +80,11 @@ public class GameDirector : MonoBehaviour
 
     //リザルトUIプレハブ
     [SerializeField] GameObject resultUIPrefab;
-    //リザルトUI
-    [SerializeField] GameObject resultUIObj;
+    //リザルトUI生成位置
+    [SerializeField] GameObject resultUIPos;
+
+    //リザルトUI生成位置
+    [SerializeField] GameObject resultObj;
 
     //プレイヤー存在判定
     private bool isPlayer;
@@ -100,13 +106,17 @@ public class GameDirector : MonoBehaviour
     private int animNum;
 
     public Guid enemyId;     //敵ID保存用
+    public int enemyPoint;
     public int point;
 
     PlayerManager playerManager;
 
     //自滅防止用変数
     public Guid getUserId;
+    public int deadNum;
+    public bool isDead;
 
+    public int JoinNum;
     //ゲーム状態
     public enum GAME_STATE
     {
@@ -119,7 +129,13 @@ public class GameDirector : MonoBehaviour
 
     GAME_STATE game_State = GAME_STATE.STOP;
 
-    
+    Color RedColor = new Color32(247, 33, 73, 255);
+    Color BlueColor = new Color32(33, 112, 247, 255);
+    Color GreenColor = new Color32(33, 247, 87, 255);
+    Color YellowColor = new Color32(247, 247, 33, 255);
+
+
+
     //キャラクターリスト
     Dictionary<Guid,GameObject>characterList = new Dictionary<Guid, GameObject>();
     //待機UIリスト
@@ -136,7 +152,9 @@ public class GameDirector : MonoBehaviour
     }
     async void Start()
     {
-       
+        enemyPoint = 0;
+        point = 0;
+
 
         //ユーザーが入室した際にOnJoinedUserメゾットを実行するようにモデルに登録しておく
         roomModel.OnJoinedUser += this.OnJoinedUser;   //ユーザー入室
@@ -161,6 +179,8 @@ public class GameDirector : MonoBehaviour
 
         roomModel.StartGameUser += this.GameStart;     //ゲーム開始
 
+        roomModel.UserDead += this.DeadUser;           //ユーザー死亡
+
         roomModel.FinishGameUser += this.FinishGameUser;   //ゲーム終了
 
 
@@ -171,6 +191,10 @@ public class GameDirector : MonoBehaviour
         isJoinFirst = false;
 
         cursor.SetActive(false);
+
+        deadNum = 0;
+        isDead = false;
+        resultObj.SetActive(false);
 
         //ユーザーモデルを取得
         userModel = GameObject.Find("UserModel").GetComponent<UserModel>();
@@ -194,16 +218,27 @@ public class GameDirector : MonoBehaviour
     {
         if (!isPlayer) return;
         
-       /* if(game_State == GAME_STATE.PREPARATION)
+        if(isStart)
         {
-            standByUI.SetActive(true);
-        }
-        else
-        {
-            standByUI.SetActive(false);
-        }*/
 
-       
+            //生存時間更新
+            time += Time.deltaTime;
+
+        }
+
+        switch (game_State)
+        {
+            case GAME_STATE.STOP:
+
+                break;
+            case GAME_STATE.READY:
+                standByUI.SetActive(true);
+                break;
+            case GAME_STATE.START:
+                standByUI.SetActive(false);
+                break;
+        }
+
     }
 
 
@@ -213,18 +248,19 @@ public class GameDirector : MonoBehaviour
     {
         //isJoinFirst = false;
 
-        if (!userId)
+        /*if (!userId)
         {
             return;
-        }
+        }*/
 
         Debug.Log("ルーム名:"+roomName.text);
         Debug.Log("ユーザーID;" + userModel.userId);
 
         cursor.SetActive(true);
 
-        game_State = GAME_STATE.PREPARATION;
+        game_State = GAME_STATE.READY;
 
+        
         await roomModel.JoinAsync(roomName.text, userModel.userId);     //ルーム名とユーザーIDを渡して入室
         //await roomModel.JoinAsync(roomName.text, userModel.userId);
 
@@ -253,7 +289,7 @@ public class GameDirector : MonoBehaviour
 
         await roomModel.JoinLobbyAsync(userModel.userId);     //ルーム名とユーザーIDを渡して入室
 
-        game_State = GAME_STATE.PREPARATION;
+        game_State = GAME_STATE.READY;
 
         Debug.Log("マッチング中");
     }
@@ -297,7 +333,9 @@ public class GameDirector : MonoBehaviour
 
         scoreUIList[user.ConnectionId] = charaInfoUI;        //フィールドで保持
 
-
+        //UIカラー
+        Image standUIColor = standByCharaUI.gameObject.GetComponent<Image>();
+        Image infoUIColor = charaInfoUI.transform.GetChild(2).transform.GetChild(0).gameObject.GetComponent<Image>();
 
         //プレイヤーNo取得(UI)
         Image number = standByCharaUI.transform.GetChild(1).gameObject.GetComponent<Image>();
@@ -322,6 +360,7 @@ public class GameDirector : MonoBehaviour
         /*//HP(デフォルト)
         Text playerPoint = charaInfoUI.transform.GetChild(4).gameObject.GetComponent<Text>();
         playerPoint.text = playerManager.hp.ToString();*/
+
         //自機区別テキスト表示
         GameObject child = characterObject.transform.GetChild(1).gameObject;
 
@@ -338,8 +377,9 @@ public class GameDirector : MonoBehaviour
                 charaNum.sprite = player1;
                 characterObject.name = "player1";
                 standByCharaUI.name = "UI1";
-
-
+                charaInfoUI.name = "UI1";
+                standUIColor.color = RedColor;
+                infoUIColor.color = RedColor;
                 break;
             case 2:
                 number.sprite = player2;
@@ -347,7 +387,10 @@ public class GameDirector : MonoBehaviour
                 charaNum.sprite = player2;
                 characterObject.name = "player2";
                 standByCharaUI.name = "UI2";
+                charaInfoUI.name = "UI2";
 
+                standUIColor.color = BlueColor;
+                infoUIColor.color = BlueColor;
                 break;
             case 3:
                 number.sprite = player3;
@@ -355,17 +398,22 @@ public class GameDirector : MonoBehaviour
                 charaNum.sprite = player3;
                 characterObject.name = "player3";
                 standByCharaUI.name = "UI3";
+                charaInfoUI.name = "UI3";
+
+                standUIColor.color = GreenColor;
+                infoUIColor.color = GreenColor;
                 break;
             case 4:
                
                 number.sprite = player4;
                 scoreUINumber.sprite = player4;
                 charaNum.sprite = player4;
-                characterObject.name = "player3";
-                /*standByUI.SetActive(false);
-                game_State = GAME_STATE.START;*/
-                Debug.Log("4人目通貨");
+                characterObject.name = "player4";
                 standByCharaUI.name = "UI4";
+                charaInfoUI.name = "UI4";
+
+                standUIColor.color = YellowColor;
+                infoUIColor.color = YellowColor;
 
                 break;
             default:
@@ -380,7 +428,8 @@ public class GameDirector : MonoBehaviour
             //自機のNoをYOUに張り替え
             charaNum.sprite = you;
 
-            
+            JoinNum = user.JoinOrder;
+
             //Instantiate(youPrefab, spawnPosList[user.JoinOrder - 1].transform.position, Quaternion.identity, characterList[roomModel.ConnectionId].gameObject.transform); //インスタンス生成
 
             characterObject.name = "MyPlay";
@@ -434,7 +483,13 @@ public class GameDirector : MonoBehaviour
         {
             Destroy(ui.gameObject);
         }
-       
+
+        //リザルトUIオブジェクト削除
+        foreach (Transform result in resultObj.transform)
+        {
+            Destroy(result.gameObject);
+        }
+
 
         isPlayer = false;
 
@@ -448,13 +503,10 @@ public class GameDirector : MonoBehaviour
     {
         //プレイヤーがいなかったら
        if (!characterList.ContainsKey(connnectionId))
-        {
-            return;
-        }
+       {
+           return;
+       }
        
-       
-
-
         //退出したプレイヤーのオブジェクト削除
         Destroy(characterList[connnectionId]);
 
@@ -487,6 +539,10 @@ public class GameDirector : MonoBehaviour
         
             Debug.Log(animNum.ToString());
         }*/
+        
+        //コンポーネント付与
+        characterList[roomModel.ConnectionId].transform.GetChild(0).gameObject.GetComponent<PlayerAnimation>().Init();
+
         //移動情報
         var moveData = new MoveData()
         {
@@ -530,11 +586,14 @@ public class GameDirector : MonoBehaviour
     //ユーザーが移動したときの処理
     private async void MovedUser(MoveData moveData)
     {
-        //プレイヤーがいなかったら
+        //送られてきたプレイヤーが存在していなかったら
         if (!characterList.ContainsKey(moveData.ConnectionId))
         {
             return;
         }
+
+        //コンポーネント付与
+        characterList[moveData.ConnectionId].transform.GetChild(0).GetComponent<PlayerAnimation>().Init();
 
         //移動したプレイヤーの位置代入
         //characterList[moveData.ConnectionId].transform.position = moveData.Pos;
@@ -544,10 +603,14 @@ public class GameDirector : MonoBehaviour
 
         //Dotweenで移動補完
         characterList[moveData.ConnectionId].transform.DOMove(moveData.Pos, dotweenTime).SetEase(Ease.Linear);
+        //Debug.Log("移動同期通った");
         //Dotweenで回転補完
+
         characterList[moveData.ConnectionId].transform.DORotate(moveData.Rotate, dotweenTime).SetEase(Ease.Linear);
+        //Debug.Log("回転同期");
         //アニメーション更新
         characterList[moveData.ConnectionId].transform.GetChild(0).GetComponent<PlayerAnimation>().SetEnemyAnim(moveData.AnimId);
+        //Debug.Log("アニメーション通った");
         //キャラクターの向き更新
         characterList[moveData.ConnectionId].transform.GetChild(0).GetComponent<AngleManager>().SetAngle(moveData.Angle);
     } 
@@ -570,6 +633,8 @@ public class GameDirector : MonoBehaviour
     //ボール発射処理
     private async void ThrowedBall(ThrowData throwData)
     {
+        //タグ変更
+        characterList[throwData.ConnectionId].gameObject.tag = "Enemy";
         //投げたユーザーのIDを保存
         enemyId = throwData.ConnectionId;
 
@@ -588,6 +653,8 @@ public class GameDirector : MonoBehaviour
     {
         Debug.Log(getUserId);
 
+        //タグ変更
+        characterList[getUserId].gameObject.tag = "BallPlayer";
         //取得者IDを更新
         this.getUserId = getUserId;
 
@@ -614,10 +681,12 @@ public class GameDirector : MonoBehaviour
         //ポイント反映
         Text playerPoint = scoreUIList[hitData.EnemyId].transform.GetChild(4).gameObject.GetComponent<Text>();
 
-        point = int.Parse(playerPoint.text);
+        enemyPoint = int.Parse(playerPoint.text);
 
-        point += hitData.Point;
-        playerPoint.text = point.ToString();
+        enemyPoint += hitData.Point;
+        playerPoint.text = enemyPoint.ToString();
+
+        if (roomModel.ConnectionId == hitData.EnemyId) point += hitData.Point;
 
         Debug.Log("獲得ポイント:" + hitData.Point);
         //当てたユーザーの得点加算
@@ -668,25 +737,155 @@ public class GameDirector : MonoBehaviour
        
         gameUI.SetActive(true);
         //await roomModel.StartGameAsync();
-       
 
+        Invoke("CountStart", 3.5f);
+    }
+    private void CountStart()
+    {
+        Debug.Log("タイマー開始");
+        isStart = true;
     }
     
-
-    public void FinishGameUser(Guid connectionId, string userName, bool isFinishAllUser)
+    public void DeadUser(DeadData deadData,int deadNum)
     {
-        Debug.Log("ゲーム終了");
+        if (deadData.ConnectionId == roomModel.ConnectionId)
+        {
+            //死亡判定
+            isDead = true;
+        }
 
+        //死亡ユーザーのタグ変更
+        characterList[deadData.ConnectionId].tag = "Dead";
+
+        //死亡人数更新
+        this.deadNum = deadNum;
+
+        //残機リスト
+        GameObject lifeList = scoreUIList[deadData.ConnectionId].transform.GetChild(5).gameObject;
+        //死亡者の残機リスト削除
+        Destroy(lifeList);
+
+
+        //死亡者のリザルトUI生成
+        GameObject resultUI = Instantiate(resultUIPrefab, Vector3.zero, Quaternion.identity, resultUIPos.gameObject.transform);
+        //リザルトUIのImageコンポーネント取得
+        Image UIColor = resultUI.GetComponent<Image>();
+
+        resultUIList[deadData.ConnectionId] = resultUI;        //フィールドで保持
+
+        //プレイヤーNo取得(UI)
+        Image number = resultUI.transform.GetChild(4).gameObject.GetComponent<Image>();
+
+        //リザルト詳細情報取得
+        GameObject detailList = resultUI.transform.GetChild(5).gameObject;
+
+        //プレイヤー名取得
+        Text name = resultUI.transform.GetChild(3).gameObject.GetComponent<Text>();
+        name.text = deadData.Name;
+
+        //詳細情報
         
-        resultUIObj.SetActive(true);
+        //ポイント
+        Text pointText = detailList.transform.GetChild(0).transform.GetChild(1).gameObject.GetComponent<Text>();
+        pointText.text = deadData.Point.ToString();
+
+        //生存時間
+        Text timeText = detailList.transform.GetChild(1).transform.GetChild(1).gameObject.GetComponent<Text>();
+        int minutes = 0;  //分
+        int seccond = 0;  //秒
+
+        //最後か
+        Debug.Log(deadData.IsLast);
+       
+        //最後のプレイヤーだった場合
+        if(deadData.IsLast)
+        {
+            timeText.text = "--:--";
+        }
+        else
+        {
+            while (deadData.Time >= 60)
+            {
+                deadData.Time -= 60;
+                minutes++;
+            }
+            seccond = deadData.Time;
+
+            //テキスト左0詰め
+            var minutesText = minutes.ToString("D2");
+            var seccondText = seccond.ToString("D2");
+
+            timeText.text = minutesText + ":" + seccondText;
+        }
+        
+        //投げた回数
+        Text throwText = detailList.transform.GetChild(2).transform.GetChild(1).gameObject.GetComponent<Text>();
+        throwText.text = deadData.ThrowNum.ToString();
+
+        //当てた回数
+        Text hitText = detailList.transform.GetChild(3).transform.GetChild(1).gameObject.GetComponent<Text>();
+        hitText.text = deadData.HitNum.ToString();
+
+        //キャッチ回数
+        Text catchText = detailList.transform.GetChild(4).transform.GetChild(1).gameObject.GetComponent<Text>();
+        catchText.text = deadData.CatchNum.ToString();
+
+
+        //プレイヤーナンバー画像差し替え
+        switch (deadData.JoinOrder)
+        {
+            case 1:
+                number.sprite = player1;
+                resultUI.name = "player1";
+                UIColor.color = RedColor;
+                break;
+            case 2:
+                number.sprite = player2;
+                resultUI.name = "player2";
+                UIColor.color = BlueColor;
+
+
+                break;
+            case 3:
+                number.sprite = player3;
+                resultUI.name = "player3";
+                UIColor.color = GreenColor;
+
+                break;
+            case 4:
+                number.sprite = player4;
+                resultUI.name = "player4";
+                UIColor.color = YellowColor;
+
+                break;
+            default:
+                Debug.Log("不到達点");
+                break;
+        }
+
+    }
+
+    public void FinishGameUser()
+    {
+        Debug.Log("ゲーム終了通知");
+
+        //リザルト表示
+        resultObj.SetActive(true);
     }
 
    
     public async void OnClickHome()
     {
-        //退出
+        //同期通信解除
+        CancelInvoke();
+
+        //退出処理
         await roomModel.LeaveAsync();
 
+        //MagicOnion切断処理
+        await roomModel.DisConnectAsync();
+
+        //シーン再読み込み
         SceneManager.LoadScene(SceneManager.GetActiveScene().name);
     }
 

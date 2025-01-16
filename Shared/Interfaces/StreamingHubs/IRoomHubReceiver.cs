@@ -58,8 +58,11 @@ namespace Shared.Interfaces.StreamingHubs
         //ゲーム内カウント通知
         void StartGame();
 
+        //ユーザー死亡通知
+        void DeadUser(DeadData deadData, int deadNum);
+
         //ゲーム終了通知
-        void FinishGame(Guid connectionId,string userName,bool isFinishAllUser);
+        void FinishGame();
 
 
     }

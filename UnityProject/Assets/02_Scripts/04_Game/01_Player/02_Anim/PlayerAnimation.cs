@@ -32,16 +32,17 @@ public class PlayerAnimation : MonoBehaviour
     //アニメステートを初期値に設定
     ANIM_STATE anim_State = ANIM_STATE.IDLE;
 
-    void Start()
+    //コンポーネント付与処理
+    public void Init()
     {
         animator = this.gameObject.GetComponent<Animator>();
 
         isLeft = false;
-
     }
 
     void Update()
     {
+        //キャラクターの向き切り替え
         if (isLeft)
         {
             this.gameObject.transform.gameObject.GetComponent<SpriteRenderer>().flipX = false;
@@ -55,11 +56,12 @@ public class PlayerAnimation : MonoBehaviour
 
     }
 
+    
     /// <summary>
     /// アニメーションID取得
     /// </summary>
     /// <returns>アニメーションID</returns>
-   public int GetAnimId()
+    public int GetAnimId()
     {
         return animator.GetInteger("animation");
     }
@@ -69,12 +71,14 @@ public class PlayerAnimation : MonoBehaviour
         animator.SetInteger("animation", (int)animId);
     }
 
-    //敵アニメーション関数
+    //敵アニメーション反映関数
     public void SetEnemyAnim(int id)
     {
+
         animator.SetInteger("animation", id);
     }
 
+    //敵の向き反映関数
     public bool GetAngle()
     {
         return isLeft;
