@@ -16,7 +16,7 @@ namespace StreamingHubs
         //プレイヤー番号リスト
         private int[] numberList = {1,2,3,4};
         //ルーム最大収容人数
-        private int MAX_PLAYER = 2;
+        private int MAX_PLAYER = 4;
 
      
         /// <summary>

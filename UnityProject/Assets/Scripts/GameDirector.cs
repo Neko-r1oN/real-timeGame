@@ -11,7 +11,7 @@ using UnityEngine.SceneManagement;
 using System.Xml.Serialization;
 using System.Threading.Tasks;
 using Cysharp.Threading.Tasks.Triggers;
-
+using KanKikuchi.AudioManager;
 
 public class GameDirector : MonoBehaviour
 {
@@ -108,6 +108,7 @@ public class GameDirector : MonoBehaviour
     public Guid enemyId;     //敵ID保存用
     public int enemyPoint;
     public int point;
+    public int hitNum;
 
     PlayerManager playerManager;
 
@@ -152,8 +153,29 @@ public class GameDirector : MonoBehaviour
     }
     async void Start()
     {
+        //メニューBGM
+        BGMManager.Instance.Play(
+            audioPath: BGMPath.MENU, //再生したいオーディオのパス
+            volumeRate: 1,                //音量の倍率
+            delay: 0,                //再生されるまでの遅延時間
+            pitch: 1,                //ピッチ
+            isLoop: true,             //ループ再生するか
+            allowsDuplicate: false             //他のBGMと重複して再生させるか
+        );
+
+        //歓声
+        BGMManager.Instance.Play(
+            audioPath: BGMPath.GUEST,         //再生したいオーディオのパス
+            volumeRate: 1,                    //音量の倍率
+            delay: 0,                         //再生されるまでの遅延時間
+            pitch: 1,                         //ピッチ
+            isLoop: true,                     //ループ再生するか
+            allowsDuplicate: true             //他のBGMと重複して再生させるか
+        );
+
         enemyPoint = 0;
         point = 0;
+        hitNum = 0;
 
 
         //ユーザーが入室した際にOnJoinedUserメゾットを実行するようにモデルに登録しておく
@@ -216,6 +238,13 @@ public class GameDirector : MonoBehaviour
 
     void Update()
     {
+        //ユーザーID表示
+        if (userModel.userName != "")
+        {
+            //Debug.Log(userModel.userName);
+            userName.text = userModel.userName;
+        }
+
         if (!isPlayer) return;
         
         if(isStart)
@@ -633,6 +662,15 @@ public class GameDirector : MonoBehaviour
     //ボール発射処理
     private async void ThrowedBall(ThrowData throwData)
     {
+        SEManager.Instance.Play(
+            audioPath: SEPath.THROW,      //再生したいオーディオのパス
+            volumeRate: 1,                //音量の倍率
+            delay: 0,                     //再生されるまでの遅延時間
+            pitch: 1,                     //ピッチ
+            isLoop: false,                 //ループ再生するか
+            callback: null                //再生終了後の処理
+        );
+
         //タグ変更
         characterList[throwData.ConnectionId].gameObject.tag = "Enemy";
         //投げたユーザーのIDを保存
@@ -673,6 +711,26 @@ public class GameDirector : MonoBehaviour
 
     public async void HitBall(HitData hitData)
     {
+        SEManager.Instance.Play(
+            audioPath: SEPath.HIT,        //再生したいオーディオのパス
+            volumeRate: 1,                //音量の倍率
+            delay: 0,                     //再生されるまでの遅延時間
+            pitch: 1,                     //ピッチ
+            isLoop: false,                 //ループ再生するか
+            callback: null                //再生終了後の処理
+        );
+
+        SEManager.Instance.Play(
+            audioPath: SEPath.GUEST_HIT,  //再生したいオーディオのパス
+            volumeRate: 1,                //音量の倍率
+            delay: 0,                     //再生されるまでの遅延時間
+            pitch: 1,                     //ピッチ
+            isLoop: false,                 //ループ再生するか
+            callback: null                //再生終了後の処理
+        );
+
+
+
         //残機リスト
         GameObject lifeList = scoreUIList[hitData.ConnectionId].transform.GetChild(5).gameObject ;
         //残機削除
@@ -686,7 +744,11 @@ public class GameDirector : MonoBehaviour
         enemyPoint += hitData.Point;
         playerPoint.text = enemyPoint.ToString();
 
-        if (roomModel.ConnectionId == hitData.EnemyId) point += hitData.Point;
+        if (roomModel.ConnectionId == hitData.EnemyId)
+        {
+            point += hitData.Point;
+            hitNum++;
+        }
 
         Debug.Log("獲得ポイント:" + hitData.Point);
         //当てたユーザーの得点加算
@@ -720,6 +782,7 @@ public class GameDirector : MonoBehaviour
 
     public void  GameCount()
     {
+        
         game_State = GAME_STATE.START;
         gameUI.SetActive(true);
        
@@ -730,6 +793,29 @@ public class GameDirector : MonoBehaviour
 
     public async void GameStart()
     {
+        BGMManager.Instance.Stop(BGMPath.MENU);
+
+        
+        BGMManager.Instance.Play(
+            audioPath: BGMPath.BUTTLE, //再生したいオーディオのパス
+            volumeRate: 1,                //音量の倍率
+            delay: 0,                //再生されるまでの遅延時間
+            pitch: 1,                //ピッチ
+            isLoop: true,             //ループ再生するか
+            allowsDuplicate: true             //他のBGMと重複して再生させるか
+        );
+
+        SEManager.Instance.Play(
+            audioPath: SEPath.COUNT_DOWN, //再生したいオーディオのパス
+            volumeRate: 1,                //音量の倍率
+            delay: 0.0f,                     //再生されるまでの遅延時間
+            pitch: 1,                     //ピッチ
+            isLoop: false,                 //ループ再生するか
+            callback: null                //再生終了後の処理
+        );
+
+
+
         standByUI.SetActive(false);
         game_State = GAME_STATE.START;
 
@@ -748,6 +834,31 @@ public class GameDirector : MonoBehaviour
     
     public void DeadUser(DeadData deadData,int deadNum)
     {
+
+        //最後のプレイヤー以外は再生
+        if (!deadData.IsLast)
+        {
+
+            SEManager.Instance.Play(
+            audioPath: SEPath.GUEST_HIT,  //再生したいオーディオのパス
+            volumeRate: 1,                //音量の倍率
+            delay: 0,                     //再生されるまでの遅延時間
+            pitch: 1,                     //ピッチ
+            isLoop: false,                 //ループ再生するか
+            callback: null                //再生終了後の処理
+        );
+
+
+            SEManager.Instance.Play(
+                audioPath: SEPath.DEAD,        //再生したいオーディオのパス
+                volumeRate: 1,                //音量の倍率
+                delay: 1,                     //再生されるまでの遅延時間
+                pitch: 1,                     //ピッチ
+                isLoop: false,                 //ループ再生するか
+                callback: null                //再生終了後の処理
+            );
+        }
+
         if (deadData.ConnectionId == roomModel.ConnectionId)
         {
             //死亡判定
@@ -800,10 +911,13 @@ public class GameDirector : MonoBehaviour
         //最後のプレイヤーだった場合
         if(deadData.IsLast)
         {
+
             timeText.text = "--:--";
         }
         else
         {
+            
+
             while (deadData.Time >= 60)
             {
                 deadData.Time -= 60;
@@ -869,10 +983,17 @@ public class GameDirector : MonoBehaviour
     {
         Debug.Log("ゲーム終了通知");
 
+        // Coroutine（コルーチン）を開始
+        StartCoroutine(FinishGame());
+    }
+    IEnumerator FinishGame()
+    {
+        yield return new WaitForSeconds(1f);//１秒待つ
+
+        Debug.Log("toutatu");
         //リザルト表示
         resultObj.SetActive(true);
     }
-
    
     public async void OnClickHome()
     {

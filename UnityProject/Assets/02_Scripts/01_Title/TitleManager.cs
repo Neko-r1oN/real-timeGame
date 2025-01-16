@@ -97,7 +97,7 @@ public class TitleManager : MonoBehaviour
     public async void OnClickRegist()
     {
 
-        if (debug.text != null)
+        if (debug.text != "")
         {
             bool isGet = await UserModel.Instance.GetUserInfoAsync(int.Parse(debug.text));
 

@@ -9,6 +9,7 @@ using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.UI;
+using KanKikuchi.AudioManager;
 
 public class PlayerManager : MonoBehaviour
 {
@@ -17,7 +18,7 @@ public class PlayerManager : MonoBehaviour
     GameDirector gameDirector;
     UserModel userModel;
 
-    private int MAX_PLAYER = 2;
+    private int MAX_PLAYER = 4;
 
     //カーソル関連
     private string enemyTag = "Enemy";           //取得タグ名(敵)
@@ -63,7 +64,7 @@ public class PlayerManager : MonoBehaviour
     private bool isLeft;     //画像の向き
 
     //HP変数
-    public int maxHp = 1;    //HP最大値
+    public int maxHp = 5;    //HP最大値
     public int hp;           //HP現在値
 
     public int damage = 1;   //ダメージ量(現状固定)
@@ -236,6 +237,7 @@ public class PlayerManager : MonoBehaviour
 
         //向きチェック
         Move();
+
         //向き判定更新
         this.gameObject.transform.GetChild(0).gameObject.GetComponent<AngleManager>().isLeft = this.isLeft;
 
@@ -418,7 +420,15 @@ public class PlayerManager : MonoBehaviour
 
     public void OnClickJump()
     {
-
+        SEManager.Instance.Play(
+           audioPath: SEPath.JUMP,      //再生したいオーディオのパス
+           volumeRate: 1,                //音量の倍率
+           delay: 0,                     //再生されるまでの遅延時間
+           pitch: 1,                     //ピッチ
+           isLoop: false,                 //ループ再生するか
+           callback: null                //再生終了後の処理
+       );
+        
         Debug.Log("ジャンプ");
         isDash = false;
         isJump = true;
@@ -504,6 +514,15 @@ public class PlayerManager : MonoBehaviour
         //着地を検出したので着地状態を書き換え
         if (!isGround)
         {
+            SEManager.Instance.Play(
+                audioPath: SEPath.JUMPED,      //再生したいオーディオのパス
+                volumeRate: 1,                //音量の倍率
+                delay: 0.6f,                     //再生されるまでの遅延時間
+                pitch: 1,                     //ピッチ
+                isLoop: false,                 //ループ再生するか
+                callback: null                //再生終了後の処理
+            );
+
             playerAnim.SetAnim(PlayerAnimation.ANIM_STATE.IDLE);
 
             isJump = false;
@@ -522,6 +541,14 @@ public class PlayerManager : MonoBehaviour
             //キャッチ状態でボールに触ったら
             if (isCatch)
             {
+                SEManager.Instance.Play(
+                    audioPath: SEPath.CATCH,      //再生したいオーディオのパス
+                    volumeRate: 1,                //音量の倍率
+                    delay: 0.6f,                     //再生されるまでの遅延時間
+                    pitch: 1,                     //ピッチ
+                    isLoop: false,                 //ループ再生するか
+                    callback: null                //再生終了後の処理
+                );
                 //ノックバック
                 rigidbody.AddForce(-transform.forward * 5f, ForceMode.VelocityChange);
 
@@ -572,7 +599,16 @@ public class PlayerManager : MonoBehaviour
         throwNum++;
 
         // 追加
-        rigidbody.AddForce(-transform.forward * 3f, ForceMode.VelocityChange);
+        //rigidbody.AddForce(-transform.forward * 3f, ForceMode.VelocityChange);
+
+        SEManager.Instance.Play(
+                    audioPath: SEPath.THROW,      //再生したいオーディオのパス
+                    volumeRate: 1,                //音量の倍率
+                    delay: 0.6f,                     //再生されるまでの遅延時間
+                    pitch: 1,                     //ピッチ
+                    isLoop: false,                 //ループ再生するか
+                    callback: null                //再生終了後の処理
+                );
 
         //ボール情報
         var throwData = new ThrowData()
@@ -643,7 +679,7 @@ public class PlayerManager : MonoBehaviour
             Point = gameDirector.point,               //ユーザー獲得ポイント
             Time = (int)gameDirector.time,            //生存時間
             ThrowNum = throwNum,                      //投げた回数
-            HitNum = hitNum,                          //当てた回数
+            HitNum = gameDirector.hitNum,                          //当てた回数
             CatchNum = catchNum,                      //キャッチした回数
             JoinOrder = gameDirector.JoinNum,         //プレイヤー番号
             IsLast = this.isLast,
