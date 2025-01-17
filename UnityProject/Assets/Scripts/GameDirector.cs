@@ -238,7 +238,7 @@ public class GameDirector : MonoBehaviour
 
     void Update()
     {
-        //ユーザーID表示
+        //ユーザーID更新(表示用)
         if (userModel.userName != "")
         {
             //Debug.Log(userModel.userName);
@@ -257,17 +257,18 @@ public class GameDirector : MonoBehaviour
 
         switch (game_State)
         {
-            case GAME_STATE.STOP:
-
-                break;
+            
             case GAME_STATE.READY:
                 standByUI.SetActive(true);
                 break;
             case GAME_STATE.START:
                 standByUI.SetActive(false);
                 break;
+            case GAME_STATE.STOP:
+                standByUI.SetActive(false);
+                break;
         }
-
+      
     }
 
 
@@ -294,7 +295,7 @@ public class GameDirector : MonoBehaviour
         //await roomModel.JoinAsync(roomName.text, userModel.userId);
 
 
-        //同期通信呼び出し、以降は0.02fごとに実行
+        //同期通信呼び出し、以降は commuTime ごとに実行
         InvokeRepeating(nameof(SendData), 0.0f, commuTime);
 
         Debug.Log("入室完了");
@@ -498,6 +499,9 @@ public class GameDirector : MonoBehaviour
         //退出処理
         await roomModel.LeaveAsync();
 
+        standByUI.SetActive(false);
+        game_State = GAME_STATE.START;
+
         //MagicOnion切断処理
         //await roomModel.DisConnectAsync();
 
@@ -524,6 +528,7 @@ public class GameDirector : MonoBehaviour
 
         cursor.SetActive(false);
 
+      
         Debug.Log("退出完了");
     }
 

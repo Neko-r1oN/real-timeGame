@@ -61,7 +61,8 @@ public class MenuManager : MonoBehaviour
 
     public void OnClickLeave()
     {
-        standbyUI.SetActive(false);
+        Debug.Log("ëﬁèoÇ®ÇµÇΩ");
+        //standbyUI.SetActive(false);
     }
 
     public void OnClickButtleBack()

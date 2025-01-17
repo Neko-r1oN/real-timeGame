@@ -96,37 +96,42 @@ public class TitleManager : MonoBehaviour
 
     public async void OnClickRegist()
     {
-
-        if (debug.text != "")
-        {
-            bool isGet = await UserModel.Instance.GetUserInfoAsync(int.Parse(debug.text));
-
-
-            if (isGet) Initiate.Fade("GameScene", Color.black, 1.0f);
-
-            else Debug.Log("データ取れませんでした");
+        if (isSuccess)
+        {//初回登録用のボタンを非表示
+            Initiate.Fade("GameScene", Color.black, 1.0f);
         }
         else
         {
-            bool isRegist = await UserModel.Instance.RegistUserAsync(nameText.text);
-
-           
-
-            Debug.Log(isRegist);
-
-            if (isRegist == true)
+            if (debug.text != "")
             {
-                registFalse.SetActive(false);
-                registTrue.SetActive(true);
-                Initiate.Fade("GameScene", Color.black, 1.0f);
+                bool isGet = await UserModel.Instance.GetUserInfoAsync(int.Parse(debug.text));
+
+
+                if (isGet) Initiate.Fade("GameScene", Color.black, 1.0f);
+
+                else Debug.Log("データ取れませんでした");
             }
-            else if (isRegist == false)
+            else
             {
-                registTrue.SetActive(false);
-                registFalse.SetActive(true);
+                bool isRegist = await UserModel.Instance.RegistUserAsync(nameText.text);
+
+
+
+                Debug.Log(isRegist);
+
+                if (isRegist == true)
+                {
+                    registFalse.SetActive(false);
+                    registTrue.SetActive(true);
+                    Initiate.Fade("GameScene", Color.black, 1.0f);
+                }
+                else if (isRegist == false)
+                {
+                    registTrue.SetActive(false);
+                    registFalse.SetActive(true);
+                }
+
             }
-            
         }
-        
     }
 }
