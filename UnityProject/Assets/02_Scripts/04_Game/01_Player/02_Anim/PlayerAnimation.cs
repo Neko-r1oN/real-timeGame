@@ -19,12 +19,18 @@ public class PlayerAnimation : MonoBehaviour
     //アニメ状態
     public enum ANIM_STATE
     {
-        IDLE = 0,             //停止中
-        DASH = 5,                 //ダッシュ中
+        IDLE = 0,                  //待機中
+        HAVE_IDLE = 1,             //待機中(所持)
+        DASH = 5,                  //ダッシュ中
+        HAVE_DASH = 6,             //ダッシュ中(所持)
         JUMP = 10,                 //ジャンプ中
+        HAVE_JUMP = 11,            //ジャンプ中(所持)
         CATCH = 15,                //キャッチ中
-        THROW = 30,                //投げ中
+        HAVE_CATCH = 16,           //キャッチ中(所持)
+        FEINT = 30,                //投げる(フェイント)
+        THROW = 31,                //投げる(所持)
         AIRTHROW = 35,             //空中投げ中
+        AIRFEINT = 36,             //空中投げ中(フェイント)
         DOWN = 80,                 //ダウン中
         DEAD = 90,                 //死亡中
     }

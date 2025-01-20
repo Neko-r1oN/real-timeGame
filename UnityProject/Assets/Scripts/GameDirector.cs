@@ -255,7 +255,7 @@ public class GameDirector : MonoBehaviour
 
         }
 
-        switch (game_State)
+       /* switch (game_State)
         {
             
             case GAME_STATE.READY:
@@ -267,7 +267,7 @@ public class GameDirector : MonoBehaviour
             case GAME_STATE.STOP:
                 standByUI.SetActive(false);
                 break;
-        }
+        }*/
       
     }
 

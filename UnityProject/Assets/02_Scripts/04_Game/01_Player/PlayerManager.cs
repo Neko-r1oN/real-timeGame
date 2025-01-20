@@ -10,6 +10,7 @@ using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.UI;
 using KanKikuchi.AudioManager;
+using UnityEngine.ProBuilder.MeshOperations;
 
 public class PlayerManager : MonoBehaviour
 {
@@ -36,10 +37,14 @@ public class PlayerManager : MonoBehaviour
     public bool isJump;           //ジャンプしているか
     public bool isCatch;          //キャッチ状態であるか
     public bool isDash;           //ダッシュ状態であるか
+    public bool isThrow;          //投げ状態であるか
+    public bool isFeint;
 
     public float velosity = 13f;              //ジャンプの強さ
     public float ballSpeed = 18.0f;           //ボールの速さ
-    public float catchDelay = 5.0f;
+    public float knockBack = 4.0f;
+    public float catchDelay = 0.6f;
+    public float throwDelay = 0.6f;
     GameObject ballPrefab;
 
 
@@ -69,7 +74,7 @@ public class PlayerManager : MonoBehaviour
 
     public int damage = 1;   //ダメージ量(現状固定)
 
-    //ステータス
+    //リザルトスコア用
     private int throwNum;
     public int hitNum;
     private int catchNum;
@@ -95,6 +100,8 @@ public class PlayerManager : MonoBehaviour
         isDash = false;       //ダッシュ状態
         isGround = false;     //接地状態
         isJump = false;       //ジャンプ状態
+        isThrow = false;      //投げ状態
+        isFeint = false;
 
         //ボール発射用プレハブ取得
         ballPrefab = (GameObject)Resources.Load("Ball");
@@ -127,7 +134,7 @@ public class PlayerManager : MonoBehaviour
 
         //フェイントボタン
         feintButton = GameObject.Find("FeintButton").GetComponent<Button>();
-        catchButton.onClick.AddListener(() => OnClickFeint());
+        feintButton.onClick.AddListener(() => OnClickFeint());
 
         //投げるボタン
         throwButton = GameObject.Find("ThrowButton").GetComponent<Button>();
@@ -251,8 +258,8 @@ public class PlayerManager : MonoBehaviour
 
         }
 
-        //キャッチ状態でない場合のみ移動できる
-        if (isCatch != true)
+        //キャッチ状態か投げ状態でない場合のみ移動できる
+        if (!isCatch || !isThrow)
         {
             // 速度ベクトルの長さを1秒でmoveSpeedだけ進むように調整します
             velocity = velocity.normalized * moveSpeed * Time.deltaTime;
@@ -268,7 +275,7 @@ public class PlayerManager : MonoBehaviour
             }
             else
             {
-                // animState=0;
+
             }
 
         }
@@ -301,36 +308,84 @@ public class PlayerManager : MonoBehaviour
 
            
         }
+        
+        if (isThrow)
+        {
+            //ジャンプ状態だったら
+            if (isJump)
+            {
+                //ジャンプ投げアニメーション
 
-        //地面についた状態で移動
-        if (isDash && isGround && !isJump)
-        {
-            playerAnim.SetAnim(PlayerAnimation.ANIM_STATE.DASH);
+                playerAnim.SetAnim(PlayerAnimation.ANIM_STATE.AIRTHROW);
+            }
+            else
+            {
+                //投げアニメーション
+                playerAnim.SetAnim(PlayerAnimation.ANIM_STATE.THROW);
+            }
         }
-        else if (isCatch)
-        {
-            playerAnim.SetAnim(PlayerAnimation.ANIM_STATE.CATCH);
-        }
+
         else
         {
-            playerAnim.SetAnim(PlayerAnimation.ANIM_STATE.IDLE);
+            if (isFeint)
+            {
+                //ジャンプ状態だったら
+                if (isJump)
+                {
+                    isJump = false;
+                    playerAnim.SetAnim(PlayerAnimation.ANIM_STATE.AIRFEINT);
+                }
+                else
+                {
+                    playerAnim.SetAnim(PlayerAnimation.ANIM_STATE.FEINT);
+                }
+                
+            }
+            else
+            {
+                //接地かつジャンプ状態でないときのみ移動
+                if (isDash && isGround && !isJump)
+                {
+                    //ダッシュアニメーション
+                    if (isHaveBall) playerAnim.SetAnim(PlayerAnimation.ANIM_STATE.HAVE_DASH);
+
+                    else if (!isHaveBall) playerAnim.SetAnim(PlayerAnimation.ANIM_STATE.DASH);
+
+                }
+                else if (isCatch)
+                {
+                    //キャッチアニメーション
+                    if (isHaveBall) playerAnim.SetAnim(PlayerAnimation.ANIM_STATE.HAVE_CATCH);
+
+                    else if (!isHaveBall) playerAnim.SetAnim(PlayerAnimation.ANIM_STATE.CATCH);
+                }
+                else
+                {
+                    //アイドル(待機)アニメーション
+                    if (isHaveBall) playerAnim.SetAnim(PlayerAnimation.ANIM_STATE.HAVE_IDLE);
+
+                    else if (!isHaveBall) playerAnim.SetAnim(PlayerAnimation.ANIM_STATE.IDLE);
+                }
+
+                //ジャンプ
+                if (isJump && !isDash)
+                {
+                    if (isHaveBall) playerAnim.SetAnim(PlayerAnimation.ANIM_STATE.HAVE_JUMP);
+
+                    else if (!isHaveBall) playerAnim.SetAnim(PlayerAnimation.ANIM_STATE.JUMP);
+                }
+            }
         }
+      
 
-        //ジャンプ
-        if (isJump && !isDash)
-        {
-            playerAnim.SetAnim(PlayerAnimation.ANIM_STATE.JUMP);
-        }
+       
 
-
-        //着地しているかを判定
+        //接地しているか判定
         if (isGround == true)
         {
-            //スペースキーが押されているかを判定
+            //ジャンプボタンが押されたか
             if (isJump == true)
             {
-
-
                 //ジャンプの方向を上向きのベクトルに設定
                 Vector3 jump_vector = Vector3.up;
                 //ジャンプの速度を計算
@@ -342,7 +397,6 @@ public class PlayerManager : MonoBehaviour
                 isGround = false;
             }
         }
-
     }
 
 
@@ -355,7 +409,7 @@ public class PlayerManager : MonoBehaviour
         //死んでいない場合
         if (!isDead)
         {
-
+            //キャッチ状態でない場合
             if (!isCatch)
             {
                 float dx = fixedJoystick.Horizontal; //joystickの水平方向の動きの値、-1~1の値をとります
@@ -455,32 +509,38 @@ public class PlayerManager : MonoBehaviour
     }
     public void OnClickThrow()
     {
-        //ジャンプ状態だったら
-        if (isJump)
+        if (!isDead)
         {
-            //ジャンプ投げアニメーション
+            isThrow = true;
 
-            playerAnim.SetAnim(PlayerAnimation.ANIM_STATE.AIRTHROW);
-        }
-        else
-        {
-            //投げアニメーション
-            playerAnim.SetAnim(PlayerAnimation.ANIM_STATE.THROW);
-        }
 
-        Invoke("isThrowOut", 2.0f);
-        Shot();
+
+            StartCoroutine(IsThrowOut());
+            Shot();
+        }
     }
 
     //フェイント(投げるふり)処理
     public void OnClickFeint()
     {
+        Debug.Log("feint");
+        isFeint = true;
         //フェイントアニメーション
-        playerAnim.SetAnim(PlayerAnimation.ANIM_STATE.THROW);
+        playerAnim.SetAnim(PlayerAnimation.ANIM_STATE.FEINT);
 
-        Invoke("isThrowOut", 1.0f);
+        
+
+        StartCoroutine(IsThrowOut());
     }
-
+    //フェイントリセット
+    IEnumerator IsThrowOut()
+    {
+        yield return new WaitForSeconds(throwDelay);//１秒待つ
+        Debug.Log("投げ状態リセット");
+        //プレイヤー状態リセット
+        isFeint = false;
+        playerAnim.SetAnim(PlayerAnimation.ANIM_STATE.IDLE);
+    }
 
     /// <summary>
     /// ボール発射処理
@@ -550,7 +610,15 @@ public class PlayerManager : MonoBehaviour
                     callback: null                //再生終了後の処理
                 );
                 //ノックバック
-                rigidbody.AddForce(-transform.forward * 5f, ForceMode.VelocityChange);
+                rigidbody.AddForce(-transform.forward * knockBack, ForceMode.VelocityChange);
+
+                //キャッチアニメーション
+                playerAnim.SetAnim(PlayerAnimation.ANIM_STATE.HAVE_CATCH);
+                Debug.Log("キャッチ");
+
+                CancelInvoke();
+                //キャッチ状態状態解除
+                Invoke("isCatchOut", 0.8f);
 
                 //ボール所持状態にする
                 isHaveBall = true;
@@ -586,6 +654,7 @@ public class PlayerManager : MonoBehaviour
     //ボール取得処理
     private async void GetBall()
     {
+        isHaveBall = true;
         //ボール所持者変更
         gameDirector.getUserId = roomModel.ConnectionId;
         Debug.Log("ボール取得");
@@ -597,7 +666,7 @@ public class PlayerManager : MonoBehaviour
     private async void ThrowBall()
     {
         throwNum++;
-
+        
         // 追加
         //rigidbody.AddForce(-transform.forward * 3f, ForceMode.VelocityChange);
 
@@ -634,6 +703,9 @@ public class PlayerManager : MonoBehaviour
             return;
 
         }
+
+        //ノックバック
+        rigidbody.AddForce(-transform.forward * knockBack, ForceMode.VelocityChange);
 
 
         //HPがまだある場合
@@ -747,13 +819,9 @@ public class PlayerManager : MonoBehaviour
     }
 
 
-    //アニメーションリセット処理
-    private void isThrowOut()
-    {
-        //playerAnim.SetBool("isThrow", false);
-        playerAnim.SetAnim(PlayerAnimation.ANIM_STATE.IDLE);
-    }
+   
 
+    //プレイヤーの向き取得(敵用)
     public bool GetAngle()
     {
         return isLeft;
