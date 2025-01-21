@@ -30,6 +30,11 @@ public class Ball : MonoBehaviour
         rb.useGravity = true; //重力を有効にする
 
     }
+
+    private void Update()
+    {
+        //Debug.Log(this.gameObject.tag);
+    }
     void OnCollisionEnter(Collision collision)
     {
         if (collision.gameObject.tag == "Ground") //タグがEnemyのオブジェクトと衝突した場合

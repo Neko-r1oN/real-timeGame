@@ -96,12 +96,24 @@ public class TitleManager : MonoBehaviour
 
     public async void OnClickRegist()
     {
-        if (isSuccess)
-        {//初回登録用のボタンを非表示
-            Initiate.Fade("GameScene", Color.black, 1.0f);
+        if (debug.text != "")
+        {
+            bool isGet = await UserModel.Instance.GetUserInfoAsync(int.Parse(debug.text));
+
+
+            if (isGet) Initiate.Fade("GameScene", Color.black, 1.0f);
+
+            else Debug.Log("データ取れませんでした");
         }
         else
         {
+            if (isSuccess)
+            {//初回登録用のボタンを非表示
+                Initiate.Fade("GameScene", Color.black, 1.0f);
+            }
+        }
+       /*
+      
             if (debug.text != "")
             {
                 bool isGet = await UserModel.Instance.GetUserInfoAsync(int.Parse(debug.text));
@@ -131,7 +143,7 @@ public class TitleManager : MonoBehaviour
                     registFalse.SetActive(true);
                 }
 
-            }
-        }
+            }*/
+        
     }
 }

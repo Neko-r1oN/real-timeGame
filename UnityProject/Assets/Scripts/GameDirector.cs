@@ -456,7 +456,9 @@ public class GameDirector : MonoBehaviour
         {
 
             //自機のNoをYOUに張り替え
-            charaNum.sprite = you;
+            //自機区別テキスト表示
+            GameObject you = characterObject.transform.GetChild(1).transform.GetChild(0).gameObject;
+            you.SetActive(true);
 
             JoinNum = user.JoinOrder;
 
@@ -737,7 +739,7 @@ public class GameDirector : MonoBehaviour
 
 
         //残機リスト
-        GameObject lifeList = scoreUIList[hitData.ConnectionId].transform.GetChild(5).gameObject ;
+        GameObject lifeList = scoreUIList[hitData.ConnectionId].transform.GetChild(5).gameObject;
         //残機削除
         Destroy(lifeList.transform.GetChild(0).gameObject);
 
