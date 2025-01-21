@@ -223,6 +223,15 @@ public class PlayerManager : MonoBehaviour
         //一番近い敵の座標取得
         searchNearEnemy = EnemySerch(enemyTag);
 
+        if (searchNearEnemy)
+        {
+            if (isHaveBall)
+            {
+                //Debug.Log("向き補正中");
+                transform.LookAt(searchNearEnemy.transform);
+            }
+        }
+
         //ボールタグ取得
         searchNearBall = EnemySerch(ballTag);
         //ボールが無かったら
@@ -231,6 +240,8 @@ public class PlayerManager : MonoBehaviour
             //ボール所持者を取得
             searchNearBall = EnemySerch(enemyBallTag);
         }
+
+       
 
         //移動処理
         if (!isCatch)
@@ -283,10 +294,7 @@ public class PlayerManager : MonoBehaviour
         //自分から一番近い敵を取得
         if (searchNearEnemy)
         {
-            if (isHaveBall)
-            {
-                transform.LookAt(searchNearEnemy.transform);
-            }
+            
         }
 
         //フィールドに敵プレイヤーが存在している場合
@@ -295,6 +303,8 @@ public class PlayerManager : MonoBehaviour
             cursor.SetActive(true);
             //カーソルを最も近い敵の座標に移動
             cursor.transform.DOMove(searchNearEnemy.gameObject.transform.position, 0.1f).SetEase(Ease.Linear);
+
+           
         }
         //フィールドに敵プレイヤーが存在していない場合
         else
@@ -482,12 +492,10 @@ public class PlayerManager : MonoBehaviour
                 //移動パッドが動かされている場合
                 if (deg != 0)
                 {
+                    //ジャンプ中は向き固定
                     if (isJump) return;
                     else
                     {
-
-
-
                         isDash = true;
 
                         //右向きに
@@ -566,7 +574,6 @@ public class PlayerManager : MonoBehaviour
            callback: null                //再生終了後の処理
        );
         
-        Debug.Log("ジャンプ");
         isDash = false;
         isJump = true;
     }
@@ -658,7 +665,9 @@ public class PlayerManager : MonoBehaviour
 
             GameObject newbullet = Instantiate(ballPrefab, new Vector3(this.transform.position.x, this.transform.position.y, this.transform.position.z), Quaternion.identity); //弾を生成
             Rigidbody bulletRigidbody = newbullet.GetComponent<Rigidbody>();
+
             bulletRigidbody.velocity = (transform.forward * ballSpeed); //キャラクターが向いている方向に弾に力を加える
+
 
             ThrowBall();
 
@@ -678,6 +687,7 @@ public class PlayerManager : MonoBehaviour
         //着地を検出したので着地状態を書き換え
         if (!isGround)
         {
+
             SEManager.Instance.Play(
                 audioPath: SEPath.JUMPED,      //再生したいオーディオのパス
                 volumeRate: 1,                //音量の倍率
@@ -771,7 +781,7 @@ public class PlayerManager : MonoBehaviour
         throwNum++;
 
         //少しだけ前進
-        if (isGround) rigidbody.AddForce(transform.forward * knockBack, ForceMode.VelocityChange);
+        //if (isGround) rigidbody.AddForce(transform.forward * knockBack, ForceMode.VelocityChange);
         
 
 
@@ -784,14 +794,18 @@ public class PlayerManager : MonoBehaviour
                     callback: null                //再生終了後の処理
                 );
 
+        Vector3 test = new Vector3();
         //ボール情報
         var throwData = new ThrowData()
         {
             ConnectionId = roomModel.ConnectionId,            //接続ID
             ThorwPos = this.gameObject.transform.position,    //投げたプレイヤーの座標
-            GoalPos = searchNearEnemy.transform.eulerAngles,    //目標座標
+            //GoalPos = searchNearEnemy.transform.eulerAngles,    //目標座標
+            GoalPos = test,    //目標座標
 
         };
+
+        
 
         //ボール発射通知
         await roomModel.ThrowBallAsync(throwData);

@@ -11,6 +11,7 @@ GameObject:
   - component: {fileID: 7069760742248081796}
   - component: {fileID: 7359606156304824647}
   - component: {fileID: 7744421115204253706}
+  - component: {fileID: 8288577339657720426}
   m_Layer: 0
   m_Name: 01_Shino
   m_TagString: Untagged
@@ -27,7 +28,7 @@ Transform:
   m_GameObject: {fileID: 519345346587970757}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 1.44, z: 0}
+  m_LocalPosition: {x: 1.07, y: 1.7, z: 2.98}
   m_LocalScale: {x: 0.36334184, y: 0.41326684, z: 0.35007587}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -81,12 +82,33 @@ CapsuleCollider:
   m_LayerOverridePriority: 0
   m_IsTrigger: 0
   m_ProvidesContacts: 0
-  m_Enabled: 1
+  m_Enabled: 0
   serializedVersion: 2
   m_Radius: 0.99910647
-  m_Height: 4.364843
+  m_Height: 1.7568172
   m_Direction: 1
-  m_Center: {x: 0, y: 0, z: 0}
+  m_Center: {x: 0, y: -1.56, z: 0}
+--- !u!65 &8288577339657720426
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 519345346587970757}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 0
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Size: {x: 1.7202839, y: 1.0000001, z: 1}
+  m_Center: {x: -0.040992465, y: -1.84, z: 0}
 --- !u!1 &3819558670196179565
 GameObject:
   m_ObjectHideFlags: 0
@@ -356,11 +378,11 @@ PrefabInstance:
       objectReference: {fileID: 21300000, guid: 6cfe8ba1a497f6f408e5773367844aa3, type: 3}
     - target: {fileID: 1319549688051628434, guid: 959dabd72fd025b4396edd772e6fb663, type: 3}
       propertyPath: m_LocalPosition.x
-      value: 0
+      value: -0.06
       objectReference: {fileID: 0}
     - target: {fileID: 1319549688051628434, guid: 959dabd72fd025b4396edd772e6fb663, type: 3}
       propertyPath: m_LocalPosition.y
-      value: 2.85
+      value: 2.81
       objectReference: {fileID: 0}
     - target: {fileID: 1319549688051628434, guid: 959dabd72fd025b4396edd772e6fb663, type: 3}
       propertyPath: m_LocalPosition.z
@@ -441,11 +463,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 8840297474997663140, guid: 596f185589718794194cac90cccc0e12, type: 3}
       propertyPath: m_LocalPosition.x
-      value: 0
+      value: -0.12
       objectReference: {fileID: 0}
     - target: {fileID: 8840297474997663140, guid: 596f185589718794194cac90cccc0e12, type: 3}
       propertyPath: m_LocalPosition.y
-      value: 0
+      value: 0.08
       objectReference: {fileID: 0}
     - target: {fileID: 8840297474997663140, guid: 596f185589718794194cac90cccc0e12, type: 3}
       propertyPath: m_LocalPosition.z
