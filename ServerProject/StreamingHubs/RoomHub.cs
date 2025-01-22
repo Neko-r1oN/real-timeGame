@@ -290,7 +290,8 @@ namespace StreamingHubs
         public async Task DownUserAsync(Guid downUserId)
         {
             //自分含め全員にダウンを通知
-            this.BroadcastExceptSelf(room).OnDownUser(downUserId);
+            //this.BroadcastExceptSelf(room).OnDownUser(downUserId);
+            this.Broadcast(room).OnDownUser(downUserId);
         }
 
         /// <summary>

@@ -714,7 +714,7 @@ public class GameDirector : MonoBehaviour
         //フィールド上のボール検索
         ballObj = GameObject.Find("Ball");
 
-        Destroy(ballObj.gameObject);    //ボール削除
+        if (ballObj) Destroy(ballObj.gameObject);    //ボール削除
 
         //マスタークライアントリセット
         roomModel.isMaster = false;
@@ -770,7 +770,7 @@ public class GameDirector : MonoBehaviour
     {
         CapsuleCollider hitBox;
         hitBox = characterList[downUserId].gameObject.GetComponent<CapsuleCollider>();   //コライダー取得
-        hitBox.isTrigger = false; //トリガーオフ(ボール反射表現)
+        hitBox.isTrigger = true; //トリガーオフ(ボール反射表現)
 
         characterList[downUserId].gameObject.tag = "Down";
 
@@ -792,7 +792,7 @@ public class GameDirector : MonoBehaviour
     {
         CapsuleCollider hitBox;
         hitBox = characterList[downUserId].gameObject.GetComponent<CapsuleCollider>();   //コライダー取得
-        hitBox.isTrigger = true; //トリガーオン(ボール反射表現)
+        hitBox.isTrigger = false; //トリガーオン(ボール反射表現)
 
         //ピヨピヨ非表示
         GameObject piyo = characterList[downUserId].gameObject.transform.GetChild(2).gameObject;   //コライダー取得
