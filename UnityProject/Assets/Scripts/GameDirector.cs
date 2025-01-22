@@ -12,6 +12,7 @@ using System.Xml.Serialization;
 using System.Threading.Tasks;
 using Cysharp.Threading.Tasks.Triggers;
 using KanKikuchi.AudioManager;
+using static UnityEngine.Rendering.DebugUI;
 
 public class GameDirector : MonoBehaviour
 {
@@ -194,6 +195,9 @@ public class GameDirector : MonoBehaviour
         roomModel.GetBall += this.GetBall;             //ボール取得
 
         roomModel.HitBall += this.HitBall;             //ボールヒット
+
+        roomModel.DownUser += this.DownUser;             //ボールヒット
+        roomModel.DownBackUser += this.DownBackUser;             //ボールヒット
 
         roomModel.ReadyUser += this.ReadyUser;         //ユーザー準備完了
 
@@ -737,7 +741,6 @@ public class GameDirector : MonoBehaviour
         );
 
 
-
         //残機リスト
         GameObject lifeList = scoreUIList[hitData.ConnectionId].transform.GetChild(5).gameObject;
         //残機削除
@@ -763,6 +766,45 @@ public class GameDirector : MonoBehaviour
         Debug.Log("ヒット");
     }
         
+    public async void DownUser(Guid downUserId)
+    {
+        CapsuleCollider hitBox;
+        hitBox = characterList[downUserId].gameObject.GetComponent<CapsuleCollider>();   //コライダー取得
+        hitBox.isTrigger = false; //トリガーオフ(ボール反射表現)
+
+        characterList[downUserId].gameObject.tag = "Down";
+
+        Debug.Log(characterList[downUserId].name + ":ダウン");
+
+        StartCoroutine(PiyoPiyo(downUserId));
+    }
+
+    IEnumerator PiyoPiyo(Guid id)
+    {
+        yield return new WaitForSeconds(0.7f);//１秒待つ
+
+        GameObject piyo = characterList[id].gameObject.transform.GetChild(2).gameObject;   //コライダー取得
+
+        piyo.SetActive(true);
+    }
+    //ダウン復帰処理
+    public async void DownBackUser(Guid downUserId)
+    {
+        CapsuleCollider hitBox;
+        hitBox = characterList[downUserId].gameObject.GetComponent<CapsuleCollider>();   //コライダー取得
+        hitBox.isTrigger = true; //トリガーオン(ボール反射表現)
+
+        //ピヨピヨ非表示
+        GameObject piyo = characterList[downUserId].gameObject.transform.GetChild(2).gameObject;   //コライダー取得
+        piyo.SetActive(false);
+
+        //自機だった場合
+        if (roomModel.ConnectionId == downUserId) characterList[downUserId].gameObject.tag = "Player";    //Pleyerタグに
+
+        else characterList[downUserId].gameObject.tag = "Enemy";
+
+        Debug.Log(characterList[downUserId].name + ":ダウン復帰");
+    }
 
     //ユーザー情報更新処理
     public　async void UpdateUserState(Guid connectionId,UserState userState)

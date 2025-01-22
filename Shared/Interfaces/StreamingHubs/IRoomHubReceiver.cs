@@ -42,6 +42,10 @@ namespace Shared.Interfaces.StreamingHubs
         //ヒット通知
         void OnHitBall(HitData hitData);
 
+        //ダウン通知
+        void OnDownUser(Guid downUserId);
+        //ダウン復帰通知
+        void OnDownBackUser(Guid downBackUserId);
 
         //ユーザー状態更新通知
         void UpdateUserState(Guid connectionId, UserState state);

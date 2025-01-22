@@ -155,9 +155,6 @@ public class UserModel : BaseModel
             this.userId = user.Id;
             this.authToken = user.Token;
 
-            Debug.Log(user.Name);
-
-            Debug.Log(userName);
             //SaveUserData();
 
             return true;

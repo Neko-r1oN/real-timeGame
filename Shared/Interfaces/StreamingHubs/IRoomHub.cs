@@ -76,6 +76,21 @@ namespace Shared.Interfaces.StreamingHubs
         Task HitBallAsync(HitData hitData);
 
         /// <summary>
+        /// ダウン関数
+        /// </summary>
+        /// <param name="DownUserId">ダウンしたユーザーID</param>
+        /// <returns></returns>
+        Task DownUserAsync(Guid DownUserId);
+
+        /// <summary>
+        /// ダウン復帰関数
+        /// </summary>
+        /// <param name="DownBackUserId">ダウン復帰したユーザーID</param>
+        /// <returns></returns>
+        Task DownBackUserAsync(Guid DownBackUserId);
+
+
+        /// <summary>
         /// 全ユーザー準備状態確認関数
         /// </summary>
         /// <param name="isAllUserReady"></param>

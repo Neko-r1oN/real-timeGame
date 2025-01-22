@@ -45,6 +45,10 @@ public class RoomModel : BaseModel, IRoomHubReceiver
 
     //ボールヒット通知
     public Action<HitData> HitBall { get; set; }
+    //ユーザーダウン通知
+    public Action<Guid> DownUser { get; set; }
+    //ユーザーダウン復帰
+    public Action<Guid> DownBackUser { get; set; }
 
     //ユーザー準備状態確認通知
     public Action<bool> ReadyUser { get; set; }
@@ -281,6 +285,26 @@ public class RoomModel : BaseModel, IRoomHubReceiver
     public void OnHitBall(HitData hitData)
     {
         HitBall(hitData);
+    }
+    //ダウン処理
+    public async Task DownUserAsync(Guid downUserId)
+    {
+        await roomHub.DownUserAsync(downUserId);
+    }
+    //ダウン通知
+    public void OnDownUser(Guid downUserId)
+    {
+        DownUser(downUserId);
+    }
+    //ダウン復帰処理
+    public async Task DownBackUserAsync(Guid downUserId)
+    {
+        await roomHub.DownBackUserAsync(downUserId);
+    }
+    //ダウン復帰通知
+    public void OnDownBackUser(Guid downUserId)
+    {
+        DownBackUser(downUserId);
     }
 
     //準備完了処理

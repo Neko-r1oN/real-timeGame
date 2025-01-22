@@ -11,6 +11,7 @@ TagManager:
   - EasyBall
   - Dead
   - BallPlayer
+  - Down
   layers:
   - Default
   - TransparentFX

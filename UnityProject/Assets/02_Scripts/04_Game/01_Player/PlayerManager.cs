@@ -14,7 +14,7 @@ using UnityEngine.ProBuilder.MeshOperations;
 
 public class PlayerManager : MonoBehaviour
 {
-
+    //
     RoomModel roomModel;
     GameDirector gameDirector;
     UserModel userModel;
@@ -32,19 +32,23 @@ public class PlayerManager : MonoBehaviour
     private GameObject searchNearBall;          //最も近い敵座標
 
     //プレイヤー状態関連
-    public bool isHaveBall;       //ボールを所持しているか
-    public bool isGround;         //地面に触れているか
-    public bool isJump;           //ジャンプしているか
-    public bool isCatch;          //キャッチ状態であるか
-    public bool isDash;           //ダッシュ状態であるか
-    public bool isThrow;          //投げ状態であるか
-    public bool isFeint;
+    private bool isHaveBall;       //ボールを所持しているか
+    private bool isGround;         //地面に触れているか
+    private bool isJump;           //ジャンプしているか
+    private bool isCatch;          //キャッチ状態であるか
+    private bool isDash;           //ダッシュ状態であるか
+    private bool isThrow;          //投げ状態であるか
+    private bool isFeint;          //フェイント状態
+    private bool isDown;           //ダウン状態
+    private bool isDead;           //死亡状態
 
     public float velosity = 13f;              //ジャンプの強さ
     public float ballSpeed = 18.0f;           //ボールの速さ
     public float knockBack = 12.0f;
-    public float catchDelay = 0.6f;
+    public float catchDelay = 10.6f;
+    public float haveCatchDelay = 0.6f;
     public float throwDelay = 0.6f;
+    public float downTime = 4.0f;
     GameObject ballPrefab;
 
 
@@ -62,7 +66,7 @@ public class PlayerManager : MonoBehaviour
 
     FixedJoystick fixedJoystick;    //JoyStick
     Rigidbody rigidbody;
-
+    CapsuleCollider hitBox;
 
     //プレイヤーアニメーション
     PlayerAnimation playerAnim;
@@ -79,7 +83,7 @@ public class PlayerManager : MonoBehaviour
     public int hitNum;
     private int catchNum;
     private bool isLast;     //最後まで生き残
-    private bool isDead;
+
 
     private bool isCalledOnce;
 
@@ -101,7 +105,12 @@ public class PlayerManager : MonoBehaviour
         isGround = false;     //接地状態
         isJump = false;       //ジャンプ状態
         isThrow = false;      //投げ状態
-        isFeint = false;
+        isFeint = false;      //フェイント状態
+        isDown = false;       //ダウン状態
+        isDead = false;       //死亡状態
+
+        isLast = true;        //最後のプレイヤーか
+        isCalledOnce = false; //一度のみ実行用
 
         //ボール発射用プレハブ取得
         ballPrefab = (GameObject)Resources.Load("Ball");
@@ -114,7 +123,7 @@ public class PlayerManager : MonoBehaviour
 
         //ボールタグ取得
         searchNearBall = EnemySerch(ballTag);
-        Debug.Log(searchNearBall);
+        //Debug.Log(searchNearBall);
         if(searchNearBall == null)
         {
             searchNearBall = EnemySerch(enemyBallTag);
@@ -122,6 +131,8 @@ public class PlayerManager : MonoBehaviour
         }
 
         rigidbody = GetComponent<Rigidbody>();
+        hitBox = GetComponent<CapsuleCollider>();
+
         fixedJoystick = GameObject.Find("Fixed Joystick").GetComponent<FixedJoystick>();
 
         //ジャンプボタン
@@ -183,11 +194,6 @@ public class PlayerManager : MonoBehaviour
             isLeft = true;
         }
 
-
-        isLast = true;
-
-        isCalledOnce = false;
-        isDead = false;
     }
 
     void Update()
@@ -268,27 +274,29 @@ public class PlayerManager : MonoBehaviour
             catchbtn.SetActive(true);
 
         }
-
-        //キャッチ状態か投げ状態でない場合のみ移動できる
-        if (!isCatch || !isThrow)
+        //死んでいない場合
+        if (!isDead)
         {
-            // 速度ベクトルの長さを1秒でmoveSpeedだけ進むように調整します
-            velocity = velocity.normalized * moveSpeed * Time.deltaTime;
-
-            // いずれかの方向に移動している場合
-            if (velocity.magnitude > 0)
+            if (!isDown)
             {
+                //キャッチ状態か投げ状態でない場合のみ移動できる
+                if (!isCatch || !isThrow)
+                {
+                    // 速度ベクトルの長さを1秒でmoveSpeedだけ進むように調整します
+                    velocity = velocity.normalized * moveSpeed * Time.deltaTime;
 
-                // プレイヤーの位置(transform.position)の更新
-                // 移動方向ベクトル(velocity)を足し込みます
-                transform.position += velocity;
+                    // いずれかの方向に移動している場合
+                    if (velocity.magnitude > 0)
+                    {
 
+                        // プレイヤーの位置(transform.position)の更新
+                        // 移動方向ベクトル(velocity)を足し込みます
+                        transform.position += velocity;
+
+                    }
+                 
+                }
             }
-            else
-            {
-
-            }
-
         }
 
         //自分から一番近い敵を取得
@@ -478,60 +486,78 @@ public class PlayerManager : MonoBehaviour
         //死んでいない場合
         if (!isDead)
         {
-            //キャッチ状態でない場合
-            if (!isCatch)
+            if (!isDown)
             {
-                float dx = fixedJoystick.Horizontal; //joystickの水平方向の動きの値、-1~1の値をとります
-                float dy = fixedJoystick.Vertical; //joystickの垂直方向の動きの値、-1~1の値をとります
-
-                float rad = Mathf.Atan2(dx - 0, dy - 0); //　 原点(0,0)と点（dx,dy)の距離から角度をとってくれる便利な関数
-
-                float deg = rad * Mathf.Rad2Deg; //radianからdegreenに変換します
-
-
-                //移動パッドが動かされている場合
-                if (deg != 0)
+                //キャッチ状態でない場合
+                if (!isCatch)
                 {
-                    //ジャンプ中は向き固定
-                    if (isJump) return;
+                    float dx = fixedJoystick.Horizontal; //joystickの水平方向の動きの値、-1~1の値をとります
+                    float dy = fixedJoystick.Vertical; //joystickの垂直方向の動きの値、-1~1の値をとります
+
+                    float rad = Mathf.Atan2(dx - 0, dy - 0); //　 原点(0,0)と点（dx,dy)の距離から角度をとってくれる便利な関数
+
+                    float deg = rad * Mathf.Rad2Deg; //radianからdegreenに変換します
+
+
+                    //移動パッドが動かされている場合
+                    if (deg != 0)
+                    {
+                        //ジャンプ中は向き固定
+                        if (isJump) return;
+                        else
+                        {
+                            isDash = true;
+
+                            //右向きに
+                            if (deg > 0) isLeft = false;
+
+                            //左向きに
+                            else if (deg < 0) isLeft = true;
+                        }
+
+                    }
+                    //移動パッドが触られていない状態
                     else
                     {
-                        isDash = true;
-
-                        //右向きに
-                        if (deg > 0) isLeft = false;
-
-                        //左向きに
-                        else if (deg < 0) isLeft = true;
-                    }
-
-                }
-                //移動パッドが触られていない状態
-                else
-                {
-                    isDash = false;
-
-                    if (/*isDash &&*/ !isJump)
-                    {
                         isDash = false;
-                    }
 
-                    //ボールタグ取得
-                    searchNearBall = EnemySerch(ballTag);
-                    if (searchNearBall == null)
-                    {
-                        //ボール所持者プレイヤータグ取得
-                        searchNearBall = EnemySerch(enemyBallTag);
-
-                    }
-
-                    //ボールを持っている場合
-                    if (isHaveBall)
-                    {
-                        if (searchNearEnemy)
+                        if (/*isDash &&*/ !isJump)
                         {
-                            if (searchNearEnemy.gameObject.transform.position.x < this.gameObject.transform.position.x)
+                            isDash = false;
+                        }
+
+                        //ボールタグ取得
+                        searchNearBall = EnemySerch(ballTag);
+                        if (searchNearBall == null)
+                        {
+                            //ボール所持者プレイヤータグ取得
+                            searchNearBall = EnemySerch(enemyBallTag);
+
+                        }
+
+                        //ボールを持っている場合
+                        if (isHaveBall)
+                        {
+                            if (searchNearEnemy)
                             {
+                                if (searchNearEnemy.gameObject.transform.position.x < this.gameObject.transform.position.x)
+                                {
+                                    isLeft = true;
+                                }
+                                else
+                                {
+                                    //Debug.Log("ボールより左に居る");
+                                    isLeft = false;
+                                }
+                            }
+                        }
+
+                        //ボールorボール所持者が取得できた場合
+                        if (searchNearBall)
+                        {
+                            if (searchNearBall.gameObject.transform.position.x < this.gameObject.transform.position.x)
+                            {
+                                //Debug.Log("ボールより右に居る");
                                 isLeft = true;
                             }
                             else
@@ -541,23 +567,7 @@ public class PlayerManager : MonoBehaviour
                             }
                         }
                     }
-
-                    //ボールorボール所持者が取得できた場合
-                    if (searchNearBall)
-                    {
-                        if (searchNearBall.gameObject.transform.position.x < this.gameObject.transform.position.x)
-                        {
-                            //Debug.Log("ボールより右に居る");
-                            isLeft = true;
-                        }
-                        else
-                        {
-                            //Debug.Log("ボールより左に居る");
-                            isLeft = false;
-                        }
-                    }
                 }
-                
             }
         }
 
@@ -606,7 +616,7 @@ public class PlayerManager : MonoBehaviour
 
 
             StartCoroutine(IsThrowOut());
-            Shot();
+            StartCoroutine(Shot());
         }
     }
 
@@ -656,10 +666,14 @@ public class PlayerManager : MonoBehaviour
     /// <summary>
     /// ボール発射処理
     /// </summary>
-    void Shot()
+    IEnumerator Shot()
     {
         if (isHaveBall)
         {
+             yield return new WaitForSeconds(0.2f);   //ボール発射タイミング
+            //当たり判定変更(ボールと重ならないように)
+            hitBox.isTrigger = true;
+
             //マスタークライアントに変更
             roomModel.isMaster = true;
 
@@ -672,7 +686,7 @@ public class PlayerManager : MonoBehaviour
             ThrowBall();
 
             //ボール所持状態を解除する
-            isHaveBall = false;
+            StartCoroutine(ChangeHitBox());
         }
         else
         {
@@ -712,6 +726,9 @@ public class PlayerManager : MonoBehaviour
         //ボールオブジェクト
         if (other.gameObject.tag == "Ball")
         {
+            //ダウン中だったら
+            if (isDown) return;
+
             //キャッチ状態でボールに触ったら
             if (isCatch)
             {
@@ -731,10 +748,10 @@ public class PlayerManager : MonoBehaviour
 
                 CancelInvoke();
                 //キャッチ状態状態解除
-                Invoke("isCatchOut", catchDelay);
+                Invoke("isCatchOut", haveCatchDelay);
 
                 //ボール所持状態にする
-                isHaveBall = true;
+                //isHaveBall = true;
                 Destroy(other.gameObject);    //ボール削除
                 Debug.Log("キャッチ成功");
 
@@ -754,9 +771,9 @@ public class PlayerManager : MonoBehaviour
         if (other.gameObject.tag == "EasyBall")
         {
             //ボール所持状態にする
-            isHaveBall = true;
+            //isHaveBall = true;
             Destroy(other.gameObject);    //ボール削除
-            Debug.Log("ゲット");
+            Debug.Log("Easy取得");
 
             //ボール獲得
             GetBall();
@@ -767,7 +784,8 @@ public class PlayerManager : MonoBehaviour
     //ボール取得処理
     private async void GetBall()
     {
-        isHaveBall = true;
+        StartCoroutine(ChangeHitBox());
+
         //ボール所持者変更
         gameDirector.getUserId = roomModel.ConnectionId;
         Debug.Log("ボール取得");
@@ -783,8 +801,6 @@ public class PlayerManager : MonoBehaviour
         //少しだけ前進
         //if (isGround) rigidbody.AddForce(transform.forward * knockBack, ForceMode.VelocityChange);
         
-
-
         SEManager.Instance.Play(
                     audioPath: SEPath.THROW,      //再生したいオーディオのパス
                     volumeRate: 1,                //音量の倍率
@@ -804,12 +820,33 @@ public class PlayerManager : MonoBehaviour
             GoalPos = test,    //目標座標
 
         };
-
-        
-
         //ボール発射通知
         await roomModel.ThrowBallAsync(throwData);
+       
+    }
+    //当たり判定変更
+    IEnumerator ChangeHitBox()
+    {
+        bool isGet = false;
+        //持っていない状態だったら
+        if (!isHaveBall)
+        {
+            hitBox.isTrigger = true;
 
+            isHaveBall = true;
+            isGet = true;
+            Debug.Log("所持に変更");
+            yield break; // ここでコルーチン終了  
+        }
+        else if(isHaveBall) 
+        {
+            if(isGet) yield break; // ここでコルーチン終了  
+            Debug.Log("非所持に変更");
+           
+            isHaveBall = false;
+            yield return new WaitForSeconds(0.1f);   //ボールの軌道妨害防止
+            hitBox.isTrigger = false;
+        }
     }
 
 
@@ -823,10 +860,8 @@ public class PlayerManager : MonoBehaviour
 
         }
 
-        //ノックバック
-        rigidbody.AddForce(-transform.forward * knockBack, ForceMode.VelocityChange);
-
-       
+        //ダウン処理
+        DownUser();
 
         //ジャンプの方向を上向きのベクトルに設定
         Vector3 jump_vector = Vector3.up;
@@ -864,7 +899,27 @@ public class PlayerManager : MonoBehaviour
        
     }
 
+    //ダウン処理
+    private async void DownUser()
+    {
+        isDown = true;
+        await roomModel.DownUserAsync(roomModel.ConnectionId);   //ダウン状態通知
 
+        StartCoroutine(DownBack());
+    }
+    IEnumerator  DownBack()
+    {
+        yield return new WaitForSeconds(downTime);//指定秒数待つ
+        Debug.Log("自機回復");
+        isDown = false;
+        //リザルト表示
+        DownBackUser();
+    }
+    //ダウン復帰処理
+    private async void DownBackUser()
+    {
+        await roomModel.DownBackUserAsync(roomModel.ConnectionId);   //ダウン復帰通知
+    }
     /// <summary>
     /// 死亡通知
     /// </summary>
@@ -879,7 +934,7 @@ public class PlayerManager : MonoBehaviour
             Point = gameDirector.point,               //ユーザー獲得ポイント
             Time = (int)gameDirector.time,            //生存時間
             ThrowNum = throwNum,                      //投げた回数
-            HitNum = gameDirector.hitNum,                          //当てた回数
+            HitNum = gameDirector.hitNum,             //当てた回数
             CatchNum = catchNum,                      //キャッチした回数
             JoinOrder = gameDirector.JoinNum,         //プレイヤー番号
             IsLast = this.isLast,
@@ -945,9 +1000,6 @@ public class PlayerManager : MonoBehaviour
         //最も近かったオブジェクトを返す
         return searchTargetObj;
     }
-
-
-   
 
     //プレイヤーの向き取得(敵用)
     public bool GetAngle()

@@ -283,6 +283,28 @@ namespace StreamingHubs
         }
 
         /// <summary>
+        /// ユーザーダウン処理
+        /// </summary>
+        /// <param name="downUserId">ダウンしたユーザーID</param>
+        /// <returns></returns>
+        public async Task DownUserAsync(Guid downUserId)
+        {
+            //自分含め全員にダウンを通知
+            this.BroadcastExceptSelf(room).OnDownUser(downUserId);
+        }
+
+        /// <summary>
+        /// ユーザーダウン復帰処理
+        /// </summary>
+        /// <param name="downUserId">ダウン復帰したユーザーID</param>
+        /// <returns></returns>
+        public async Task DownBackUserAsync(Guid downBackUserId)
+        {
+            //自分含め全員にダウンを通知
+            this.Broadcast(room).OnDownBackUser(downBackUserId);
+        }
+
+        /// <summary>
         /// 準備確認処理
         /// </summary>
         /// <param name="isReady">準備状態</param>
@@ -365,7 +387,6 @@ namespace StreamingHubs
             //接続IDが1番のクライアントのみ実行
             this.Broadcast(room).GameCount(currentTime);
         }
-
 
         public async Task FinishGameAsync()
         {
