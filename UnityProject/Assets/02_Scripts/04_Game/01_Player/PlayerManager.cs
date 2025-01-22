@@ -204,7 +204,8 @@ public class PlayerManager : MonoBehaviour
             isLast = false;
             Debug.Log("デッティ");
             //死亡処理
-            playerAnim.SetAnim(PlayerAnimation.ANIM_STATE.DEAD);
+            //playerAnim.SetAnim(PlayerAnimation.ANIM_STATE.DEAD);
+            playerAnim.SetAnim(PlayerAnimation.ANIM_STATE.DOWN);
 
             //操作不能
             Destroy(fixedJoystick);
@@ -330,6 +331,7 @@ public class PlayerManager : MonoBehaviour
            
         }
         
+
         if(isHaveBall)
         {
             if (isFeint)
@@ -396,60 +398,78 @@ public class PlayerManager : MonoBehaviour
         }
         else
         {
-            if (isFeint)
+            if (isDown)
             {
                 //ジャンプ状態だったら
-                if (isJump)
+                if (isDead)
                 {
-                    isJump = false;
-                    playerAnim.SetAnim(PlayerAnimation.ANIM_STATE.AIRFEINT);
+                    
+                    playerAnim.SetAnim(PlayerAnimation.ANIM_STATE.DEAD);
                 }
                 else
                 {
-                    playerAnim.SetAnim(PlayerAnimation.ANIM_STATE.FEINT);
-                }
-                
-            }
-
-            if (isThrow)
-            {
-                //ジャンプ状態だったら
-                if (isJump)
-                {
-                    //ジャンプ投げアニメーション
-
-                    playerAnim.SetAnim(PlayerAnimation.ANIM_STATE.AIRTHROW);
-                   
-                }
-                else
-                {
-                    //投げアニメーション
-                    playerAnim.SetAnim(PlayerAnimation.ANIM_STATE.THROW);
-                   
+                    playerAnim.SetAnim(PlayerAnimation.ANIM_STATE.DOWN);
                 }
             }
             else
             {
-                //接地かつジャンプ状態でないときのみ移動
-                if (isDash && isGround && !isJump)
+
+
+                if (isFeint)
                 {
-                   playerAnim.SetAnim(PlayerAnimation.ANIM_STATE.DASH);
+                    //ジャンプ状態だったら
+                    if (isJump)
+                    {
+                        isJump = false;
+                        playerAnim.SetAnim(PlayerAnimation.ANIM_STATE.AIRFEINT);
+                    }
+                    else
+                    {
+                        playerAnim.SetAnim(PlayerAnimation.ANIM_STATE.FEINT);
+                    }
 
                 }
-                else if (isCatch)
+
+                if (isThrow)
                 {
-                    playerAnim.SetAnim(PlayerAnimation.ANIM_STATE.CATCH);
+                    //ジャンプ状態だったら
+                    if (isJump)
+                    {
+                        //ジャンプ投げアニメーション
+
+                        playerAnim.SetAnim(PlayerAnimation.ANIM_STATE.AIRTHROW);
+
+                    }
+                    else
+                    {
+                        //投げアニメーション
+                        playerAnim.SetAnim(PlayerAnimation.ANIM_STATE.THROW);
+
+                    }
                 }
                 else
                 {
-                    //アイドル(待機)アニメーション
-                    playerAnim.SetAnim(PlayerAnimation.ANIM_STATE.IDLE);
-                }
+                    //接地かつジャンプ状態でないときのみ移動
+                    if (isDash && isGround && !isJump)
+                    {
+                        playerAnim.SetAnim(PlayerAnimation.ANIM_STATE.DASH);
 
-                //ジャンプ
-                if (isJump && !isDash)
-                {
-                    playerAnim.SetAnim(PlayerAnimation.ANIM_STATE.JUMP);
+                    }
+                    else if (isCatch)
+                    {
+                        playerAnim.SetAnim(PlayerAnimation.ANIM_STATE.CATCH);
+                    }
+                    else
+                    {
+                        //アイドル(待機)アニメーション
+                        playerAnim.SetAnim(PlayerAnimation.ANIM_STATE.IDLE);
+                    }
+
+                    //ジャンプ
+                    if (isJump && !isDash)
+                    {
+                        playerAnim.SetAnim(PlayerAnimation.ANIM_STATE.JUMP);
+                    }
                 }
             }
         }
