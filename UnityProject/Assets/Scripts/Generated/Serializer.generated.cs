@@ -670,7 +670,7 @@ namespace MessagePack.Formatters.Shared.Model.Entity
                 return;
             }
 
-            writer.WriteArrayHeader(7);
+            writer.WriteArrayHeader(8);
             writer.Write(value.isReady);
             writer.Write(value.isGameCountFinish);
             writer.Write(value.isGameFinish);
@@ -678,6 +678,7 @@ namespace MessagePack.Formatters.Shared.Model.Entity
             writer.Write(value.Score);
             writer.Write(value.Life);
             writer.Write(value.UseCharaId);
+            writer.Write(value.isHaveBall);
         }
 
         public global::Shared.Model.Entity.UserState Deserialize(ref global::MessagePack.MessagePackReader reader, global::MessagePack.MessagePackSerializerOptions options)
@@ -715,6 +716,9 @@ namespace MessagePack.Formatters.Shared.Model.Entity
                         break;
                     case 6:
                         ____result.UseCharaId = reader.ReadInt32();
+                        break;
+                    case 7:
+                        ____result.isHaveBall = reader.ReadBoolean();
                         break;
                     default:
                         reader.Skip();

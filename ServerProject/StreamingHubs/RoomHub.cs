@@ -247,7 +247,9 @@ namespace StreamingHubs
             //ボール座標情報を自分のRoomDataに保存
             var roomStrage = this.room.GetInMemoryStorage<RoomData>();
             var roomData = roomStrage.Get(this.ConnectionId);
-            roomData = new RoomData() { ThrowData = throwData };
+            roomData.UserState.isHaveBall = false;
+            //roomData = new RoomData() { ThrowData = throwData };
+
 
             //自分以外のルーム参加者全員にボールの座標通知を送信
             this.BroadcastExceptSelf(room).OnThrowBall(throwData);
@@ -262,9 +264,33 @@ namespace StreamingHubs
         public async Task GetBallAsync(Guid getUserId)
         {
 
-            //自分以外のルーム参加者全員にボール取得通知を送信
-            this.BroadcastExceptSelf(room).OnGetBall(getUserId);
-            //this.Broadcast(room).OnGetBall();
+            //準備できたことを自分のRoomDataに保存
+            var roomDataStrage = this.room.GetInMemoryStorage<RoomData>();
+
+            RoomData[] roomDataList = roomDataStrage.AllValues.ToArray<RoomData>();
+
+            //参加ユーザー分所持チェック
+            foreach (var data in roomDataList)
+            {
+                //所持状況が重複していた場合
+                if (data.UserState.isHaveBall)
+                {
+                    Console.WriteLine("ボール重複検知");
+                    return;
+                }
+            }
+            //排他制御
+            lock (roomDataStrage)
+            {
+                Console.WriteLine("正常取得");
+
+                var roomData = roomDataStrage.Get(getUserId);
+                roomData.UserState.isHaveBall = true;    //所持状況更新
+
+                //自分以外のルーム参加者全員にボール取得通知を送信
+                this.BroadcastExceptSelf(room).OnGetBall(getUserId);
+                //this.Broadcast(room).OnGetBall();
+            }
 
         }
 

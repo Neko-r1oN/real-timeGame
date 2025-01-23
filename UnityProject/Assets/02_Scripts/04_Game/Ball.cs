@@ -20,7 +20,7 @@ public class Ball : MonoBehaviour
         objectCollider.isTrigger = false; //Trigger‚Æ‚µ‚Äˆµ‚¤
         rb = GetComponent<Rigidbody>();
         rb.useGravity = false; //d—Í‚ğ–³Œø‚É‚·‚é
-        Invoke("TriggerChange", 0.7f);
+        Invoke("TriggerChange", 0.5f);
     }
 
     private async void TriggerChange()
@@ -41,11 +41,7 @@ public class Ball : MonoBehaviour
         {
 
             this.gameObject.tag = "EasyBall";
-            //rb.useGravity = true;
-
-            //if (playerManager.isCatch) Destroy(this.gameObject); //’e‚ğÁ‚·
-
-            //else if (!playerManager.isCatch) rb.useGravity = false; //d—Í‚ğ–³Œø‚É‚·‚é
+           
 
         }
     }

@@ -25,6 +25,8 @@ namespace Shared.Model.Entity
         public int Life { get; set; }                       //体力
         [Key(6)]
         public int UseCharaId { get; set; }                  //使用キャラクターID
-       
+        [Key(7)]
+        public bool isHaveBall { get; set; }                  //ボール所持状況
+
     }
 }

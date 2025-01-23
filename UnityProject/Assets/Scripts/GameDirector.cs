@@ -711,7 +711,19 @@ public class GameDirector : MonoBehaviour
         Debug.Log(this.getUserId);
        
         Debug.Log("取得者ID更新");
+        bool isDelete = false;
         //フィールド上のボール検索
+        while (isDelete)
+        {
+            ballObj = GameObject.Find("Ball");
+
+            if (ballObj)
+            {
+                Destroy(ballObj.gameObject);    //ボール削除
+                isDelete = true;
+            }
+        }
+
         ballObj = GameObject.Find("Ball");
 
         if (ballObj) Destroy(ballObj.gameObject);    //ボール削除

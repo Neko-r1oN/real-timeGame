@@ -63,6 +63,7 @@ public class PlayerManager : MonoBehaviour
     Button feintButton;
 
     GameObject catchbtn;    //表示切替用
+    GameObject throwbtn;    //表示切替用
 
     FixedJoystick fixedJoystick;    //JoyStick
     Rigidbody rigidbody;
@@ -153,6 +154,7 @@ public class PlayerManager : MonoBehaviour
 
 
         catchbtn = GameObject.Find("CatchButton");
+        throwbtn = GameObject.Find("ThrowButton");
 
         //ルームモデルの取得
         roomModel = GameObject.Find("RoomModel").GetComponent<RoomModel>();
@@ -627,10 +629,16 @@ public class PlayerManager : MonoBehaviour
         isCatch = false;
         Debug.Log("キャッチ解除");
     }
-    public void OnClickThrow()
+    void OnClickThrow()
     {
+      
         if (!isDead)
         {
+            if (isFeint) StopAllCoroutines();
+
+            throwbtn.SetActive(false);
+
+            isFeint = false;
             isThrow = true;
 
 
@@ -792,7 +800,7 @@ public class PlayerManager : MonoBehaviour
         {
             //ボール所持状態にする
             //isHaveBall = true;
-            Destroy(other.gameObject);    //ボール削除
+            //Destroy(other.gameObject);    //ボール削除
             Debug.Log("Easy取得");
 
             //ボール獲得
@@ -804,14 +812,27 @@ public class PlayerManager : MonoBehaviour
     //ボール取得処理
     private async void GetBall()
     {
+        //ボール所持者重複チェック
+        GameObject ballChack = EnemySerch(enemyBallTag);
+
+        if (ballChack) return;
+
+        //取得者のIDを通知
+        await roomModel.GetBallAsync(roomModel.ConnectionId);
+
+        Debug.Log("所持者いない");
+        //ボール所持者重複チェック
+        GameObject ball = EnemySerch(ballTag);
+        Destroy(ball);    //ボール削除
+
         StartCoroutine(ChangeHitBox());
 
         //ボール所持者変更
         gameDirector.getUserId = roomModel.ConnectionId;
         Debug.Log("ボール取得");
 
-        //取得者のIDを通知
-        await roomModel.GetBallAsync(roomModel.ConnectionId);
+        throwbtn.SetActive(true);
+
     }
     //ボール取得処理
     private async void ThrowBall()
