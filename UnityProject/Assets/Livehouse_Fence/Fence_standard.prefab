@@ -13,7 +13,7 @@ GameObject:
   - component: {fileID: 1659044076164045358}
   m_Layer: 0
   m_Name: Fence_standard
-  m_TagString: Ground
+  m_TagString: Wall
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -95,7 +95,7 @@ BoxCollider:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 6959782879886251839}
-  m_Material: {fileID: 0}
+  m_Material: {fileID: 13400000, guid: 7f9d3c98ed6c787459ea24910f3191e7, type: 2}
   m_IncludeLayers:
     serializedVersion: 2
     m_Bits: 0
@@ -107,5 +107,5 @@ BoxCollider:
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3
-  m_Size: {x: 0.028352657, y: 0.0035803386, z: 0.049346298}
-  m_Center: {x: 0.0010153868, y: -0.0010786174, z: 0.024564378}
+  m_Size: {x: 0.028352655, y: 0.005910978, z: 0.049346298}
+  m_Center: {x: 0.0010153865, y: -0.001329067, z: 0.024564374}

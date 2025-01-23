@@ -12,7 +12,9 @@ public class MenuManager : MonoBehaviour
     public CinemachineVirtualCameraBase charaCam;
 
     [SerializeField] InputField roomName;
-    
+
+    [SerializeField] GameObject menuCanvas;
+
     [SerializeField] GameObject roomMenu;
 
     [SerializeField] GameObject controller;
@@ -25,6 +27,7 @@ public class MenuManager : MonoBehaviour
         menuCam.Priority = 50;
         charaCam.Priority = 0;
 
+        menuCanvas.SetActive(false);
         roomMenu.SetActive(false);
         //controller.SetActive(false);
     }
@@ -43,6 +46,7 @@ public class MenuManager : MonoBehaviour
     }
     public void OnClickBack()
     {
+        
         //カメラ優先度設定
         menuCam.Priority = 50;
         charaCam.Priority = 0;
@@ -50,6 +54,8 @@ public class MenuManager : MonoBehaviour
 
     public void OnClickButtle()
     {
+        menuCanvas.SetActive(true);
+
         //カメラ優先度設定
         roomMenu.SetActive(true);
         roomName.text = "lobby";     //デフォルトはロビー行
@@ -67,8 +73,9 @@ public class MenuManager : MonoBehaviour
 
     public void OnClickButtleBack()
     {
+        menuCanvas.SetActive(false);
         //カメラ優先度設定
-       // controller.SetActive(false);
+        // controller.SetActive(false);
         roomMenu.SetActive(false);
         //カメラ優先度設定
         menuCam.Priority = 50;

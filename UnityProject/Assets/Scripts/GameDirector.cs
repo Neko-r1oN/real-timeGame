@@ -167,8 +167,17 @@ public class GameDirector : MonoBehaviour
         //歓声
         BGMManager.Instance.Play(
             audioPath: BGMPath.GUEST,         //再生したいオーディオのパス
-            volumeRate: 1,                    //音量の倍率
+            volumeRate: 0.5f,                    //音量の倍率
             delay: 0,                         //再生されるまでの遅延時間
+            pitch: 1,                         //ピッチ
+            isLoop: true,                     //ループ再生するか
+            allowsDuplicate: true             //他のBGMと重複して再生させるか
+        );
+        //歓声
+        BGMManager.Instance.Play(
+            audioPath: BGMPath.GUEST,         //再生したいオーディオのパス
+            volumeRate: 0.5f,                    //音量の倍率
+            delay: 0.7f,                         //再生されるまでの遅延時間
             pitch: 1,                         //ピッチ
             isLoop: true,                     //ループ再生するか
             allowsDuplicate: true             //他のBGMと重複して再生させるか
@@ -259,7 +268,7 @@ public class GameDirector : MonoBehaviour
 
         }
 
-       /* switch (game_State)
+      /* switch (game_State)
         {
             
             case GAME_STATE.READY:
@@ -523,10 +532,10 @@ public class GameDirector : MonoBehaviour
             Destroy(ui.gameObject);
         }
 
-        //リザルトUIオブジェクト削除
-        foreach (Transform result in resultObj.transform)
+        //スコアUIオブジェクト削除
+        foreach (Transform info in spawnPlayerUIObj.transform)
         {
-            Destroy(result.gameObject);
+            Destroy(info.gameObject);
         }
 
 
@@ -553,6 +562,9 @@ public class GameDirector : MonoBehaviour
         //退出したプレイヤーUIのオブジェクト削除
         Destroy(standUIList[connnectionId]);
 
+        //退出したプレイヤーUIのオブジェクト削除
+        Destroy(scoreUIList[connnectionId]);
+
         //Destroy(ballObj);
 
         //退出したプレイヤーをリストから削除
@@ -560,6 +572,9 @@ public class GameDirector : MonoBehaviour
 
         //退出したプレイヤーUIをリストから削除
         standUIList.Remove(connnectionId);
+
+        //退出したプレイヤーUIをリストから削除
+        scoreUIList.Remove(connnectionId);
 
         Debug.Log("退出したユーザー番号:"+ connnectionId);
 
@@ -911,7 +926,7 @@ public class GameDirector : MonoBehaviour
 
 
             SEManager.Instance.Play(
-                audioPath: SEPath.DEAD,        //再生したいオーディオのパス
+                audioPath: SEPath.DOWN,        //再生したいオーディオのパス
                 volumeRate: 1,                //音量の倍率
                 delay: 1,                     //再生されるまでの遅延時間
                 pitch: 1,                     //ピッチ

@@ -597,6 +597,7 @@ public class PlayerManager : MonoBehaviour
 
     public void OnClickJump()
     {
+        if(!isJump)
         SEManager.Instance.Play(
            audioPath: SEPath.JUMP,      //再生したいオーディオのパス
            volumeRate: 1,                //音量の倍率
@@ -634,6 +635,7 @@ public class PlayerManager : MonoBehaviour
       
         if (!isDead)
         {
+            if (!isHaveBall) return;
             if (isFeint) StopAllCoroutines();
 
             throwbtn.SetActive(false);
@@ -714,7 +716,7 @@ public class PlayerManager : MonoBehaviour
             ThrowBall();
 
             //ボール所持状態を解除する
-            StartCoroutine(ChangeHitBox());
+            StartCoroutine(ChangeThrowHitBox());
         }
         else
         {
@@ -729,11 +731,12 @@ public class PlayerManager : MonoBehaviour
         //着地を検出したので着地状態を書き換え
         if (!isGround)
         {
+            if (other.gameObject.tag == "Wall") return;
 
             SEManager.Instance.Play(
                 audioPath: SEPath.JUMPED,      //再生したいオーディオのパス
                 volumeRate: 1,                //音量の倍率
-                delay: 0.6f,                     //再生されるまでの遅延時間
+                delay: 0.0f,                     //再生されるまでの遅延時間
                 pitch: 1,                     //ピッチ
                 isLoop: false,                 //ループ再生するか
                 callback: null                //再生終了後の処理
@@ -763,7 +766,7 @@ public class PlayerManager : MonoBehaviour
                 SEManager.Instance.Play(
                     audioPath: SEPath.CATCH,      //再生したいオーディオのパス
                     volumeRate: 1,                //音量の倍率
-                    delay: 0.6f,                     //再生されるまでの遅延時間
+                    delay: 0.2f,                     //再生されるまでの遅延時間
                     pitch: 1,                     //ピッチ
                     isLoop: false,                 //ループ再生するか
                     callback: null                //再生終了後の処理
@@ -825,13 +828,22 @@ public class PlayerManager : MonoBehaviour
         GameObject ball = EnemySerch(ballTag);
         Destroy(ball);    //ボール削除
 
-        StartCoroutine(ChangeHitBox());
+        StartCoroutine(ChangeGetHitBox());
 
         //ボール所持者変更
         gameDirector.getUserId = roomModel.ConnectionId;
         Debug.Log("ボール取得");
 
-        throwbtn.SetActive(true);
+        SEManager.Instance.Play(
+               audioPath: SEPath.GET,      //再生したいオーディオのパス
+               volumeRate: 1,                //音量の倍率
+               delay: 0,                     //再生されるまでの遅延時間
+               pitch: 1,                     //ピッチ
+               isLoop: false,                 //ループ再生するか
+               callback: null                //再生終了後の処理
+               );
+
+       throwbtn.SetActive(true);
 
     }
     //ボール取得処理
@@ -845,7 +857,7 @@ public class PlayerManager : MonoBehaviour
         SEManager.Instance.Play(
                     audioPath: SEPath.THROW,      //再生したいオーディオのパス
                     volumeRate: 1,                //音量の倍率
-                    delay: 0.6f,                     //再生されるまでの遅延時間
+                    delay: 0.0f,                     //再生されるまでの遅延時間
                     pitch: 1,                     //ピッチ
                     isLoop: false,                 //ループ再生するか
                     callback: null                //再生終了後の処理
@@ -866,29 +878,31 @@ public class PlayerManager : MonoBehaviour
        
     }
     //当たり判定変更
-    IEnumerator ChangeHitBox()
+    IEnumerator ChangeGetHitBox()
     {
-        bool isGet = false;
         //持っていない状態だったら
         if (!isHaveBall)
         {
             hitBox.isTrigger = true;
 
             isHaveBall = true;
-            isGet = true;
             Debug.Log("所持に変更");
             yield break; // ここでコルーチン終了  
         }
-        else if(isHaveBall) 
-        {
-            if(isGet) yield break; // ここでコルーチン終了  
-            Debug.Log("非所持に変更");
-           
-            isHaveBall = false;
-            yield return new WaitForSeconds(0.1f);   //ボールの軌道妨害防止
-            hitBox.isTrigger = false;
-        }
+       
     }
+    //当たり判定変更
+    IEnumerator ChangeThrowHitBox()
+    {
+
+        Debug.Log("非所持に変更");
+
+        isHaveBall = false;
+        yield return new WaitForSeconds(0.1f);   //ボールの軌道妨害防止
+        hitBox.isTrigger = false;
+
+    }
+
 
 
     private async void HitBall()

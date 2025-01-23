@@ -12,6 +12,7 @@ TagManager:
   - Dead
   - BallPlayer
   - Down
+  - Wall
   layers:
   - Default
   - TransparentFX
