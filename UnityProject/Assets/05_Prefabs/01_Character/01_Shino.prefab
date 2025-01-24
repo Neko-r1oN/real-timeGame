@@ -106,8 +106,8 @@ BoxCollider:
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3
-  m_Size: {x: 0.09727882, y: 2.448922, z: 0.0674375}
-  m_Center: {x: -0.1252507, y: -1.1155252, z: 0.0035537581}
+  m_Size: {x: 1.032138, y: 0.48294407, z: 0.68843126}
+  m_Center: {x: -0.112272754, y: -2.2392793, z: 0.050453275}
 --- !u!1 &3631495533016376940
 GameObject:
   m_ObjectHideFlags: 0
@@ -129,7 +129,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!4 &8822268445790823233
 Transform:
   m_ObjectHideFlags: 0
@@ -160,7 +160,7 @@ MeshRenderer:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 3631495533016376940}
-  m_Enabled: 1
+  m_Enabled: 0
   m_CastShadows: 1
   m_ReceiveShadows: 1
   m_DynamicOccludee: 1

@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Numerics;
+using UnityEngine;
 using System.Text;
 using MagicOnion;
 using Shared.Model.Entity;
@@ -41,6 +41,10 @@ namespace Shared.Interfaces.StreamingHubs
         
         //ヒット通知
         void OnHitBall(HitData hitData);
+
+        //標準カーソルの移動通知
+        void OnMoveCursor(Vector3 cursorPos);
+
 
         //ダウン通知
         void OnDownUser(Guid downUserId);

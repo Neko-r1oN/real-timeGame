@@ -45,6 +45,8 @@ public class RoomModel : BaseModel, IRoomHubReceiver
 
     //ボールヒット通知
     public Action<HitData> HitBall { get; set; }
+
+    public Action<Vector3> MoveCursor { get; set; }
     //ユーザーダウン通知
     public Action<Guid> DownUser { get; set; }
     //ユーザーダウン復帰
@@ -286,6 +288,18 @@ public class RoomModel : BaseModel, IRoomHubReceiver
     {
         HitBall(hitData);
     }
+
+    //標準カーソル座標同期処理
+    public async Task MoveCursorAsync(Vector3 cursorPos)
+    {
+        await roomHub.MoveCursorAsync(cursorPos);
+    }
+    //標準カーソル座標同期通知
+    public void OnMoveCursor(Vector3 cursorPos)
+    {
+        MoveCursor(cursorPos);
+    }
+
     //ダウン処理
     public async Task DownUserAsync(Guid downUserId)
     {

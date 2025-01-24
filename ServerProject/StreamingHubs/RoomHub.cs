@@ -5,6 +5,8 @@ using ServerProject.StreamingHubs;
 using Shared.Interfaces.StreamingHubs;
 using Shared.Model.Entity;
 using System.Diagnostics;
+using System;
+using UnityEngine;
 
 
 namespace StreamingHubs
@@ -37,43 +39,50 @@ namespace StreamingHubs
             //グループストレージにユーザー情報を格納
             var roomStorage = this.room.GetInMemoryStorage<RoomData>();
 
-            //自身の入室番号を取得
-            int joinOrderNum = GetJoinOrder(roomStorage.AllValues.ToArray<RoomData>());
-
-            //参加ユーザーの情報を挿入
-            var joinedUser = new JoinedUser() { ConnectionId = this.ConnectionId,
-                UserData = user,IsSelf = true, JoinOrder = joinOrderNum};
-
-
-            //ルームデータにユーザーとゲーム状態を挿入
-            var roomData = new RoomData() {JoinedUser = joinedUser , UserState = new UserState(), MoveData = new MoveData()};
-
-
-
-            roomStorage.Set(this.ConnectionId, roomData);
-
-            //プライベートマッチで入室した際
-            if (roomName != "Lobby")
-            {
-                //ルーム参加者全員にユーザーの入室通知を送信
-                
-                //通常通り通知
-                this.BroadcastExceptSelf(room).OnJoin(joinedUser);
-            }
-
-            Console.WriteLine("参加者名:" + joinedUser.UserData.Name);
-            //Console.WriteLine("スコア:" + joinedUser.UserState.Score);
-
-            //await Task.Delay(1000);
-            //同時実行されないように１回だけ実行するよう lock で設定(排他的処理)
+            //同時実行されないように lock で設定(排他的処理)
             lock (roomStorage)
             {
+                //自身の入室番号を取得
+                int joinOrderNum = GetJoinOrder(roomStorage.AllValues.ToArray<RoomData>());
+
+                //参加ユーザーの情報を挿入
+                var joinedUser = new JoinedUser()
+                {
+                    ConnectionId = this.ConnectionId,
+                    UserData = user,
+                    IsSelf = true,
+                    JoinOrder = joinOrderNum
+                };
+
+
+                //ルームデータにユーザーとゲーム状態を挿入
+                var roomData = new RoomData() { JoinedUser = joinedUser, UserState = new UserState(), MoveData = new MoveData() };
+
+
+
+                roomStorage.Set(this.ConnectionId, roomData);
+
+                //await Task.Delay(1000);
+
+                //プライベートマッチで入室した際
+                if (roomName != "Lobby")
+                {
+                    //ルーム参加者全員にユーザーの入室通知を送信
+
+                    //通常通り通知
+                    this.BroadcastExceptSelf(room).OnJoin(joinedUser);
+                }
+
+                Console.WriteLine("参加者名:" + joinedUser.UserData.Name);
+                //Console.WriteLine("スコア:" + joinedUser.UserState.Score);
+
+
                 RoomData[] roomDataList = roomStorage.AllValues.ToArray<RoomData>();
 
                 //参加中のユーザー情報を流す
                 JoinedUser[] joinedUserList = new JoinedUser[roomDataList.Length];
 
-                Debug.WriteLine("接続ID"+this.ConnectionId);
+                Debug.WriteLine("接続ID" + this.ConnectionId);
 
                 //RoomDataList内のJoinedUserを格納
                 for (int i = 0; i < joinedUserList.Length; i++)
@@ -86,14 +95,14 @@ namespace StreamingHubs
                 {
 
 
-                   
-                    Console.WriteLine("プラべ:"+roomName);
-                        Console.WriteLine("ゲーム開始");
-                        //ゲーム開始通知
-                        this.Broadcast(room).StartGame();
+
+                    Console.WriteLine("プラべ:" + roomName);
+                    Console.WriteLine("ゲーム開始");
+                    //ゲーム開始通知
+                    this.Broadcast(room).StartGame();
 
 
-                   
+
                 }
 
                 return joinedUserList;
@@ -125,7 +134,7 @@ namespace StreamingHubs
                 //書式を桁無し指定にして再入室
                 this.Broadcast(room).OnMatch(Guid.NewGuid().ToString("N"));
 
-              
+                
 
             }
             //return joinedUserList;
@@ -306,6 +315,18 @@ namespace StreamingHubs
 
             //自分含め全員に通知
             this.Broadcast(room).OnHitBall(hitData);
+        }
+
+        /// <summary>
+        /// 標準カーソル移動処理(ボール所持者のみ実行)
+        /// </summary>
+        /// <returns></returns>
+        public async Task MoveCursorAsync(Vector3 cursorPos)
+        {
+
+            //自分以外のルーム参加者全員にユーザーの移動通知を送信
+            this.BroadcastExceptSelf(room).OnMoveCursor(cursorPos);
+
         }
 
         /// <summary>

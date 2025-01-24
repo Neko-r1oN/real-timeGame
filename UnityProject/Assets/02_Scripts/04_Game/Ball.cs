@@ -10,10 +10,13 @@ public class Ball : MonoBehaviour
     private CapsuleCollider objectCollider;
     private Rigidbody rb;
 
+
+
     PlayerManager playerManager;
 
     void Start()
     {
+        
         this.name = "Ball";
 
         GetComponent<Renderer>().material.color = new Color32(0, 0, 0, 1); //弾の色を黒にする
@@ -40,6 +43,8 @@ public class Ball : MonoBehaviour
     {
         if (collision.gameObject.tag == "Ground" || collision.gameObject.tag == "Wall") //タグがEnemyのオブジェクトと衝突した場合
         {
+            //cursor.SetActive(false);
+
             SEManager.Instance.Play(
                 audioPath: SEPath.BOUND,      //再生したいオーディオのパス
                 volumeRate: 1,                //音量の倍率
@@ -47,9 +52,10 @@ public class Ball : MonoBehaviour
                 pitch: 1,                     //ピッチ
                 isLoop: false,                 //ループ再生するか
                 callback: null                //再生終了後の処理
-      );
+            );
+
             this.gameObject.tag = "EasyBall";
-           
+
 
         }
     }

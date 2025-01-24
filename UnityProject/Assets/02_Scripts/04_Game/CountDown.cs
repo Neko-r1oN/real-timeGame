@@ -162,7 +162,7 @@ public class CountDown : MonoBehaviour
     public void ChangeCamera()
     {// カメラの表示・非表示を切り替える
 
-        Debug.Log(changeCamNum);
+        //Debug.Log(changeCamNum);
         switch (changeCamNum)
         {
             
@@ -173,7 +173,7 @@ public class CountDown : MonoBehaviour
                     pCam3.Priority = 0;
                     pCam4.Priority = 0;
                     mainCam.Priority = 0;
-                    Debug.Log("1");
+                    //Debug.Log("1");
 
                     changeCamNum++;
                     break;
@@ -185,7 +185,7 @@ public class CountDown : MonoBehaviour
                     pCam3.Priority = 0;
                     pCam4.Priority = 0;
                     mainCam.Priority = 0;
-                    Debug.Log("2");
+                    //Debug.Log("2");
 
                     changeCamNum++;
                     break;
@@ -198,7 +198,7 @@ public class CountDown : MonoBehaviour
                     pCam4.Priority = 0;
                     mainCam.Priority = 0;
 
-                    Debug.Log("3");
+                    //Debug.Log("3");
 
                     changeCamNum++;
                     break;
@@ -211,7 +211,7 @@ public class CountDown : MonoBehaviour
                     pCam4.Priority = 1;
                     mainCam.Priority = 0;
 
-                    Debug.Log("4");
+                    //Debug.Log("4");
 
                     changeCamNum++;
                     break;
@@ -224,7 +224,7 @@ public class CountDown : MonoBehaviour
                     pCam4.Priority = 0;
                     mainCam.Priority = 1;
 
-                    Debug.Log("5");
+                    //Debug.Log("5");
 
                     changeCamNum++;
 

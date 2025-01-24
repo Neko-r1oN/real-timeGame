@@ -12,7 +12,10 @@ using System.Xml.Serialization;
 using System.Threading.Tasks;
 using Cysharp.Threading.Tasks.Triggers;
 using KanKikuchi.AudioManager;
-using static UnityEngine.Rendering.DebugUI;
+using static GameDirector;
+using UnityEngine.InputSystem.XR;
+using MessagePack.Resolvers;
+
 
 public class GameDirector : MonoBehaviour
 {
@@ -43,12 +46,16 @@ public class GameDirector : MonoBehaviour
     //ターゲット用カーソル
     [SerializeField] GameObject cursor;
 
+    //入室UI
+    [SerializeField] GameObject joinUI;
     //待機中UI
     [SerializeField] GameObject standByUI;
+    [SerializeField] GameObject matchText;
 
     //ユーザー待機中UI生成親オブジェクト
     [SerializeField] private GameObject spawnUIObj;
-
+    //メニューUI
+    [SerializeField] GameObject menuCanvas;
 
     //ユーザースコア表示UIプレハブ
     [SerializeField] GameObject playerUIPrefab;
@@ -63,11 +70,12 @@ public class GameDirector : MonoBehaviour
     //スコア表示UI生成親オブジェクト
     [SerializeField] GameObject spawnStandUIObj;
 
-
+    [SerializeField] GameObject controller;
     public bool isStart;
     public float time;              //生存時間
 
-
+    private Guid[] joinedId = new Guid[0];
+    int joinNum = 0;
 
     //ゲームUI
     [SerializeField] GameObject gameUI;
@@ -91,6 +99,7 @@ public class GameDirector : MonoBehaviour
     private bool isPlayer;
     //ボール存在判定
     private bool isBall;
+    private bool isMatch;
 
     GameObject ballObj;
 
@@ -154,6 +163,8 @@ public class GameDirector : MonoBehaviour
     }
     async void Start()
     {
+        isMatch = false;
+
         //メニューBGM
         BGMManager.Instance.Play(
             audioPath: BGMPath.MENU, //再生したいオーディオのパス
@@ -187,6 +198,7 @@ public class GameDirector : MonoBehaviour
         point = 0;
         hitNum = 0;
 
+       
 
         //ユーザーが入室した際にOnJoinedUserメゾットを実行するようにモデルに登録しておく
         roomModel.OnJoinedUser += this.OnJoinedUser;   //ユーザー入室
@@ -204,6 +216,8 @@ public class GameDirector : MonoBehaviour
         roomModel.GetBall += this.GetBall;             //ボール取得
 
         roomModel.HitBall += this.HitBall;             //ボールヒット
+
+        roomModel.MoveCursor += this.MovedCursor;
 
         roomModel.DownUser += this.DownUser;             //ボールヒット
         roomModel.DownBackUser += this.DownBackUser;             //ボールヒット
@@ -225,7 +239,7 @@ public class GameDirector : MonoBehaviour
 
         isJoinFirst = false;
 
-        cursor.SetActive(false);
+        cursor.SetActive(true);
 
         deadNum = 0;
         isDead = false;
@@ -252,13 +266,13 @@ public class GameDirector : MonoBehaviour
     void Update()
     {
         //ユーザーID更新(表示用)
-        if (userModel.userName != "")
+        /*if (userModel.userName != "")
         {
             //Debug.Log(userModel.userName);
             userName.text = userModel.userName;
-        }
+        }*/
 
-        if (!isPlayer) return;
+        // if (!isPlayer) return;
         
         if(isStart)
         {
@@ -268,9 +282,11 @@ public class GameDirector : MonoBehaviour
 
         }
 
-      /* switch (game_State)
+        //Debug.Log(game_State);
+        switch (game_State)
         {
             
+
             case GAME_STATE.READY:
                 standByUI.SetActive(true);
                 break;
@@ -280,7 +296,7 @@ public class GameDirector : MonoBehaviour
             case GAME_STATE.STOP:
                 standByUI.SetActive(false);
                 break;
-        }*/
+        }
       
     }
 
@@ -302,11 +318,13 @@ public class GameDirector : MonoBehaviour
         cursor.SetActive(true);
 
         game_State = GAME_STATE.READY;
+        if (!isMatch)
+        {
 
-        
-        await roomModel.JoinAsync(roomName.text, userModel.userId);     //ルーム名とユーザーIDを渡して入室
-        //await roomModel.JoinAsync(roomName.text, userModel.userId);
+            await roomModel.JoinAsync(roomName.text, userModel.userId);     //ルーム名とユーザーIDを渡して入室
 
+            isMatch = true;//await roomModel.JoinAsync(roomName.text, userModel.userId);
+        }
 
         //同期通信呼び出し、以降は commuTime ごとに実行
         InvokeRepeating(nameof(SendData), 0.0f, commuTime);
@@ -317,21 +335,24 @@ public class GameDirector : MonoBehaviour
     //入室処理
     public async void JoinLobby()
     {
-        if (!userId)
+        /*if (!userId)
         {
             return;
-        }
+        }*/
 
-        Debug.Log("ロビークリック");
-        Debug.Log("ユーザーID;" + userId.text);
+       
+        game_State = GAME_STATE.READY;
 
-        cursor.SetActive(true);
+        menuCanvas.SetActive(true);
+         cursor.SetActive(true);
 
-        
 
 
-        await roomModel.JoinLobbyAsync(userModel.userId);     //ルーム名とユーザーIDを渡して入室
 
+         await roomModel.JoinLobbyAsync(userModel.userId);     //ルーム名とユーザーIDを渡して入室
+
+        //同期通信呼び出し、以降は commuTime ごとに実行
+        //InvokeRepeating(nameof(SendData), 0.0f, commuTime);
         game_State = GAME_STATE.READY;
 
         Debug.Log("マッチング中");
@@ -340,24 +361,40 @@ public class GameDirector : MonoBehaviour
     //マッチングが成立したときの処理
     private async void MatchedUser(string roomName)
     {
-        await roomModel.LeaveAsync();
+      
+            await roomModel.LeaveAsync();
 
 
-        Debug.Log("入室するルーム名:"+roomName);
+            Debug.Log("マッチ:" + roomName);
 
-        
 
-        //受け取ったユーザーIDをルーム名に渡して入室
-        await roomModel.JoinAsync(roomName, userModel.userId);
 
-       
-
-        Debug.Log("マッチング入室完了");
+        if (!isMatch)
+        {
+            //受け取ったユーザーIDをルーム名に渡して入室
+            await roomModel.JoinAsync(roomName, userModel.userId);
+            
+            //同期通信呼び出し、以降は commuTime ごとに実行
+            InvokeRepeating(nameof(SendData), 0.0f, commuTime);
+            isMatch = true;
+        }
     }
 
     //ユーザーが入室したときの処理
     private void OnJoinedUser(JoinedUser user)
     {
+        bool isJoined = false;
+
+        if (joinedId != null)
+        {
+            Debug.Log("保存ID:"+joinedId);
+            //重複チェック
+            foreach (Guid id in joinedId)
+            {
+                Debug.Log(id + ":" + user.ConnectionId);
+                if (id == user.ConnectionId) return;
+            }
+        }
         //マスターチェック
         roomModel.OnMasterCheck(user);
 
@@ -371,10 +408,21 @@ public class GameDirector : MonoBehaviour
         GameObject charaInfoUI = Instantiate(playerUIPrefab, Vector3.zero, Quaternion.identity, spawnPlayerUIObj.gameObject.transform);
 
         characterList[user.ConnectionId] = characterObject;        //フィールドで保持
-        
+
+        //コンポーネント付与
+        characterList[user.ConnectionId].transform.GetChild(0).GetComponent<PlayerAnimation>().Init();
+
+
         standUIList[user.ConnectionId] = standByCharaUI;        //フィールドで保持
 
         scoreUIList[user.ConnectionId] = charaInfoUI;        //フィールドで保持
+
+        
+        //入室保存
+        Array.Resize(ref joinedId, joinedId.Length +1);
+        joinedId[joinedId.Length - 1] = user.ConnectionId;
+       // joinedId[joinNum] = user.ConnectionId;
+        //joinNum++;
 
         //UIカラー
         Image standUIColor = standByCharaUI.gameObject.GetComponent<Image>();
@@ -507,7 +555,7 @@ public class GameDirector : MonoBehaviour
     //切断処理
     public async void DisConnectRoom()
     {
-
+        isMatch = false;
         //同期通信解除
         CancelInvoke();
 
@@ -515,7 +563,10 @@ public class GameDirector : MonoBehaviour
         await roomModel.LeaveAsync();
 
         standByUI.SetActive(false);
-        game_State = GAME_STATE.START;
+        menuCanvas.SetActive(false);
+
+        
+        game_State = GAME_STATE.STOP;
 
         //MagicOnion切断処理
         //await roomModel.DisConnectAsync();
@@ -541,7 +592,7 @@ public class GameDirector : MonoBehaviour
 
         isPlayer = false;
 
-        cursor.SetActive(false);
+        //cursor.SetActive(false);
 
       
         Debug.Log("退出完了");
@@ -550,8 +601,9 @@ public class GameDirector : MonoBehaviour
     //ユーザーが退出したときの処理
     private async void LeavedUser(Guid connnectionId)
     {
+       
         //プレイヤーがいなかったら
-       if (!characterList.ContainsKey(connnectionId))
+        if (!characterList.ContainsKey(connnectionId))
        {
            return;
        }
@@ -564,8 +616,6 @@ public class GameDirector : MonoBehaviour
 
         //退出したプレイヤーUIのオブジェクト削除
         Destroy(scoreUIList[connnectionId]);
-
-        //Destroy(ballObj);
 
         //退出したプレイヤーをリストから削除
         characterList.Remove(connnectionId);
@@ -584,6 +634,10 @@ public class GameDirector : MonoBehaviour
         game_State = GAME_STATE.STOP;
 
         Debug.Log("退出ユーザーオブジェクト削除");
+
+        isMatch = false;
+
+        menuCanvas.SetActive(true);
     }
 
     private async void SendData()
@@ -596,8 +650,9 @@ public class GameDirector : MonoBehaviour
         }*/
         
         //コンポーネント付与
-        characterList[roomModel.ConnectionId].transform.GetChild(0).gameObject.GetComponent<PlayerAnimation>().Init();
+        //characterList[roomModel.ConnectionId].transform.GetChild(0).gameObject.GetComponent<PlayerAnimation>().Init();
 
+       
         //移動情報
         var moveData = new MoveData()
         {
@@ -612,6 +667,8 @@ public class GameDirector : MonoBehaviour
         //プレイヤー移動
         await roomModel.MoveAsync(moveData);
 
+        //カーソル座標送信
+        if(roomModel.isMaster) await roomModel.MoveCursorAsync(cursor.transform.position);
 
         //フィールド上のボール検索
         ballObj = GameObject.Find("Ball");
@@ -650,12 +707,6 @@ public class GameDirector : MonoBehaviour
         //コンポーネント付与
         characterList[moveData.ConnectionId].transform.GetChild(0).GetComponent<PlayerAnimation>().Init();
 
-        //移動したプレイヤーの位置代入
-        //characterList[moveData.ConnectionId].transform.position = moveData.Pos;
-
-        //移動したプレイヤーの角度代入a
-        //characterList[moveData.ConnectionId].transform.eulerAngles = moveData.Rotate;
-
         //Dotweenで移動補完
         characterList[moveData.ConnectionId].transform.DOMove(moveData.Pos, dotweenTime).SetEase(Ease.Linear);
         //Debug.Log("移動同期通った");
@@ -683,6 +734,14 @@ public class GameDirector : MonoBehaviour
         ballObj.transform.DOMove(moveBallData.Pos, dotweenTime).SetEase(Ease.Linear);
         //Dotweenで回転補完
         ballObj.transform.DORotate(moveBallData.Rotate, dotweenTime).SetEase(Ease.Linear);
+    }
+    //ユーザーが移動したときの処理
+    private async void MovedCursor(Vector3 cursorPos)
+    {
+        Debug.Log("カーソル受け");
+        //Dotweenで移動補完
+        cursor.transform.DOMove(cursorPos, dotweenTime).SetEase(Ease.Linear);
+
     }
 
     //ボール発射処理
@@ -745,6 +804,8 @@ public class GameDirector : MonoBehaviour
 
         //マスタークライアントリセット
         roomModel.isMaster = false;
+
+        if(getUserId == roomModel.ConnectionId) roomModel.isMaster = true;
     }
 
     public async void HitBall(HitData hitData)
@@ -812,7 +873,9 @@ public class GameDirector : MonoBehaviour
 
         GameObject piyo = characterList[id].gameObject.transform.GetChild(2).gameObject;   //コライダー取得
 
-        piyo.SetActive(true);
+        MeshRenderer rend = piyo.GetComponent<MeshRenderer>();
+        rend.enabled = true;
+        //piyo.SetActive(true);
     }
     //ダウン復帰処理
     public async void DownBackUser(Guid downUserId)
@@ -823,7 +886,12 @@ public class GameDirector : MonoBehaviour
 
         //ピヨピヨ非表示
         GameObject piyo = characterList[downUserId].gameObject.transform.GetChild(2).gameObject;   //コライダー取得
-        piyo.SetActive(false);
+
+
+        MeshRenderer rend = piyo.GetComponent<MeshRenderer>();
+        rend.enabled = false;
+
+        //piyo.SetActive(false);
 
         //自機だった場合
         if (roomModel.ConnectionId == downUserId) characterList[downUserId].gameObject.tag = "Player";    //Pleyerタグに
@@ -869,9 +937,23 @@ public class GameDirector : MonoBehaviour
 
     public async void GameStart()
     {
+        Text text = matchText.GetComponent<Text>();    
+        matchText.GetComponent<TextManager>().enabled = false;
+
+        text.text = "マッチング成立";
+
+        StartCoroutine(StartCount());
+    }
+
+    IEnumerator StartCount()
+    {
+        yield return new WaitForSeconds(2f);//１秒待つ
+
+        joinUI.SetActive(false);
+
         BGMManager.Instance.Stop(BGMPath.MENU);
 
-        
+
         BGMManager.Instance.Play(
             audioPath: BGMPath.BUTTLE, //再生したいオーディオのパス
             volumeRate: 1,                //音量の倍率
@@ -896,18 +978,16 @@ public class GameDirector : MonoBehaviour
         game_State = GAME_STATE.START;
 
         Debug.Log("ゲーム開始");
-       
-        gameUI.SetActive(true);
-        //await roomModel.StartGameAsync();
 
-        Invoke("CountStart", 3.5f);
-    }
-    private void CountStart()
-    {
-        Debug.Log("タイマー開始");
+        gameUI.SetActive(true);
+
         isStart = true;
+        Debug.Log("toutatu");
+        //リザルト表示
+       
     }
-    
+
+
     public void DeadUser(DeadData deadData,int deadNum)
     {
 

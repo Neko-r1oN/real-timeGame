@@ -2,9 +2,11 @@
 using Shared.Model.Entity;
 using System;
 using System.Collections.Generic;
-using System.Numerics;
+//using System.Numerics;
+
 using System.Text;
 using System.Threading.Tasks;
+using UnityEngine;
 
 namespace Shared.Interfaces.StreamingHubs
 {
@@ -74,6 +76,12 @@ namespace Shared.Interfaces.StreamingHubs
         /// </summary>
         /// <returns></returns>
         Task HitBallAsync(HitData hitData);
+
+        /// <summary>
+        /// 標準カーソル移動関数
+        /// </summary>
+        /// <returns></returns>
+        Task MoveCursorAsync(Vector3 cursorPos);
 
         /// <summary>
         /// ダウン関数
