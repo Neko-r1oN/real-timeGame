@@ -6,40 +6,41 @@ using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.UIElements;
 using UnityEngine.SceneManagement;
+using Unity.VisualScripting;
 
 
 
 public class TitleManager : MonoBehaviour
 {
-
-    
-    //[SerializeField] UserModel userModel;
-
     //ユーザーID入力フィールド(デバッグ用)
     [SerializeField] InputField debug;
-
 
     //名前フィールド
     [SerializeField] GameObject nameField;
     [SerializeField] Text nameText;
 
+    //登録画面
+    [SerializeField] GameObject registUI;
+
     //登録判定
-    [SerializeField] GameObject registTrue;
     [SerializeField] GameObject registFalse;
 
     //ボタン関係
     [SerializeField] GameObject dummyButton;
     [SerializeField] GameObject startButton;
 
+    [SerializeField] GameObject ConnnectText;
     //判定用変数
     private bool isClick;
     bool isSuccess;
-
+    bool isConnecting;
     // Start is called before the first frame update
     void Start()
     {
-        registTrue.SetActive(false);
-        registFalse.SetActive(false);
+        registUI.SetActive(false);
+        isConnecting = false;
+
+        ConnnectText.SetActive(false);
 
         nameText.text = "";
         isClick = true;
@@ -73,17 +74,20 @@ public class TitleManager : MonoBehaviour
         //情報がなかった場合
         else
         {
-            //入力欄に文字が入力されている場合
-            if (nameText.text != "" || debug.text != "")
+            if (!isConnecting)
             {
-                dummyButton.SetActive(false);
-                startButton.SetActive(true);
-            }
-            //未記入の場合
-            else
-            {
-                dummyButton.SetActive(true);
-                startButton.SetActive(false);
+                //入力欄に文字が入力されている場合
+                if (nameText.text != "" || debug.text != "")
+                {
+                    dummyButton.SetActive(false);
+                    startButton.SetActive(true);
+                }
+                //未記入の場合
+                else
+                {
+                    dummyButton.SetActive(true);
+                    startButton.SetActive(false);
+                }
             }
         }
 
@@ -92,10 +96,12 @@ public class TitleManager : MonoBehaviour
         isClick = true;
 
 
-    }
+       
 
-    public async void OnClickRegist()
+    }
+    public async void TapScreen()
     {
+        //デバッグだったら
         if (debug.text != "")
         {
             bool isGet = await UserModel.Instance.GetUserInfoAsync(int.Parse(debug.text));
@@ -105,45 +111,43 @@ public class TitleManager : MonoBehaviour
 
             else Debug.Log("データ取れませんでした");
         }
+        
         else
         {
+            //ファイルがローカルに保存されていたら
             if (isSuccess)
-            {//初回登録用のボタンを非表示
+            {//タップでゲームシーン
                 Initiate.Fade("GameScene", Color.black, 1.0f);
             }
-        }
-       /*
-      
-            if (debug.text != "")
-            {
-                bool isGet = await UserModel.Instance.GetUserInfoAsync(int.Parse(debug.text));
 
-
-                if (isGet) Initiate.Fade("GameScene", Color.black, 1.0f);
-
-                else Debug.Log("データ取れませんでした");
-            }
             else
-            {
-                bool isRegist = await UserModel.Instance.RegistUserAsync(nameText.text);
+            {//登録UI表示
+                registUI.SetActive(true);
+            }
+        }
+    }
+    public async void OnClickRegist()
+    {
+        isConnecting = true;
+        ConnnectText.SetActive(true);
+        startButton.SetActive(false);
+        bool isRegist = await UserModel.Instance.RegistUserAsync(nameText.text);
 
 
 
-                Debug.Log(isRegist);
+        Debug.Log(isRegist);
 
-                if (isRegist == true)
-                {
-                    registFalse.SetActive(false);
-                    registTrue.SetActive(true);
-                    Initiate.Fade("GameScene", Color.black, 1.0f);
-                }
-                else if (isRegist == false)
-                {
-                    registTrue.SetActive(false);
-                    registFalse.SetActive(true);
-                }
-
-            }*/
-        
+        if (isRegist == true)
+        {
+            registUI.SetActive(false);
+            Initiate.Fade("GameScene", Color.black, 1.0f);
+        }
+        else if (isRegist == false)
+        {
+            startButton.SetActive(true);
+            registFalse.SetActive(true);
+            isConnecting = false;
+            ConnnectText.SetActive(false);
+        }
     }
 }
