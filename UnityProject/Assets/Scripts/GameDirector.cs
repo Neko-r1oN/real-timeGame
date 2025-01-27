@@ -555,9 +555,10 @@ public class GameDirector : MonoBehaviour
     //切断処理
     public async void DisConnectRoom()
     {
-        isMatch = false;
         //同期通信解除
         CancelInvoke();
+        isMatch = false;
+        
 
         //退出処理
         await roomModel.LeaveAsync();
@@ -604,10 +605,11 @@ public class GameDirector : MonoBehaviour
        
         //プレイヤーがいなかったら
         if (!characterList.ContainsKey(connnectionId))
-       {
+        {
            return;
-       }
+        }
        
+
         //退出したプレイヤーのオブジェクト削除
         Destroy(characterList[connnectionId]);
 
@@ -642,56 +644,63 @@ public class GameDirector : MonoBehaviour
 
     private async void SendData()
     {
+        //プレイヤーがいなかったら
+        if (!characterList.ContainsKey(roomModel.ConnectionId))
+        {
+            return;
+        }
         /*if(roomModel.isMaster)
         {
             animNum = characterList[roomModel.ConnectionId].transform.GetChild(0).gameObject.GetComponent<PlayerManager>().animState;
         
             Debug.Log(animNum.ToString());
         }*/
-        
+
         //コンポーネント付与
         //characterList[roomModel.ConnectionId].transform.GetChild(0).gameObject.GetComponent<PlayerAnimation>().Init();
 
-       
-        //移動情報
-        var moveData = new MoveData()
+        if (characterList.ContainsKey(roomModel.ConnectionId))
         {
-            ConnectionId = roomModel.ConnectionId,      //接続ID
-            Pos = characterList[roomModel.ConnectionId].transform.position,         //キャラ位置
-            Rotate = characterList[roomModel.ConnectionId].transform.eulerAngles,   //キャラ回転
-            Angle = characterList[roomModel.ConnectionId].transform.GetChild(0).gameObject.GetComponent<AngleManager> ().GetAngle(),  //キャラクターの向き
-            AnimId = characterList[roomModel.ConnectionId].transform.GetChild(0).gameObject.GetComponent<PlayerAnimation>().GetAnimId(),      //アニメーションID
-        };
-
-        //Debug.Log(moveData.AnimId);
-        //プレイヤー移動
-        await roomModel.MoveAsync(moveData);
-
-        //カーソル座標送信
-        if(roomModel.isMaster) await roomModel.MoveCursorAsync(cursor.transform.position);
-
-        //フィールド上のボール検索
-        ballObj = GameObject.Find("Ball");
-
-        if (!ballObj) return;
-
-        //ボールが取れたら
-        if (ballObj) isBall = true;
-
-        //ボールが存在している&マスタークライアント
-        if (isBall && roomModel.isMaster)
-        {
-            //ボール情報
-            var moveBallData = new MoveData()
+            //移動情報
+            var moveData = new MoveData()
             {
                 ConnectionId = roomModel.ConnectionId,      //接続ID
-                Pos = ballObj.transform.position,           //ボール位置
-                Rotate = ballObj.transform.eulerAngles,     //ボール回転
-
+                Pos = characterList[roomModel.ConnectionId].transform.position,         //キャラ位置
+                Rotate = characterList[roomModel.ConnectionId].transform.eulerAngles,   //キャラ回転
+                Angle = characterList[roomModel.ConnectionId].transform.GetChild(0).gameObject.GetComponent<AngleManager>().GetAngle(),  //キャラクターの向き
+                AnimId = characterList[roomModel.ConnectionId].transform.GetChild(0).gameObject.GetComponent<PlayerAnimation>().GetAnimId(),      //アニメーションID
             };
 
-            //ボール位置同期
-            await roomModel.MoveBallAsync(moveBallData);
+            //Debug.Log(moveData.AnimId);
+            //プレイヤー移動
+            await roomModel.MoveAsync(moveData);
+
+            //カーソル座標送信
+            if (roomModel.isMaster) await roomModel.MoveCursorAsync(cursor.transform.position);
+
+            //フィールド上のボール検索
+            ballObj = GameObject.Find("Ball");
+
+            if (!ballObj) return;
+
+            //ボールが取れたら
+            if (ballObj) isBall = true;
+
+            //ボールが存在している&マスタークライアント
+            if (isBall && roomModel.isMaster)
+            {
+                //ボール情報
+                var moveBallData = new MoveData()
+                {
+                    ConnectionId = roomModel.ConnectionId,      //接続ID
+                    Pos = ballObj.transform.position,           //ボール位置
+                    Rotate = ballObj.transform.eulerAngles,     //ボール回転
+
+                };
+
+                //ボール位置同期
+                await roomModel.MoveBallAsync(moveBallData);
+            }
         }
     }
 
