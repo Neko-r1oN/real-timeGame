@@ -642,7 +642,7 @@ public class PlayerManager : MonoBehaviour
     public void Move()
     {
         //‚¢‚¸‚ê‚©‚Ìó‘Ô‚¾‚Á‚½ê‡
-        if (isDead || isDown || isCatch || isFeint) return;
+        if (isDead || isDown || isCatch || isFeint || isThrow) return;
 
 
         float dx = fixedJoystick.Horizontal; //joystick‚Ì…•½•ûŒü‚Ì“®‚«‚Ì’lA-1~1‚Ì’l‚ğ‚Æ‚è‚Ü‚·
