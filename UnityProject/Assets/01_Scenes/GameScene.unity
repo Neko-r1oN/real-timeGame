@@ -12572,12 +12572,20 @@ PrefabInstance:
       value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 751800042013150566, guid: 4c1ed6c5a9ed9ab4183236a60573278a, type: 3}
+      propertyPath: m_Intensity
+      value: 228.7
+      objectReference: {fileID: 0}
+    - target: {fileID: 751800042013150566, guid: 4c1ed6c5a9ed9ab4183236a60573278a, type: 3}
       propertyPath: m_Lightmapping
       value: 2
       objectReference: {fileID: 0}
     - target: {fileID: 1160080751447961495, guid: 4c1ed6c5a9ed9ab4183236a60573278a, type: 3}
       propertyPath: m_Lightmapping
       value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 1814176268552382122, guid: 4c1ed6c5a9ed9ab4183236a60573278a, type: 3}
+      propertyPath: m_Intensity
+      value: 61.3
       objectReference: {fileID: 0}
     - target: {fileID: 1814176268552382122, guid: 4c1ed6c5a9ed9ab4183236a60573278a, type: 3}
       propertyPath: m_Lightmapping
@@ -12592,8 +12600,16 @@ PrefabInstance:
       value: "\u5149\u6E90\u5B9F\u9A13 (1)"
       objectReference: {fileID: 0}
     - target: {fileID: 8422565707297264112, guid: 4c1ed6c5a9ed9ab4183236a60573278a, type: 3}
+      propertyPath: m_Intensity
+      value: 228.7
+      objectReference: {fileID: 0}
+    - target: {fileID: 8422565707297264112, guid: 4c1ed6c5a9ed9ab4183236a60573278a, type: 3}
       propertyPath: m_Lightmapping
       value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 8902992330249716984, guid: 4c1ed6c5a9ed9ab4183236a60573278a, type: 3}
+      propertyPath: m_Intensity
+      value: 228.7
       objectReference: {fileID: 0}
     - target: {fileID: 8902992330249716984, guid: 4c1ed6c5a9ed9ab4183236a60573278a, type: 3}
       propertyPath: m_Lightmapping
