@@ -312,19 +312,16 @@ public class GameDirector : MonoBehaviour
             return;
         }*/
 
-        Debug.Log("ルーム名:"+roomName.text);
+        Debug.Log("ルーム名:" + roomName.text);
         Debug.Log("ユーザーID;" + userModel.userId);
 
         cursor.SetActive(true);
 
         game_State = GAME_STATE.READY;
-        if (!isMatch)
-        {
 
-            await roomModel.JoinAsync(roomName.text, userModel.userId);     //ルーム名とユーザーIDを渡して入室
 
-            isMatch = true;//await roomModel.JoinAsync(roomName.text, userModel.userId);
-        }
+        await roomModel.JoinAsync(roomName.text, userModel.userId);     //ルーム名とユーザーIDを渡して入室
+
 
         //同期通信呼び出し、以降は commuTime ごとに実行
         InvokeRepeating(nameof(SendData), 0.0f, commuTime);
@@ -334,25 +331,13 @@ public class GameDirector : MonoBehaviour
 
     //入室処理
     public async void JoinLobby()
-    {
-        /*if (!userId)
-        {
-            return;
-        }*/
-
-       
-        game_State = GAME_STATE.READY;
+    {   
 
         menuCanvas.SetActive(true);
          cursor.SetActive(true);
 
-
-
-
          await roomModel.JoinLobbyAsync(userModel.userId);     //ルーム名とユーザーIDを渡して入室
 
-        //同期通信呼び出し、以降は commuTime ごとに実行
-        //InvokeRepeating(nameof(SendData), 0.0f, commuTime);
         game_State = GAME_STATE.READY;
 
         Debug.Log("マッチング中");
@@ -557,6 +542,7 @@ public class GameDirector : MonoBehaviour
     {
         //同期通信解除
         CancelInvoke();
+
         isMatch = false;
         
 
@@ -647,20 +633,15 @@ public class GameDirector : MonoBehaviour
         //プレイヤーがいなかったら
         if (!characterList.ContainsKey(roomModel.ConnectionId))
         {
+            Debug.Log("いないよ");
             return;
         }
-        /*if(roomModel.isMaster)
-        {
-            animNum = characterList[roomModel.ConnectionId].transform.GetChild(0).gameObject.GetComponent<PlayerManager>().animState;
-        
-            Debug.Log(animNum.ToString());
-        }*/
-
+        Debug.Log("いるよ");
         //コンポーネント付与
         //characterList[roomModel.ConnectionId].transform.GetChild(0).gameObject.GetComponent<PlayerAnimation>().Init();
 
-        if (characterList.ContainsKey(roomModel.ConnectionId))
-        {
+        /*if (game_State == GAME_STATE.START)
+        {*/
             //移動情報
             var moveData = new MoveData()
             {
@@ -701,7 +682,8 @@ public class GameDirector : MonoBehaviour
                 //ボール位置同期
                 await roomModel.MoveBallAsync(moveBallData);
             }
-        }
+        //}
+
     }
 
     //ユーザーが移動したときの処理
@@ -747,7 +729,7 @@ public class GameDirector : MonoBehaviour
     //ユーザーが移動したときの処理
     private async void MovedCursor(Vector3 cursorPos)
     {
-        Debug.Log("カーソル受け");
+       
         //Dotweenで移動補完
         cursor.transform.DOMove(cursorPos, dotweenTime).SetEase(Ease.Linear);
 
@@ -878,7 +860,17 @@ public class GameDirector : MonoBehaviour
 
     IEnumerator PiyoPiyo(Guid id)
     {
+
         yield return new WaitForSeconds(0.7f);//１秒待つ
+
+        SEManager.Instance.Play(
+                audioPath: SEPath.PIYOPIYO,        //再生したいオーディオのパス
+                volumeRate: 1,                //音量の倍率
+                delay: 1,                     //再生されるまでの遅延時間
+                pitch: 1,                     //ピッチ
+                isLoop: false,                 //ループ再生するか
+                callback: null                //再生終了後の処理
+            );
 
         GameObject piyo = characterList[id].gameObject.transform.GetChild(2).gameObject;   //コライダー取得
 

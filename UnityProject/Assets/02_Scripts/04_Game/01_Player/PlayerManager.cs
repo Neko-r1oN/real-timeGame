@@ -43,12 +43,12 @@ public class PlayerManager : MonoBehaviour
     private bool isDead;           //死亡状態
 
     public float velosity = 13f;              //ジャンプの強さ
-    public float ballSpeed = 18.0f;           //ボールの速さ
-    public float knockBack = 12.0f;
-    public float catchDelay = 10.6f;
+    public float ballSpeed = 23.0f;           //ボールの速さ
+    public float knockBack = 12.0f;           //
+    public float catchDelay = 0.6f;           //キャッチ有効時間
     public float haveCatchDelay = 0.6f;
-    public float throwDelay = 0.6f;
-    public float downTime = 4.0f;
+    public float throwDelay = 0.6f;           //玉発射ディレイ
+    public float downTime = 4.0f;             //ダウン時間
     GameObject ballPrefab;
 
     private bool isInit = false;
@@ -401,29 +401,33 @@ public class PlayerManager : MonoBehaviour
 
         }
         //死んでいない場合
-        if (!isDead)
+        /*if (!isDead)
         {
             if (!isDown)
             {
-                //キャッチ状態か投げ状態でない場合のみ移動できる
-                if (!isCatch || !isThrow)
+                if (!isCatch)
                 {
-                    // 速度ベクトルの長さを1秒でmoveSpeedだけ進むように調整します
-                    velocity = velocity.normalized * moveSpeed * Time.deltaTime;
-
-                    // いずれかの方向に移動している場合
-                    if (velocity.magnitude > 0)
+                    //キャッチ状態か投げ状態でない場合のみ移動できる
+                    if (!isThrow)
                     {
+                        // 速度ベクトルの長さを1秒でmoveSpeedだけ進むように調整します
+                        velocity = velocity.normalized * moveSpeed * Time.deltaTime;
 
-                        // プレイヤーの位置(transform.position)の更新
-                        // 移動方向ベクトル(velocity)を足し込みます
-                        transform.position += velocity;
+                        // いずれかの方向に移動している場合
+                        if (velocity.magnitude > 0)
+                        {
+
+                            // プレイヤーの位置(transform.position)の更新
+                            // 移動方向ベクトル(velocity)を足し込みます
+                            transform.position += velocity;
+
+                        }
 
                     }
-
                 }
             }
-        }
+
+        }*/
 
         //フィールドに敵プレイヤーが存在している場合
         if (searchNearEnemy != null)
@@ -626,6 +630,7 @@ public class PlayerManager : MonoBehaviour
             if (isDown) return;
             if (isThrow) return;
             if(isFeint) return;
+            if(isCatch) return;
             Vector3 move = (Camera.main.transform.forward * fixedJoystick.Vertical + Camera.main.transform.right * fixedJoystick.Horizontal) * moveSpeed;
 
             move.y = rigidbody.velocity.y;
