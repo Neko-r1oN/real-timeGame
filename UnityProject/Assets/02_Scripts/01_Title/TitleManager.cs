@@ -74,20 +74,22 @@ public class TitleManager : MonoBehaviour
         //î•ñ‚ª‚È‚©‚Á‚½ê‡
         else
         {
+
             if (!isConnecting)
             {
-                //“ü—Í—“‚É•¶š‚ª“ü—Í‚³‚ê‚Ä‚¢‚éê‡
-                if (nameText.text != "" || debug.text != "")
-                {
-                    dummyButton.SetActive(false);
-                    startButton.SetActive(true);
-                }
                 //–¢‹L“ü‚Ìê‡
-                else
+                if (nameText.text.Length < 3 || nameText.text.Length >= 8)
                 {
                     dummyButton.SetActive(true);
                     startButton.SetActive(false);
                 }
+                //“ü—Í—“‚É•¶š‚ª“ü—Í‚³‚ê‚Ä‚¢‚éê‡
+                else/* if (nameText.text != "" || debug.text != "")*/
+                {
+                    dummyButton.SetActive(false);
+                    startButton.SetActive(true);
+                }
+                
             }
         }
 
