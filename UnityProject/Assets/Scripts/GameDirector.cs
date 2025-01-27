@@ -6,7 +6,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
-using DG.Tweening;                 //DOTween‚ğg‚¤‚Æ‚«‚Í‚±‚Ìusing‚ğ“ü‚ê‚é
+using DG.Tweening;                 //DOTweenã‚’ä½¿ã†ã¨ãã¯ã“ã®usingã‚’å…¥ã‚Œã‚‹
 using UnityEngine.SceneManagement;
 using System.Xml.Serialization;
 using System.Threading.Tasks;
@@ -19,65 +19,65 @@ using MessagePack.Resolvers;
 
 public class GameDirector : MonoBehaviour
 {
-    //ƒvƒŒƒCƒ„[ƒvƒŒƒnƒu
+    //ãƒ—ãƒ¬ã‚¤ãƒ¤ãƒ¼ãƒ—ãƒ¬ãƒãƒ–
     [SerializeField] GameObject characterPrefab;
-    //ƒ‹[ƒ€ƒ‚ƒfƒ‹
+    //ãƒ«ãƒ¼ãƒ ãƒ¢ãƒ‡ãƒ«
     [SerializeField] RoomModel roomModel;
 
 
-    //ƒ‹[ƒ€ƒf[ƒ^(•\¦—p)
+    //ãƒ«ãƒ¼ãƒ ãƒ‡ãƒ¼ã‚¿(è¡¨ç¤ºç”¨)
     [SerializeField] Text roomNameText;
     [SerializeField] Text userName;
 
     private UserModel userModel;
     //private UserModel userModel;
 
-    //“üºƒf[ƒ^(“ü—Í—p)
+    //å…¥å®¤ãƒ‡ãƒ¼ã‚¿(å…¥åŠ›ç”¨)
     [SerializeField] Text roomName;
     [SerializeField] Text userId;
 
-    //ƒvƒŒƒCƒ„[¶¬eƒIƒuƒWƒFƒNƒg
+    //ãƒ—ãƒ¬ã‚¤ãƒ¤ãƒ¼ç”Ÿæˆè¦ªã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆ
     [SerializeField] private GameObject spawnObj;
-    //ƒvƒŒƒCƒ„[¶¬ˆÊ’u
+    //ãƒ—ãƒ¬ã‚¤ãƒ¤ãƒ¼ç”Ÿæˆä½ç½®
     [SerializeField] private Transform[] spawnPosList;
 
     SpriteRenderer charaNum;
 
-    //ƒ^[ƒQƒbƒg—pƒJ[ƒ\ƒ‹
+    //ã‚¿ãƒ¼ã‚²ãƒƒãƒˆç”¨ã‚«ãƒ¼ã‚½ãƒ«
     [SerializeField] GameObject cursor;
 
-    //“üºUI
+    //å…¥å®¤UI
     [SerializeField] GameObject joinUI;
-    //‘Ò‹@’†UI
+    //å¾…æ©Ÿä¸­UI
     [SerializeField] GameObject standByUI;
     [SerializeField] GameObject matchText;
 
-    //ƒ†[ƒU[‘Ò‹@’†UI¶¬eƒIƒuƒWƒFƒNƒg
+    //ãƒ¦ãƒ¼ã‚¶ãƒ¼å¾…æ©Ÿä¸­UIç”Ÿæˆè¦ªã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆ
     [SerializeField] private GameObject spawnUIObj;
-    //ƒƒjƒ…[UI
+    //ãƒ¡ãƒ‹ãƒ¥ãƒ¼UI
     [SerializeField] GameObject menuCanvas;
 
-    //ƒ†[ƒU[ƒXƒRƒA•\¦UIƒvƒŒƒnƒu
+    //ãƒ¦ãƒ¼ã‚¶ãƒ¼ã‚¹ã‚³ã‚¢è¡¨ç¤ºUIãƒ—ãƒ¬ãƒãƒ–
     [SerializeField] GameObject playerUIPrefab;
-    //ƒ†[ƒU[ƒXƒRƒA•\¦UIƒIƒuƒWƒFƒNƒg
+    //ãƒ¦ãƒ¼ã‚¶ãƒ¼ã‚¹ã‚³ã‚¢è¡¨ç¤ºUIã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆ
     [SerializeField] GameObject spawnPlayerUIObj;
 
-    //ƒ‰ƒCƒtƒvƒŒƒnƒu
+    //ãƒ©ã‚¤ãƒ•ãƒ—ãƒ¬ãƒãƒ–
     [SerializeField] GameObject lifePrefab;
 
-    //ƒ†[ƒU[•Ê‘Ò‹@UIƒvƒŒƒnƒu
+    //ãƒ¦ãƒ¼ã‚¶ãƒ¼åˆ¥å¾…æ©ŸUIãƒ—ãƒ¬ãƒãƒ–
     [SerializeField] GameObject standUIPrefab;
-    //ƒXƒRƒA•\¦UI¶¬eƒIƒuƒWƒFƒNƒg
+    //ã‚¹ã‚³ã‚¢è¡¨ç¤ºUIç”Ÿæˆè¦ªã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆ
     [SerializeField] GameObject spawnStandUIObj;
 
     [SerializeField] GameObject controller;
     public bool isStart;
-    public float time;              //¶‘¶ŠÔ
+    public float time;              //ç”Ÿå­˜æ™‚é–“
 
     private Guid[] joinedId = new Guid[0];
     int joinNum = 0;
 
-    //ƒQ[ƒ€UI
+    //ã‚²ãƒ¼ãƒ UI
     [SerializeField] GameObject gameUI;
 
     public Sprite player1;
@@ -87,17 +87,17 @@ public class GameDirector : MonoBehaviour
 
     public Sprite you;
 
-    //ƒŠƒUƒ‹ƒgUIƒvƒŒƒnƒu
+    //ãƒªã‚¶ãƒ«ãƒˆUIãƒ—ãƒ¬ãƒãƒ–
     [SerializeField] GameObject resultUIPrefab;
-    //ƒŠƒUƒ‹ƒgUI¶¬ˆÊ’u
+    //ãƒªã‚¶ãƒ«ãƒˆUIç”Ÿæˆä½ç½®
     [SerializeField] GameObject resultUIPos;
 
-    //ƒŠƒUƒ‹ƒgUI¶¬ˆÊ’u
+    //ãƒªã‚¶ãƒ«ãƒˆUIç”Ÿæˆä½ç½®
     [SerializeField] GameObject resultObj;
 
-    //ƒvƒŒƒCƒ„[‘¶İ”»’è
+    //ãƒ—ãƒ¬ã‚¤ãƒ¤ãƒ¼å­˜åœ¨åˆ¤å®š
     private bool isPlayer;
-    //ƒ{[ƒ‹‘¶İ”»’è
+    //ãƒœãƒ¼ãƒ«å­˜åœ¨åˆ¤å®š
     private bool isBall;
     private bool isMatch;
 
@@ -105,37 +105,37 @@ public class GameDirector : MonoBehaviour
 
     [SerializeField] GameObject ballPrefab;
 
-    //ƒ}ƒXƒ^[ƒNƒ‰ƒCƒAƒ“ƒg”»’è
+    //ãƒã‚¹ã‚¿ãƒ¼ã‚¯ãƒ©ã‚¤ã‚¢ãƒ³ãƒˆåˆ¤å®š
     private bool isJoinFirst;
 
-    //ƒIƒuƒWƒFƒNƒgˆÚ“®‘JˆÚ•âŠ®ŠÔ
+    //ã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆç§»å‹•é·ç§»è£œå®Œæ™‚é–“
     private float dotweenTime = 0.1f;
-    //ƒT[ƒo[’ÊMŠÔ
+    //ã‚µãƒ¼ãƒãƒ¼é€šä¿¡æ™‚é–“
     private float commuTime = 0.02f;
 
     private int animNum;
 
-    public Guid enemyId;     //“GID•Û‘¶—p
+    public Guid enemyId;     //æ•µIDä¿å­˜ç”¨
     public int enemyPoint;
     public int point;
     public int hitNum;
 
     PlayerManager playerManager;
 
-    //©–Å–h~—p•Ï”
+    //è‡ªæ»…é˜²æ­¢ç”¨å¤‰æ•°
     public Guid getUserId;
     public int deadNum;
     public bool isDead;
 
     public int JoinNum;
-    //ƒQ[ƒ€ó‘Ô
+    //ã‚²ãƒ¼ãƒ çŠ¶æ…‹
     public enum GAME_STATE
     {
-        STOP = 0,             //’â~’†
-        PREPARATION = 1,      //€”õ’†
-        READY = 2,            //€”õŠ®—¹’†
-        COUNTDOWN = 3,        //ŠJnƒJƒEƒ“ƒg’†
-        START = 4,            //ƒQ[ƒ€’†
+        STOP = 0,             //åœæ­¢ä¸­
+        PREPARATION = 1,      //æº–å‚™ä¸­
+        READY = 2,            //æº–å‚™å®Œäº†ä¸­
+        COUNTDOWN = 3,        //é–‹å§‹ã‚«ã‚¦ãƒ³ãƒˆä¸­
+        START = 4,            //ã‚²ãƒ¼ãƒ ä¸­
     }
 
     GAME_STATE game_State = GAME_STATE.STOP;
@@ -147,51 +147,51 @@ public class GameDirector : MonoBehaviour
 
 
 
-    //ƒLƒƒƒ‰ƒNƒ^[ƒŠƒXƒg
+    //ã‚­ãƒ£ãƒ©ã‚¯ã‚¿ãƒ¼ãƒªã‚¹ãƒˆ
     Dictionary<Guid,GameObject>characterList = new Dictionary<Guid, GameObject>();
-    //‘Ò‹@UIƒŠƒXƒg
+    //å¾…æ©ŸUIãƒªã‚¹ãƒˆ
     Dictionary<Guid, GameObject> standUIList = new Dictionary<Guid, GameObject>();
-    //ƒXƒRƒAUIƒŠƒXƒg
+    //ã‚¹ã‚³ã‚¢UIãƒªã‚¹ãƒˆ
     Dictionary<Guid, GameObject> scoreUIList = new Dictionary<Guid, GameObject>();
-    //ƒŠƒUƒ‹ƒgUIƒŠƒXƒg
+    //ãƒªã‚¶ãƒ«ãƒˆUIãƒªã‚¹ãƒˆ
     Dictionary<Guid, GameObject> resultUIList = new Dictionary<Guid, GameObject>();
 
     void Awake()
     {
-        //ƒtƒŒ[ƒ€ƒŒ[ƒgİ’è
-        Application.targetFrameRate = 60; // ‰Šúó‘Ô‚Í-1‚É‚È‚Á‚Ä‚¢‚é
+        //ãƒ•ãƒ¬ãƒ¼ãƒ ãƒ¬ãƒ¼ãƒˆè¨­å®š
+        Application.targetFrameRate = 60; // åˆæœŸçŠ¶æ…‹ã¯-1ã«ãªã£ã¦ã„ã‚‹
     }
     async void Start()
     {
         isMatch = false;
 
-        //ƒƒjƒ…[BGM
+        //ãƒ¡ãƒ‹ãƒ¥ãƒ¼BGM
         BGMManager.Instance.Play(
-            audioPath: BGMPath.MENU, //Ä¶‚µ‚½‚¢ƒI[ƒfƒBƒI‚ÌƒpƒX
-            volumeRate: 1,                //‰¹—Ê‚Ì”{—¦
-            delay: 0,                //Ä¶‚³‚ê‚é‚Ü‚Å‚Ì’x‰„ŠÔ
-            pitch: 1,                //ƒsƒbƒ`
-            isLoop: true,             //ƒ‹[ƒvÄ¶‚·‚é‚©
-            allowsDuplicate: false             //‘¼‚ÌBGM‚Æd•¡‚µ‚ÄÄ¶‚³‚¹‚é‚©
+            audioPath: BGMPath.MENU, //å†ç”Ÿã—ãŸã„ã‚ªãƒ¼ãƒ‡ã‚£ã‚ªã®ãƒ‘ã‚¹
+            volumeRate: 1,                //éŸ³é‡ã®å€ç‡
+            delay: 0,                //å†ç”Ÿã•ã‚Œã‚‹ã¾ã§ã®é…å»¶æ™‚é–“
+            pitch: 1,                //ãƒ”ãƒƒãƒ
+            isLoop: true,             //ãƒ«ãƒ¼ãƒ—å†ç”Ÿã™ã‚‹ã‹
+            allowsDuplicate: false             //ä»–ã®BGMã¨é‡è¤‡ã—ã¦å†ç”Ÿã•ã›ã‚‹ã‹
         );
 
-        //Š½º
+        //æ­“å£°
         BGMManager.Instance.Play(
-            audioPath: BGMPath.GUEST,         //Ä¶‚µ‚½‚¢ƒI[ƒfƒBƒI‚ÌƒpƒX
-            volumeRate: 0.5f,                    //‰¹—Ê‚Ì”{—¦
-            delay: 0,                         //Ä¶‚³‚ê‚é‚Ü‚Å‚Ì’x‰„ŠÔ
-            pitch: 1,                         //ƒsƒbƒ`
-            isLoop: true,                     //ƒ‹[ƒvÄ¶‚·‚é‚©
-            allowsDuplicate: true             //‘¼‚ÌBGM‚Æd•¡‚µ‚ÄÄ¶‚³‚¹‚é‚©
+            audioPath: BGMPath.GUEST,         //å†ç”Ÿã—ãŸã„ã‚ªãƒ¼ãƒ‡ã‚£ã‚ªã®ãƒ‘ã‚¹
+            volumeRate: 0.5f,                    //éŸ³é‡ã®å€ç‡
+            delay: 0,                         //å†ç”Ÿã•ã‚Œã‚‹ã¾ã§ã®é…å»¶æ™‚é–“
+            pitch: 1,                         //ãƒ”ãƒƒãƒ
+            isLoop: true,                     //ãƒ«ãƒ¼ãƒ—å†ç”Ÿã™ã‚‹ã‹
+            allowsDuplicate: true             //ä»–ã®BGMã¨é‡è¤‡ã—ã¦å†ç”Ÿã•ã›ã‚‹ã‹
         );
-        //Š½º
+        //æ­“å£°
         BGMManager.Instance.Play(
-            audioPath: BGMPath.GUEST,         //Ä¶‚µ‚½‚¢ƒI[ƒfƒBƒI‚ÌƒpƒX
-            volumeRate: 0.5f,                    //‰¹—Ê‚Ì”{—¦
-            delay: 0.7f,                         //Ä¶‚³‚ê‚é‚Ü‚Å‚Ì’x‰„ŠÔ
-            pitch: 1,                         //ƒsƒbƒ`
-            isLoop: true,                     //ƒ‹[ƒvÄ¶‚·‚é‚©
-            allowsDuplicate: true             //‘¼‚ÌBGM‚Æd•¡‚µ‚ÄÄ¶‚³‚¹‚é‚©
+            audioPath: BGMPath.GUEST,         //å†ç”Ÿã—ãŸã„ã‚ªãƒ¼ãƒ‡ã‚£ã‚ªã®ãƒ‘ã‚¹
+            volumeRate: 0.5f,                    //éŸ³é‡ã®å€ç‡
+            delay: 0.7f,                         //å†ç”Ÿã•ã‚Œã‚‹ã¾ã§ã®é…å»¶æ™‚é–“
+            pitch: 1,                         //ãƒ”ãƒƒãƒ
+            isLoop: true,                     //ãƒ«ãƒ¼ãƒ—å†ç”Ÿã™ã‚‹ã‹
+            allowsDuplicate: true             //ä»–ã®BGMã¨é‡è¤‡ã—ã¦å†ç”Ÿã•ã›ã‚‹ã‹
         );
 
         enemyPoint = 0;
@@ -200,37 +200,37 @@ public class GameDirector : MonoBehaviour
 
        
 
-        //ƒ†[ƒU[‚ª“üº‚µ‚½Û‚ÉOnJoinedUserƒƒ]ƒbƒg‚ğÀs‚·‚é‚æ‚¤‚Éƒ‚ƒfƒ‹‚É“o˜^‚µ‚Ä‚¨‚­
-        roomModel.OnJoinedUser += this.OnJoinedUser;   //ƒ†[ƒU[“üº
+        //ãƒ¦ãƒ¼ã‚¶ãƒ¼ãŒå…¥å®¤ã—ãŸéš›ã«OnJoinedUserãƒ¡ã‚¾ãƒƒãƒˆã‚’å®Ÿè¡Œã™ã‚‹ã‚ˆã†ã«ãƒ¢ãƒ‡ãƒ«ã«ç™»éŒ²ã—ã¦ãŠã
+        roomModel.OnJoinedUser += this.OnJoinedUser;   //ãƒ¦ãƒ¼ã‚¶ãƒ¼å…¥å®¤
 
-        roomModel.MatchedUser += this.MatchedUser;     //ƒ}ƒbƒ`ƒ“ƒO
+        roomModel.MatchedUser += this.MatchedUser;     //ãƒãƒƒãƒãƒ³ã‚°
 
-        roomModel.LeavedUser += this.LeavedUser;       //ƒ†[ƒU[‘Şo
+        roomModel.LeavedUser += this.LeavedUser;       //ãƒ¦ãƒ¼ã‚¶ãƒ¼é€€å‡º
 
-        roomModel.MovedUser += this.MovedUser;         //ƒ†[ƒU[ˆÚ“®î•ñ
+        roomModel.MovedUser += this.MovedUser;         //ãƒ¦ãƒ¼ã‚¶ãƒ¼ç§»å‹•æƒ…å ±
 
-        roomModel.MovedBall += this.MovedBall;         //ƒ{[ƒ‹ˆÚ“®î•ñ
+        roomModel.MovedBall += this.MovedBall;         //ãƒœãƒ¼ãƒ«ç§»å‹•æƒ…å ±
 
-        roomModel.ThrowedBall += this.ThrowedBall;     //ƒ{[ƒ‹“Š‚°
+        roomModel.ThrowedBall += this.ThrowedBall;     //ãƒœãƒ¼ãƒ«æŠ•ã’
 
-        roomModel.GetBall += this.GetBall;             //ƒ{[ƒ‹æ“¾
+        roomModel.GetBall += this.GetBall;             //ãƒœãƒ¼ãƒ«å–å¾—
 
-        roomModel.HitBall += this.HitBall;             //ƒ{[ƒ‹ƒqƒbƒg
+        roomModel.HitBall += this.HitBall;             //ãƒœãƒ¼ãƒ«ãƒ’ãƒƒãƒˆ
 
         roomModel.MoveCursor += this.MovedCursor;
 
-        roomModel.DownUser += this.DownUser;             //ƒ{[ƒ‹ƒqƒbƒg
-        roomModel.DownBackUser += this.DownBackUser;             //ƒ{[ƒ‹ƒqƒbƒg
+        roomModel.DownUser += this.DownUser;             //ãƒœãƒ¼ãƒ«ãƒ’ãƒƒãƒˆ
+        roomModel.DownBackUser += this.DownBackUser;             //ãƒœãƒ¼ãƒ«ãƒ’ãƒƒãƒˆ
 
-        roomModel.ReadyUser += this.ReadyUser;         //ƒ†[ƒU[€”õŠ®—¹
+        roomModel.ReadyUser += this.ReadyUser;         //ãƒ¦ãƒ¼ã‚¶ãƒ¼æº–å‚™å®Œäº†
 
-        //roomModel.StartGameCount += this.GameCount;    //ƒQ[ƒ€“àƒJƒEƒ“ƒgŠJn
+        //roomModel.StartGameCount += this.GameCount;    //ã‚²ãƒ¼ãƒ å†…ã‚«ã‚¦ãƒ³ãƒˆé–‹å§‹
 
-        roomModel.StartGameUser += this.GameStart;     //ƒQ[ƒ€ŠJn
+        roomModel.StartGameUser += this.GameStart;     //ã‚²ãƒ¼ãƒ é–‹å§‹
 
-        roomModel.UserDead += this.DeadUser;           //ƒ†[ƒU[€–S
+        roomModel.UserDead += this.DeadUser;           //ãƒ¦ãƒ¼ã‚¶ãƒ¼æ­»äº¡
 
-        roomModel.FinishGameUser += this.FinishGameUser;   //ƒQ[ƒ€I—¹
+        roomModel.FinishGameUser += this.FinishGameUser;   //ã‚²ãƒ¼ãƒ çµ‚äº†
 
 
         isPlayer = false;
@@ -245,10 +245,10 @@ public class GameDirector : MonoBehaviour
         isDead = false;
         resultObj.SetActive(false);
 
-        //ƒ†[ƒU[ƒ‚ƒfƒ‹‚ğæ“¾
+        //ãƒ¦ãƒ¼ã‚¶ãƒ¼ãƒ¢ãƒ‡ãƒ«ã‚’å–å¾—
         userModel = GameObject.Find("UserModel").GetComponent<UserModel>();
 
-        //ƒ†[ƒU[ID•\¦
+        //ãƒ¦ãƒ¼ã‚¶ãƒ¼IDè¡¨ç¤º
         if (userModel.userName != "")
         {
             Debug.Log(userModel.userName);
@@ -256,7 +256,7 @@ public class GameDirector : MonoBehaviour
         }
 
 
-        //‘Ò‹@
+        //å¾…æ©Ÿ
         await roomModel.ConnectAsync();
 
         
@@ -265,7 +265,7 @@ public class GameDirector : MonoBehaviour
 
     void Update()
     {
-        //ƒ†[ƒU[IDXV(•\¦—p)
+        //ãƒ¦ãƒ¼ã‚¶ãƒ¼IDæ›´æ–°(è¡¨ç¤ºç”¨)
         /*if (userModel.userName != "")
         {
             //Debug.Log(userModel.userName);
@@ -277,7 +277,7 @@ public class GameDirector : MonoBehaviour
         if(isStart)
         {
 
-            //¶‘¶ŠÔXV
+            //ç”Ÿå­˜æ™‚é–“æ›´æ–°
             time += Time.deltaTime;
 
         }
@@ -302,7 +302,7 @@ public class GameDirector : MonoBehaviour
 
 
 
-    //“üºˆ—
+    //å…¥å®¤å‡¦ç†
     public async void JoinRoom()
     {
         //isJoinFirst = false;
@@ -312,8 +312,8 @@ public class GameDirector : MonoBehaviour
             return;
         }*/
 
-        Debug.Log("ƒ‹[ƒ€–¼:"+roomName.text);
-        Debug.Log("ƒ†[ƒU[ID;" + userModel.userId);
+        Debug.Log("ãƒ«ãƒ¼ãƒ å:"+roomName.text);
+        Debug.Log("ãƒ¦ãƒ¼ã‚¶ãƒ¼ID;" + userModel.userId);
 
         cursor.SetActive(true);
 
@@ -321,18 +321,18 @@ public class GameDirector : MonoBehaviour
         if (!isMatch)
         {
 
-            await roomModel.JoinAsync(roomName.text, userModel.userId);     //ƒ‹[ƒ€–¼‚Æƒ†[ƒU[ID‚ğ“n‚µ‚Ä“üº
+            await roomModel.JoinAsync(roomName.text, userModel.userId);     //ãƒ«ãƒ¼ãƒ åã¨ãƒ¦ãƒ¼ã‚¶ãƒ¼IDã‚’æ¸¡ã—ã¦å…¥å®¤
 
             isMatch = true;//await roomModel.JoinAsync(roomName.text, userModel.userId);
         }
 
-        //“¯Šú’ÊMŒÄ‚Ño‚µAˆÈ~‚Í commuTime ‚²‚Æ‚ÉÀs
+        //åŒæœŸé€šä¿¡å‘¼ã³å‡ºã—ã€ä»¥é™ã¯ commuTime ã”ã¨ã«å®Ÿè¡Œ
         InvokeRepeating(nameof(SendData), 0.0f, commuTime);
 
-        Debug.Log("“üºŠ®—¹");
+        Debug.Log("å…¥å®¤å®Œäº†");
     }
 
-    //“üºˆ—
+    //å…¥å®¤å‡¦ç†
     public async void JoinLobby()
     {
         /*if (!userId)
@@ -349,117 +349,117 @@ public class GameDirector : MonoBehaviour
 
 
 
-         await roomModel.JoinLobbyAsync(userModel.userId);     //ƒ‹[ƒ€–¼‚Æƒ†[ƒU[ID‚ğ“n‚µ‚Ä“üº
+         await roomModel.JoinLobbyAsync(userModel.userId);     //ãƒ«ãƒ¼ãƒ åã¨ãƒ¦ãƒ¼ã‚¶ãƒ¼IDã‚’æ¸¡ã—ã¦å…¥å®¤
 
-        //“¯Šú’ÊMŒÄ‚Ño‚µAˆÈ~‚Í commuTime ‚²‚Æ‚ÉÀs
+        //åŒæœŸé€šä¿¡å‘¼ã³å‡ºã—ã€ä»¥é™ã¯ commuTime ã”ã¨ã«å®Ÿè¡Œ
         //InvokeRepeating(nameof(SendData), 0.0f, commuTime);
         game_State = GAME_STATE.READY;
 
-        Debug.Log("ƒ}ƒbƒ`ƒ“ƒO’†");
+        Debug.Log("ãƒãƒƒãƒãƒ³ã‚°ä¸­");
     }
 
-    //ƒ}ƒbƒ`ƒ“ƒO‚ª¬—§‚µ‚½‚Æ‚«‚Ìˆ—
+    //ãƒãƒƒãƒãƒ³ã‚°ãŒæˆç«‹ã—ãŸã¨ãã®å‡¦ç†
     private async void MatchedUser(string roomName)
     {
       
             await roomModel.LeaveAsync();
 
 
-            Debug.Log("ƒ}ƒbƒ`:" + roomName);
+            Debug.Log("ãƒãƒƒãƒ:" + roomName);
 
 
 
         if (!isMatch)
         {
-            //ó‚¯æ‚Á‚½ƒ†[ƒU[ID‚ğƒ‹[ƒ€–¼‚É“n‚µ‚Ä“üº
+            //å—ã‘å–ã£ãŸãƒ¦ãƒ¼ã‚¶ãƒ¼IDã‚’ãƒ«ãƒ¼ãƒ åã«æ¸¡ã—ã¦å…¥å®¤
             await roomModel.JoinAsync(roomName, userModel.userId);
             
-            //“¯Šú’ÊMŒÄ‚Ño‚µAˆÈ~‚Í commuTime ‚²‚Æ‚ÉÀs
+            //åŒæœŸé€šä¿¡å‘¼ã³å‡ºã—ã€ä»¥é™ã¯ commuTime ã”ã¨ã«å®Ÿè¡Œ
             InvokeRepeating(nameof(SendData), 0.0f, commuTime);
             isMatch = true;
         }
     }
 
-    //ƒ†[ƒU[‚ª“üº‚µ‚½‚Æ‚«‚Ìˆ—
+    //ãƒ¦ãƒ¼ã‚¶ãƒ¼ãŒå…¥å®¤ã—ãŸã¨ãã®å‡¦ç†
     private void OnJoinedUser(JoinedUser user)
     {
         bool isJoined = false;
 
         if (joinedId != null)
         {
-            Debug.Log("•Û‘¶ID:"+joinedId);
-            //d•¡ƒ`ƒFƒbƒN
+            Debug.Log("ä¿å­˜ID:"+joinedId);
+            //é‡è¤‡ãƒã‚§ãƒƒã‚¯
             foreach (Guid id in joinedId)
             {
                 Debug.Log(id + ":" + user.ConnectionId);
                 if (id == user.ConnectionId) return;
             }
         }
-        //ƒ}ƒXƒ^[ƒ`ƒFƒbƒN
+        //ãƒã‚¹ã‚¿ãƒ¼ãƒã‚§ãƒƒã‚¯
         roomModel.OnMasterCheck(user);
 
-        //ƒLƒƒƒ‰ƒNƒ^[¶¬
-        GameObject characterObject = Instantiate(characterPrefab,spawnPosList[user.JoinOrder - 1].transform.position, Quaternion.identity, spawnObj.gameObject.transform); //ƒCƒ“ƒXƒ^ƒ“ƒX¶¬
+        //ã‚­ãƒ£ãƒ©ã‚¯ã‚¿ãƒ¼ç”Ÿæˆ
+        GameObject characterObject = Instantiate(characterPrefab,spawnPosList[user.JoinOrder - 1].transform.position, Quaternion.identity, spawnObj.gameObject.transform); //ã‚¤ãƒ³ã‚¹ã‚¿ãƒ³ã‚¹ç”Ÿæˆ
 
-        //‘Ò‹@’†UI¶¬
+        //å¾…æ©Ÿä¸­UIç”Ÿæˆ
         GameObject standByCharaUI = Instantiate(standUIPrefab, Vector3.zero,Quaternion.identity,spawnUIObj.gameObject.transform);
 
-        //ƒvƒŒƒCƒ„[ƒXƒRƒAUI¶¬
+        //ãƒ—ãƒ¬ã‚¤ãƒ¤ãƒ¼ã‚¹ã‚³ã‚¢UIç”Ÿæˆ
         GameObject charaInfoUI = Instantiate(playerUIPrefab, Vector3.zero, Quaternion.identity, spawnPlayerUIObj.gameObject.transform);
 
-        characterList[user.ConnectionId] = characterObject;        //ƒtƒB[ƒ‹ƒh‚Å•Û
+        characterList[user.ConnectionId] = characterObject;        //ãƒ•ã‚£ãƒ¼ãƒ«ãƒ‰ã§ä¿æŒ
 
-        //ƒRƒ“ƒ|[ƒlƒ“ƒg•t—^
+        //ã‚³ãƒ³ãƒãƒ¼ãƒãƒ³ãƒˆä»˜ä¸
         characterList[user.ConnectionId].transform.GetChild(0).GetComponent<PlayerAnimation>().Init();
 
 
-        standUIList[user.ConnectionId] = standByCharaUI;        //ƒtƒB[ƒ‹ƒh‚Å•Û
+        standUIList[user.ConnectionId] = standByCharaUI;        //ãƒ•ã‚£ãƒ¼ãƒ«ãƒ‰ã§ä¿æŒ
 
-        scoreUIList[user.ConnectionId] = charaInfoUI;        //ƒtƒB[ƒ‹ƒh‚Å•Û
+        scoreUIList[user.ConnectionId] = charaInfoUI;        //ãƒ•ã‚£ãƒ¼ãƒ«ãƒ‰ã§ä¿æŒ
 
         
-        //“üº•Û‘¶
+        //å…¥å®¤ä¿å­˜
         Array.Resize(ref joinedId, joinedId.Length +1);
         joinedId[joinedId.Length - 1] = user.ConnectionId;
        // joinedId[joinNum] = user.ConnectionId;
         //joinNum++;
 
-        //UIƒJƒ‰[
+        //UIã‚«ãƒ©ãƒ¼
         Image standUIColor = standByCharaUI.gameObject.GetComponent<Image>();
         Image infoUIColor = charaInfoUI.transform.GetChild(2).transform.GetChild(0).gameObject.GetComponent<Image>();
 
-        //ƒvƒŒƒCƒ„[Noæ“¾(UI)
+        //ãƒ—ãƒ¬ã‚¤ãƒ¤ãƒ¼Noå–å¾—(UI)
         Image number = standByCharaUI.transform.GetChild(1).gameObject.GetComponent<Image>();
 
-        //ƒvƒŒƒCƒ„[–¼æ“¾
+        //ãƒ—ãƒ¬ã‚¤ãƒ¤ãƒ¼åå–å¾—
         Text name = standByCharaUI.transform.GetChild(3).gameObject.GetComponent<Text>();
         name.text = user.UserData.Name;
 
-        //ƒvƒŒƒCƒ„[î•ñUIæ“¾(UI)
+        //ãƒ—ãƒ¬ã‚¤ãƒ¤ãƒ¼æƒ…å ±UIå–å¾—(UI)
         Image scoreUINumber = charaInfoUI.transform.GetChild(3).gameObject.GetComponent<Image>();
         Text infoName = charaInfoUI.transform.GetChild(1).gameObject.GetComponent<Text>();
         infoName.text = user.UserData.Name;
 
-        //ƒ‰ƒCƒt¶¬
+        //ãƒ©ã‚¤ãƒ•ç”Ÿæˆ
         /*GameObject lifePos = charaInfoUI.transform.GetChild(5).gameObject.GetComponent<GameObject>();
 
         for(int i = 1;i <= playerManager.hp; i++)
-        {//İ’è•ªUI¶¬
+        {//è¨­å®šåˆ†UIç”Ÿæˆ
             lifePos = Instantiate(lifePrefab, Vector3.zero, Quaternion.identity, lifePos.gameObject.transform);
         }
         */
-        /*//HP(ƒfƒtƒHƒ‹ƒg)
+        /*//HP(ãƒ‡ãƒ•ã‚©ãƒ«ãƒˆ)
         Text playerPoint = charaInfoUI.transform.GetChild(4).gameObject.GetComponent<Text>();
         playerPoint.text = playerManager.hp.ToString();*/
 
-        //©‹@‹æ•ÊƒeƒLƒXƒg•\¦
+        //è‡ªæ©ŸåŒºåˆ¥ãƒ†ã‚­ã‚¹ãƒˆè¡¨ç¤º
         GameObject child = characterObject.transform.GetChild(1).gameObject;
 
         charaNum = child.GetComponent<SpriteRenderer>();
 
         
 
-        //ƒvƒŒƒCƒ„[ƒiƒ“ƒo[‰æ‘œ·‚µ‘Ö‚¦
+        //ãƒ—ãƒ¬ã‚¤ãƒ¤ãƒ¼ãƒŠãƒ³ãƒãƒ¼ç”»åƒå·®ã—æ›¿ãˆ
         switch (user.JoinOrder)
         {
             case 1:
@@ -508,7 +508,7 @@ public class GameDirector : MonoBehaviour
 
                 break;
             default:
-                Debug.Log("ŠÏíÒ");
+                Debug.Log("è¦³æˆ¦è€…");
                 break;
         }
 
@@ -516,32 +516,32 @@ public class GameDirector : MonoBehaviour
         if (user.ConnectionId == roomModel.ConnectionId)
         {
 
-            //©‹@‚ÌNo‚ğYOU‚É’£‚è‘Ö‚¦
-            //©‹@‹æ•ÊƒeƒLƒXƒg•\¦
+            //è‡ªæ©Ÿã®Noã‚’YOUã«å¼µã‚Šæ›¿ãˆ
+            //è‡ªæ©ŸåŒºåˆ¥ãƒ†ã‚­ã‚¹ãƒˆè¡¨ç¤º
             GameObject you = characterObject.transform.GetChild(1).transform.GetChild(0).gameObject;
             you.SetActive(true);
 
             JoinNum = user.JoinOrder;
 
-            //Instantiate(youPrefab, spawnPosList[user.JoinOrder - 1].transform.position, Quaternion.identity, characterList[roomModel.ConnectionId].gameObject.transform); //ƒCƒ“ƒXƒ^ƒ“ƒX¶¬
+            //Instantiate(youPrefab, spawnPosList[user.JoinOrder - 1].transform.position, Quaternion.identity, characterList[roomModel.ConnectionId].gameObject.transform); //ã‚¤ãƒ³ã‚¹ã‚¿ãƒ³ã‚¹ç”Ÿæˆ
 
             characterObject.name = "MyPlay";
-            //©‹@—p‚ÌƒXƒNƒŠƒvƒg•ƒ^ƒO‚ğ’Ç‰Á
+            //è‡ªæ©Ÿç”¨ã®ã‚¹ã‚¯ãƒªãƒ—ãƒˆï¼†ã‚¿ã‚°ã‚’è¿½åŠ 
             characterList[roomModel.ConnectionId].gameObject.AddComponent<PlayerManager>();
             characterList[roomModel.ConnectionId].tag = "Player";
 
-            //©‹@‚ğØ–¾
+            //è‡ªæ©Ÿã‚’è¨¼æ˜
             isPlayer = true;
 
-            //“üº”Ô†
-            Debug.Log("“üº”Ô†:"+user.JoinOrder);
+            //å…¥å®¤ç•ªå·
+            Debug.Log("å…¥å®¤ç•ªå·:"+user.JoinOrder);
 
         }
         else
         {
             string enemy = "Enemy";
             characterObject.name = enemy;
-            //©‹@ˆÈŠO—p‚ÌƒXƒNƒŠƒvƒg•ƒ^ƒO‚ğ’Ç‰Á
+            //è‡ªæ©Ÿä»¥å¤–ç”¨ã®ã‚¹ã‚¯ãƒªãƒ—ãƒˆï¼†ã‚¿ã‚°ã‚’è¿½åŠ 
 
             characterObject.tag = "Enemy";
 
@@ -552,15 +552,15 @@ public class GameDirector : MonoBehaviour
 
     }
 
-    //Ø’fˆ—
+    //åˆ‡æ–­å‡¦ç†
     public async void DisConnectRoom()
     {
-        //“¯Šú’ÊM‰ğœ
+        //åŒæœŸé€šä¿¡è§£é™¤
         CancelInvoke();
         isMatch = false;
         
 
-        //‘Şoˆ—
+        //é€€å‡ºå‡¦ç†
         await roomModel.LeaveAsync();
 
         standByUI.SetActive(false);
@@ -569,22 +569,22 @@ public class GameDirector : MonoBehaviour
         
         game_State = GAME_STATE.STOP;
 
-        //MagicOnionØ’fˆ—
+        //MagicOnionåˆ‡æ–­å‡¦ç†
         //await roomModel.DisConnectAsync();
 
-        // ƒvƒŒƒCƒ„[ƒIƒuƒWƒFƒNƒg‚Ìíœ
+        // ãƒ—ãƒ¬ã‚¤ãƒ¤ãƒ¼ã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆã®å‰Šé™¤
         foreach (Transform player in spawnObj.transform)
         {
             Destroy(player.gameObject);
         }
 
-        //UIƒIƒuƒWƒFƒNƒgíœ
+        //UIã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆå‰Šé™¤
         foreach (Transform ui in spawnUIObj.transform)
         {
             Destroy(ui.gameObject);
         }
 
-        //ƒXƒRƒAUIƒIƒuƒWƒFƒNƒgíœ
+        //ã‚¹ã‚³ã‚¢UIã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆå‰Šé™¤
         foreach (Transform info in spawnPlayerUIObj.transform)
         {
             Destroy(info.gameObject);
@@ -596,46 +596,46 @@ public class GameDirector : MonoBehaviour
         //cursor.SetActive(false);
 
       
-        Debug.Log("‘ŞoŠ®—¹");
+        Debug.Log("é€€å‡ºå®Œäº†");
     }
 
-    //ƒ†[ƒU[‚ª‘Şo‚µ‚½‚Æ‚«‚Ìˆ—
+    //ãƒ¦ãƒ¼ã‚¶ãƒ¼ãŒé€€å‡ºã—ãŸã¨ãã®å‡¦ç†
     private async void LeavedUser(Guid connnectionId)
     {
        
-        //ƒvƒŒƒCƒ„[‚ª‚¢‚È‚©‚Á‚½‚ç
+        //ãƒ—ãƒ¬ã‚¤ãƒ¤ãƒ¼ãŒã„ãªã‹ã£ãŸã‚‰
         if (!characterList.ContainsKey(connnectionId))
         {
            return;
         }
        
 
-        //‘Şo‚µ‚½ƒvƒŒƒCƒ„[‚ÌƒIƒuƒWƒFƒNƒgíœ
+        //é€€å‡ºã—ãŸãƒ—ãƒ¬ã‚¤ãƒ¤ãƒ¼ã®ã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆå‰Šé™¤
         Destroy(characterList[connnectionId]);
 
-        //‘Şo‚µ‚½ƒvƒŒƒCƒ„[UI‚ÌƒIƒuƒWƒFƒNƒgíœ
+        //é€€å‡ºã—ãŸãƒ—ãƒ¬ã‚¤ãƒ¤ãƒ¼UIã®ã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆå‰Šé™¤
         Destroy(standUIList[connnectionId]);
 
-        //‘Şo‚µ‚½ƒvƒŒƒCƒ„[UI‚ÌƒIƒuƒWƒFƒNƒgíœ
+        //é€€å‡ºã—ãŸãƒ—ãƒ¬ã‚¤ãƒ¤ãƒ¼UIã®ã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆå‰Šé™¤
         Destroy(scoreUIList[connnectionId]);
 
-        //‘Şo‚µ‚½ƒvƒŒƒCƒ„[‚ğƒŠƒXƒg‚©‚çíœ
+        //é€€å‡ºã—ãŸãƒ—ãƒ¬ã‚¤ãƒ¤ãƒ¼ã‚’ãƒªã‚¹ãƒˆã‹ã‚‰å‰Šé™¤
         characterList.Remove(connnectionId);
 
-        //‘Şo‚µ‚½ƒvƒŒƒCƒ„[UI‚ğƒŠƒXƒg‚©‚çíœ
+        //é€€å‡ºã—ãŸãƒ—ãƒ¬ã‚¤ãƒ¤ãƒ¼UIã‚’ãƒªã‚¹ãƒˆã‹ã‚‰å‰Šé™¤
         standUIList.Remove(connnectionId);
 
-        //‘Şo‚µ‚½ƒvƒŒƒCƒ„[UI‚ğƒŠƒXƒg‚©‚çíœ
+        //é€€å‡ºã—ãŸãƒ—ãƒ¬ã‚¤ãƒ¤ãƒ¼UIã‚’ãƒªã‚¹ãƒˆã‹ã‚‰å‰Šé™¤
         scoreUIList.Remove(connnectionId);
 
-        Debug.Log("‘Şo‚µ‚½ƒ†[ƒU[”Ô†:"+ connnectionId);
+        Debug.Log("é€€å‡ºã—ãŸãƒ¦ãƒ¼ã‚¶ãƒ¼ç•ªå·:"+ connnectionId);
 
-        //ƒvƒŒƒCƒ„[”»’è‚ğƒŠƒZƒbƒg
+        //ãƒ—ãƒ¬ã‚¤ãƒ¤ãƒ¼åˆ¤å®šã‚’ãƒªã‚»ãƒƒãƒˆ
         isPlayer = false;
 
         game_State = GAME_STATE.STOP;
 
-        Debug.Log("‘Şoƒ†[ƒU[ƒIƒuƒWƒFƒNƒgíœ");
+        Debug.Log("é€€å‡ºãƒ¦ãƒ¼ã‚¶ãƒ¼ã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆå‰Šé™¤");
 
         isMatch = false;
 
@@ -644,7 +644,7 @@ public class GameDirector : MonoBehaviour
 
     private async void SendData()
     {
-        //ƒvƒŒƒCƒ„[‚ª‚¢‚È‚©‚Á‚½‚ç
+        //ãƒ—ãƒ¬ã‚¤ãƒ¤ãƒ¼ãŒã„ãªã‹ã£ãŸã‚‰
         if (!characterList.ContainsKey(roomModel.ConnectionId))
         {
             return;
@@ -656,162 +656,162 @@ public class GameDirector : MonoBehaviour
             Debug.Log(animNum.ToString());
         }*/
 
-        //ƒRƒ“ƒ|[ƒlƒ“ƒg•t—^
+        //ã‚³ãƒ³ãƒãƒ¼ãƒãƒ³ãƒˆä»˜ä¸
         //characterList[roomModel.ConnectionId].transform.GetChild(0).gameObject.GetComponent<PlayerAnimation>().Init();
 
         if (characterList.ContainsKey(roomModel.ConnectionId))
         {
-            //ˆÚ“®î•ñ
+            //ç§»å‹•æƒ…å ±
             var moveData = new MoveData()
             {
-                ConnectionId = roomModel.ConnectionId,      //Ú‘±ID
-                Pos = characterList[roomModel.ConnectionId].transform.position,         //ƒLƒƒƒ‰ˆÊ’u
-                Rotate = characterList[roomModel.ConnectionId].transform.eulerAngles,   //ƒLƒƒƒ‰‰ñ“]
-                Angle = characterList[roomModel.ConnectionId].transform.GetChild(0).gameObject.GetComponent<AngleManager>().GetAngle(),  //ƒLƒƒƒ‰ƒNƒ^[‚ÌŒü‚«
-                AnimId = characterList[roomModel.ConnectionId].transform.GetChild(0).gameObject.GetComponent<PlayerAnimation>().GetAnimId(),      //ƒAƒjƒ[ƒVƒ‡ƒ“ID
+                ConnectionId = roomModel.ConnectionId,      //æ¥ç¶šID
+                Pos = characterList[roomModel.ConnectionId].transform.position,         //ã‚­ãƒ£ãƒ©ä½ç½®
+                Rotate = characterList[roomModel.ConnectionId].transform.eulerAngles,   //ã‚­ãƒ£ãƒ©å›è»¢
+                Angle = characterList[roomModel.ConnectionId].transform.GetChild(0).gameObject.GetComponent<AngleManager>().GetAngle(),  //ã‚­ãƒ£ãƒ©ã‚¯ã‚¿ãƒ¼ã®å‘ã
+                AnimId = characterList[roomModel.ConnectionId].transform.GetChild(0).gameObject.GetComponent<PlayerAnimation>().GetAnimId(),      //ã‚¢ãƒ‹ãƒ¡ãƒ¼ã‚·ãƒ§ãƒ³ID
             };
 
             //Debug.Log(moveData.AnimId);
-            //ƒvƒŒƒCƒ„[ˆÚ“®
+            //ãƒ—ãƒ¬ã‚¤ãƒ¤ãƒ¼ç§»å‹•
             await roomModel.MoveAsync(moveData);
 
-            //ƒJ[ƒ\ƒ‹À•W‘—M
+            //ã‚«ãƒ¼ã‚½ãƒ«åº§æ¨™é€ä¿¡
             if (roomModel.isMaster) await roomModel.MoveCursorAsync(cursor.transform.position);
 
-            //ƒtƒB[ƒ‹ƒhã‚Ìƒ{[ƒ‹ŒŸõ
+            //ãƒ•ã‚£ãƒ¼ãƒ«ãƒ‰ä¸Šã®ãƒœãƒ¼ãƒ«æ¤œç´¢
             ballObj = GameObject.Find("Ball");
 
             if (!ballObj) return;
 
-            //ƒ{[ƒ‹‚ªæ‚ê‚½‚ç
+            //ãƒœãƒ¼ãƒ«ãŒå–ã‚ŒãŸã‚‰
             if (ballObj) isBall = true;
 
-            //ƒ{[ƒ‹‚ª‘¶İ‚µ‚Ä‚¢‚é&ƒ}ƒXƒ^[ƒNƒ‰ƒCƒAƒ“ƒg
+            //ãƒœãƒ¼ãƒ«ãŒå­˜åœ¨ã—ã¦ã„ã‚‹&ãƒã‚¹ã‚¿ãƒ¼ã‚¯ãƒ©ã‚¤ã‚¢ãƒ³ãƒˆ
             if (isBall && roomModel.isMaster)
             {
-                //ƒ{[ƒ‹î•ñ
+                //ãƒœãƒ¼ãƒ«æƒ…å ±
                 var moveBallData = new MoveData()
                 {
-                    ConnectionId = roomModel.ConnectionId,      //Ú‘±ID
-                    Pos = ballObj.transform.position,           //ƒ{[ƒ‹ˆÊ’u
-                    Rotate = ballObj.transform.eulerAngles,     //ƒ{[ƒ‹‰ñ“]
+                    ConnectionId = roomModel.ConnectionId,      //æ¥ç¶šID
+                    Pos = ballObj.transform.position,           //ãƒœãƒ¼ãƒ«ä½ç½®
+                    Rotate = ballObj.transform.eulerAngles,     //ãƒœãƒ¼ãƒ«å›è»¢
 
                 };
 
-                //ƒ{[ƒ‹ˆÊ’u“¯Šú
+                //ãƒœãƒ¼ãƒ«ä½ç½®åŒæœŸ
                 await roomModel.MoveBallAsync(moveBallData);
             }
         }
     }
 
-    //ƒ†[ƒU[‚ªˆÚ“®‚µ‚½‚Æ‚«‚Ìˆ—
+    //ãƒ¦ãƒ¼ã‚¶ãƒ¼ãŒç§»å‹•ã—ãŸã¨ãã®å‡¦ç†
     private async void MovedUser(MoveData moveData)
     {
-        //‘—‚ç‚ê‚Ä‚«‚½ƒvƒŒƒCƒ„[‚ª‘¶İ‚µ‚Ä‚¢‚È‚©‚Á‚½‚ç
+        //é€ã‚‰ã‚Œã¦ããŸãƒ—ãƒ¬ã‚¤ãƒ¤ãƒ¼ãŒå­˜åœ¨ã—ã¦ã„ãªã‹ã£ãŸã‚‰
         if (!characterList.ContainsKey(moveData.ConnectionId))
         {
             return;
         }
 
-        //ƒRƒ“ƒ|[ƒlƒ“ƒg•t—^
+        //ã‚³ãƒ³ãƒãƒ¼ãƒãƒ³ãƒˆä»˜ä¸
         characterList[moveData.ConnectionId].transform.GetChild(0).GetComponent<PlayerAnimation>().Init();
 
-        //Dotween‚ÅˆÚ“®•âŠ®
+        //Dotweenã§ç§»å‹•è£œå®Œ
         characterList[moveData.ConnectionId].transform.DOMove(moveData.Pos, dotweenTime).SetEase(Ease.Linear);
-        //Debug.Log("ˆÚ“®“¯Šú’Ê‚Á‚½");
-        //Dotween‚Å‰ñ“]•âŠ®
+        //Debug.Log("ç§»å‹•åŒæœŸé€šã£ãŸ");
+        //Dotweenã§å›è»¢è£œå®Œ
 
         characterList[moveData.ConnectionId].transform.DORotate(moveData.Rotate, dotweenTime).SetEase(Ease.Linear);
-        //Debug.Log("‰ñ“]“¯Šú");
-        //ƒAƒjƒ[ƒVƒ‡ƒ“XV
+        //Debug.Log("å›è»¢åŒæœŸ");
+        //ã‚¢ãƒ‹ãƒ¡ãƒ¼ã‚·ãƒ§ãƒ³æ›´æ–°
         characterList[moveData.ConnectionId].transform.GetChild(0).GetComponent<PlayerAnimation>().SetEnemyAnim(moveData.AnimId);
-        //Debug.Log("ƒAƒjƒ[ƒVƒ‡ƒ“’Ê‚Á‚½");
-        //ƒLƒƒƒ‰ƒNƒ^[‚ÌŒü‚«XV
+        //Debug.Log("ã‚¢ãƒ‹ãƒ¡ãƒ¼ã‚·ãƒ§ãƒ³é€šã£ãŸ");
+        //ã‚­ãƒ£ãƒ©ã‚¯ã‚¿ãƒ¼ã®å‘ãæ›´æ–°
         characterList[moveData.ConnectionId].transform.GetChild(0).GetComponent<AngleManager>().SetAngle(moveData.Angle);
     } 
 
-    //ƒ†[ƒU[‚ªˆÚ“®‚µ‚½‚Æ‚«‚Ìˆ—
+    //ãƒ¦ãƒ¼ã‚¶ãƒ¼ãŒç§»å‹•ã—ãŸã¨ãã®å‡¦ç†
     private async void MovedBall(MoveData moveBallData)
     {
-        //ƒ{[ƒ‹‚ª–³‚©‚Á‚½‚ç
+        //ãƒœãƒ¼ãƒ«ãŒç„¡ã‹ã£ãŸã‚‰
         if (!ballObj)
         {
             return;
         }
        
-        //Dotween‚ÅˆÚ“®•âŠ®
+        //Dotweenã§ç§»å‹•è£œå®Œ
         ballObj.transform.DOMove(moveBallData.Pos, dotweenTime).SetEase(Ease.Linear);
-        //Dotween‚Å‰ñ“]•âŠ®
+        //Dotweenã§å›è»¢è£œå®Œ
         ballObj.transform.DORotate(moveBallData.Rotate, dotweenTime).SetEase(Ease.Linear);
     }
-    //ƒ†[ƒU[‚ªˆÚ“®‚µ‚½‚Æ‚«‚Ìˆ—
+    //ãƒ¦ãƒ¼ã‚¶ãƒ¼ãŒç§»å‹•ã—ãŸã¨ãã®å‡¦ç†
     private async void MovedCursor(Vector3 cursorPos)
     {
-        Debug.Log("ƒJ[ƒ\ƒ‹ó‚¯");
-        //Dotween‚ÅˆÚ“®•âŠ®
+        Debug.Log("ã‚«ãƒ¼ã‚½ãƒ«å—ã‘");
+        //Dotweenã§ç§»å‹•è£œå®Œ
         cursor.transform.DOMove(cursorPos, dotweenTime).SetEase(Ease.Linear);
 
     }
 
-    //ƒ{[ƒ‹”­Ëˆ—
+    //ãƒœãƒ¼ãƒ«ç™ºå°„å‡¦ç†
     private async void ThrowedBall(ThrowData throwData)
     {
         SEManager.Instance.Play(
-            audioPath: SEPath.THROW,      //Ä¶‚µ‚½‚¢ƒI[ƒfƒBƒI‚ÌƒpƒX
-            volumeRate: 1,                //‰¹—Ê‚Ì”{—¦
-            delay: 0,                     //Ä¶‚³‚ê‚é‚Ü‚Å‚Ì’x‰„ŠÔ
-            pitch: 1,                     //ƒsƒbƒ`
-            isLoop: false,                 //ƒ‹[ƒvÄ¶‚·‚é‚©
-            callback: null                //Ä¶I—¹Œã‚Ìˆ—
+            audioPath: SEPath.THROW,      //å†ç”Ÿã—ãŸã„ã‚ªãƒ¼ãƒ‡ã‚£ã‚ªã®ãƒ‘ã‚¹
+            volumeRate: 1,                //éŸ³é‡ã®å€ç‡
+            delay: 0,                     //å†ç”Ÿã•ã‚Œã‚‹ã¾ã§ã®é…å»¶æ™‚é–“
+            pitch: 1,                     //ãƒ”ãƒƒãƒ
+            isLoop: false,                 //ãƒ«ãƒ¼ãƒ—å†ç”Ÿã™ã‚‹ã‹
+            callback: null                //å†ç”Ÿçµ‚äº†å¾Œã®å‡¦ç†
         );
 
-        //ƒ^ƒO•ÏX
+        //ã‚¿ã‚°å¤‰æ›´
         characterList[throwData.ConnectionId].gameObject.tag = "Enemy";
-        //“Š‚°‚½ƒ†[ƒU[‚ÌID‚ğ•Û‘¶
+        //æŠ•ã’ãŸãƒ¦ãƒ¼ã‚¶ãƒ¼ã®IDã‚’ä¿å­˜
         enemyId = throwData.ConnectionId;
 
-        //“Š‚°‚½À•W‚É‹Ê‚ğ¶¬
+        //æŠ•ã’ãŸåº§æ¨™ã«ç‰ã‚’ç”Ÿæˆ
         Vector3 pos = characterList[throwData.ConnectionId].transform.position;
-        GameObject newbullet = Instantiate(ballPrefab, new Vector3(pos.x, pos.y, pos.z), Quaternion.identity); //’e‚ğ¶¬
+        GameObject newbullet = Instantiate(ballPrefab, new Vector3(pos.x, pos.y, pos.z), Quaternion.identity); //å¼¾ã‚’ç”Ÿæˆ
 
 
-        //ÅŒã‚É“Š‚°‚½l‚Éƒ}ƒXƒ^[ƒNƒ‰ƒCƒAƒ“ƒgŒ ‚ğ÷“n‚·‚é—\’è
+        //æœ€å¾Œã«æŠ•ã’ãŸäººã«ãƒã‚¹ã‚¿ãƒ¼ã‚¯ãƒ©ã‚¤ã‚¢ãƒ³ãƒˆæ¨©ã‚’è­²æ¸¡ã™ã‚‹äºˆå®š
 
-        Debug.Log("ƒ{[ƒ‹’Ê’mó‚¯‚½‚æ");
+        Debug.Log("ãƒœãƒ¼ãƒ«é€šçŸ¥å—ã‘ãŸã‚ˆ");
     }
 
-    //ƒ{[ƒ‹æ“¾ˆ—
+    //ãƒœãƒ¼ãƒ«å–å¾—å‡¦ç†
     private async void GetBall(Guid getUserId)
     {
         Debug.Log(getUserId);
 
-        //ƒ^ƒO•ÏX
+        //ã‚¿ã‚°å¤‰æ›´
         characterList[getUserId].gameObject.tag = "BallPlayer";
-        //æ“¾ÒID‚ğXV
+        //å–å¾—è€…IDã‚’æ›´æ–°
         this.getUserId = getUserId;
 
         
         Debug.Log(this.getUserId);
        
-        Debug.Log("æ“¾ÒIDXV");
+        Debug.Log("å–å¾—è€…IDæ›´æ–°");
         bool isDelete = false;
-        //ƒtƒB[ƒ‹ƒhã‚Ìƒ{[ƒ‹ŒŸõ
+        //ãƒ•ã‚£ãƒ¼ãƒ«ãƒ‰ä¸Šã®ãƒœãƒ¼ãƒ«æ¤œç´¢
         while (isDelete)
         {
             ballObj = GameObject.Find("Ball");
 
             if (ballObj)
             {
-                Destroy(ballObj.gameObject);    //ƒ{[ƒ‹íœ
+                Destroy(ballObj.gameObject);    //ãƒœãƒ¼ãƒ«å‰Šé™¤
                 isDelete = true;
             }
         }
 
         ballObj = GameObject.Find("Ball");
 
-        if (ballObj) Destroy(ballObj.gameObject);    //ƒ{[ƒ‹íœ
+        if (ballObj) Destroy(ballObj.gameObject);    //ãƒœãƒ¼ãƒ«å‰Šé™¤
 
-        //ƒ}ƒXƒ^[ƒNƒ‰ƒCƒAƒ“ƒgƒŠƒZƒbƒg
+        //ãƒã‚¹ã‚¿ãƒ¼ã‚¯ãƒ©ã‚¤ã‚¢ãƒ³ãƒˆãƒªã‚»ãƒƒãƒˆ
         roomModel.isMaster = false;
 
         if(getUserId == roomModel.ConnectionId) roomModel.isMaster = true;
@@ -820,30 +820,30 @@ public class GameDirector : MonoBehaviour
     public async void HitBall(HitData hitData)
     {
         SEManager.Instance.Play(
-            audioPath: SEPath.HIT,        //Ä¶‚µ‚½‚¢ƒI[ƒfƒBƒI‚ÌƒpƒX
-            volumeRate: 1,                //‰¹—Ê‚Ì”{—¦
-            delay: 0,                     //Ä¶‚³‚ê‚é‚Ü‚Å‚Ì’x‰„ŠÔ
-            pitch: 1,                     //ƒsƒbƒ`
-            isLoop: false,                 //ƒ‹[ƒvÄ¶‚·‚é‚©
-            callback: null                //Ä¶I—¹Œã‚Ìˆ—
+            audioPath: SEPath.HIT,        //å†ç”Ÿã—ãŸã„ã‚ªãƒ¼ãƒ‡ã‚£ã‚ªã®ãƒ‘ã‚¹
+            volumeRate: 1,                //éŸ³é‡ã®å€ç‡
+            delay: 0,                     //å†ç”Ÿã•ã‚Œã‚‹ã¾ã§ã®é…å»¶æ™‚é–“
+            pitch: 1,                     //ãƒ”ãƒƒãƒ
+            isLoop: false,                 //ãƒ«ãƒ¼ãƒ—å†ç”Ÿã™ã‚‹ã‹
+            callback: null                //å†ç”Ÿçµ‚äº†å¾Œã®å‡¦ç†
         );
 
         SEManager.Instance.Play(
-            audioPath: SEPath.GUEST_HIT,  //Ä¶‚µ‚½‚¢ƒI[ƒfƒBƒI‚ÌƒpƒX
-            volumeRate: 1,                //‰¹—Ê‚Ì”{—¦
-            delay: 0,                     //Ä¶‚³‚ê‚é‚Ü‚Å‚Ì’x‰„ŠÔ
-            pitch: 1,                     //ƒsƒbƒ`
-            isLoop: false,                 //ƒ‹[ƒvÄ¶‚·‚é‚©
-            callback: null                //Ä¶I—¹Œã‚Ìˆ—
+            audioPath: SEPath.GUEST_HIT,  //å†ç”Ÿã—ãŸã„ã‚ªãƒ¼ãƒ‡ã‚£ã‚ªã®ãƒ‘ã‚¹
+            volumeRate: 1,                //éŸ³é‡ã®å€ç‡
+            delay: 0,                     //å†ç”Ÿã•ã‚Œã‚‹ã¾ã§ã®é…å»¶æ™‚é–“
+            pitch: 1,                     //ãƒ”ãƒƒãƒ
+            isLoop: false,                 //ãƒ«ãƒ¼ãƒ—å†ç”Ÿã™ã‚‹ã‹
+            callback: null                //å†ç”Ÿçµ‚äº†å¾Œã®å‡¦ç†
         );
 
 
-        //c‹@ƒŠƒXƒg
+        //æ®‹æ©Ÿãƒªã‚¹ãƒˆ
         GameObject lifeList = scoreUIList[hitData.ConnectionId].transform.GetChild(5).gameObject;
-        //c‹@íœ
+        //æ®‹æ©Ÿå‰Šé™¤
         Destroy(lifeList.transform.GetChild(0).gameObject);
 
-        //ƒ|ƒCƒ“ƒg”½‰f
+        //ãƒã‚¤ãƒ³ãƒˆåæ˜ 
         Text playerPoint = scoreUIList[hitData.EnemyId].transform.GetChild(4).gameObject.GetComponent<Text>();
 
         enemyPoint = int.Parse(playerPoint.text);
@@ -857,44 +857,44 @@ public class GameDirector : MonoBehaviour
             hitNum++;
         }
 
-        Debug.Log("Šl“¾ƒ|ƒCƒ“ƒg:" + hitData.Point);
-        //“–‚Ä‚½ƒ†[ƒU[‚Ì“¾“_‰ÁZ
+        Debug.Log("ç²å¾—ãƒã‚¤ãƒ³ãƒˆ:" + hitData.Point);
+        //å½“ã¦ãŸãƒ¦ãƒ¼ã‚¶ãƒ¼ã®å¾—ç‚¹åŠ ç®—
 
-        Debug.Log("ƒqƒbƒg");
+        Debug.Log("ãƒ’ãƒƒãƒˆ");
     }
         
     public async void DownUser(Guid downUserId)
     {
         CapsuleCollider hitBox;
-        hitBox = characterList[downUserId].gameObject.GetComponent<CapsuleCollider>();   //ƒRƒ‰ƒCƒ_[æ“¾
-        hitBox.isTrigger = true; //ƒgƒŠƒK[ƒIƒt(ƒ{[ƒ‹”½Ë•\Œ»)
+        hitBox = characterList[downUserId].gameObject.GetComponent<CapsuleCollider>();   //ã‚³ãƒ©ã‚¤ãƒ€ãƒ¼å–å¾—
+        hitBox.isTrigger = true; //ãƒˆãƒªã‚¬ãƒ¼ã‚ªãƒ•(ãƒœãƒ¼ãƒ«åå°„è¡¨ç¾)
 
         characterList[downUserId].gameObject.tag = "Down";
 
-        Debug.Log(characterList[downUserId].name + ":ƒ_ƒEƒ“");
+        Debug.Log(characterList[downUserId].name + ":ãƒ€ã‚¦ãƒ³");
 
         StartCoroutine(PiyoPiyo(downUserId));
     }
 
     IEnumerator PiyoPiyo(Guid id)
     {
-        yield return new WaitForSeconds(0.7f);//‚P•b‘Ò‚Â
+        yield return new WaitForSeconds(0.7f);//ï¼‘ç§’å¾…ã¤
 
-        GameObject piyo = characterList[id].gameObject.transform.GetChild(2).gameObject;   //ƒRƒ‰ƒCƒ_[æ“¾
+        GameObject piyo = characterList[id].gameObject.transform.GetChild(2).gameObject;   //ã‚³ãƒ©ã‚¤ãƒ€ãƒ¼å–å¾—
 
         MeshRenderer rend = piyo.GetComponent<MeshRenderer>();
         rend.enabled = true;
         //piyo.SetActive(true);
     }
-    //ƒ_ƒEƒ“•œ‹Aˆ—
+    //ãƒ€ã‚¦ãƒ³å¾©å¸°å‡¦ç†
     public async void DownBackUser(Guid downUserId)
     {
         CapsuleCollider hitBox;
-        hitBox = characterList[downUserId].gameObject.GetComponent<CapsuleCollider>();   //ƒRƒ‰ƒCƒ_[æ“¾
-        hitBox.isTrigger = false; //ƒgƒŠƒK[ƒIƒ“(ƒ{[ƒ‹”½Ë•\Œ»)
+        hitBox = characterList[downUserId].gameObject.GetComponent<CapsuleCollider>();   //ã‚³ãƒ©ã‚¤ãƒ€ãƒ¼å–å¾—
+        hitBox.isTrigger = false; //ãƒˆãƒªã‚¬ãƒ¼ã‚ªãƒ³(ãƒœãƒ¼ãƒ«åå°„è¡¨ç¾)
 
-        //ƒsƒˆƒsƒˆ”ñ•\¦
-        GameObject piyo = characterList[downUserId].gameObject.transform.GetChild(2).gameObject;   //ƒRƒ‰ƒCƒ_[æ“¾
+        //ãƒ”ãƒ¨ãƒ”ãƒ¨éè¡¨ç¤º
+        GameObject piyo = characterList[downUserId].gameObject.transform.GetChild(2).gameObject;   //ã‚³ãƒ©ã‚¤ãƒ€ãƒ¼å–å¾—
 
 
         MeshRenderer rend = piyo.GetComponent<MeshRenderer>();
@@ -902,18 +902,18 @@ public class GameDirector : MonoBehaviour
 
         //piyo.SetActive(false);
 
-        //©‹@‚¾‚Á‚½ê‡
-        if (roomModel.ConnectionId == downUserId) characterList[downUserId].gameObject.tag = "Player";    //Pleyerƒ^ƒO‚É
+        //è‡ªæ©Ÿã ã£ãŸå ´åˆ
+        if (roomModel.ConnectionId == downUserId) characterList[downUserId].gameObject.tag = "Player";    //Pleyerã‚¿ã‚°ã«
 
         else characterList[downUserId].gameObject.tag = "Enemy";
 
-        Debug.Log(characterList[downUserId].name + ":ƒ_ƒEƒ“•œ‹A");
+        Debug.Log(characterList[downUserId].name + ":ãƒ€ã‚¦ãƒ³å¾©å¸°");
     }
 
-    //ƒ†[ƒU[î•ñXVˆ—
-    public@async void UpdateUserState(Guid connectionId,UserState userState)
+    //ãƒ¦ãƒ¼ã‚¶ãƒ¼æƒ…å ±æ›´æ–°å‡¦ç†
+    publicã€€async void UpdateUserState(Guid connectionId,UserState userState)
     {
-        //ƒvƒŒƒCƒ„[‚ª‚¢‚È‚©‚Á‚½‚ç
+        //ãƒ—ãƒ¬ã‚¤ãƒ¤ãƒ¼ãŒã„ãªã‹ã£ãŸã‚‰
         if (!characterList.ContainsKey(roomModel.ConnectionId))
         {
             return;   
@@ -922,12 +922,12 @@ public class GameDirector : MonoBehaviour
 
         //await roomModel.UpdateStateUser(connectionId,userState);
     }
-    //ƒ†[ƒU[€”õŠ®—¹ˆ—
+    //ãƒ¦ãƒ¼ã‚¶ãƒ¼æº–å‚™å®Œäº†å‡¦ç†
     public async void ReadyUser(bool isReady)
     {
         isReady = true;
         await roomModel.ReadyAsync(isReady);
-        Debug.Log("€”õŠ®—¹");
+        Debug.Log("æº–å‚™å®Œäº†");
         game_State = GAME_STATE.READY;
     }
 
@@ -939,7 +939,7 @@ public class GameDirector : MonoBehaviour
         game_State = GAME_STATE.START;
         gameUI.SetActive(true);
        
-        Debug.Log("ƒJƒEƒ“ƒgƒ_ƒEƒ“ŠJn");
+        Debug.Log("ã‚«ã‚¦ãƒ³ãƒˆãƒ€ã‚¦ãƒ³é–‹å§‹");
 
         Invoke("GameStart", 4.0f);
     }
@@ -949,14 +949,14 @@ public class GameDirector : MonoBehaviour
         Text text = matchText.GetComponent<Text>();    
         matchText.GetComponent<TextManager>().enabled = false;
 
-        text.text = "ƒ}ƒbƒ`ƒ“ƒO¬—§";
+        text.text = "ãƒãƒƒãƒãƒ³ã‚°æˆç«‹";
 
         StartCoroutine(StartCount());
     }
 
     IEnumerator StartCount()
     {
-        yield return new WaitForSeconds(2f);//‚P•b‘Ò‚Â
+        yield return new WaitForSeconds(2f);//ï¼‘ç§’å¾…ã¤
 
         joinUI.SetActive(false);
 
@@ -964,21 +964,21 @@ public class GameDirector : MonoBehaviour
 
 
         BGMManager.Instance.Play(
-            audioPath: BGMPath.BUTTLE, //Ä¶‚µ‚½‚¢ƒI[ƒfƒBƒI‚ÌƒpƒX
-            volumeRate: 1,                //‰¹—Ê‚Ì”{—¦
-            delay: 0,                //Ä¶‚³‚ê‚é‚Ü‚Å‚Ì’x‰„ŠÔ
-            pitch: 1,                //ƒsƒbƒ`
-            isLoop: true,             //ƒ‹[ƒvÄ¶‚·‚é‚©
-            allowsDuplicate: true             //‘¼‚ÌBGM‚Æd•¡‚µ‚ÄÄ¶‚³‚¹‚é‚©
+            audioPath: BGMPath.BUTTLE, //å†ç”Ÿã—ãŸã„ã‚ªãƒ¼ãƒ‡ã‚£ã‚ªã®ãƒ‘ã‚¹
+            volumeRate: 1,                //éŸ³é‡ã®å€ç‡
+            delay: 0,                //å†ç”Ÿã•ã‚Œã‚‹ã¾ã§ã®é…å»¶æ™‚é–“
+            pitch: 1,                //ãƒ”ãƒƒãƒ
+            isLoop: true,             //ãƒ«ãƒ¼ãƒ—å†ç”Ÿã™ã‚‹ã‹
+            allowsDuplicate: true             //ä»–ã®BGMã¨é‡è¤‡ã—ã¦å†ç”Ÿã•ã›ã‚‹ã‹
         );
 
         SEManager.Instance.Play(
-            audioPath: SEPath.COUNT_DOWN, //Ä¶‚µ‚½‚¢ƒI[ƒfƒBƒI‚ÌƒpƒX
-            volumeRate: 1,                //‰¹—Ê‚Ì”{—¦
-            delay: 0.0f,                     //Ä¶‚³‚ê‚é‚Ü‚Å‚Ì’x‰„ŠÔ
-            pitch: 1,                     //ƒsƒbƒ`
-            isLoop: false,                 //ƒ‹[ƒvÄ¶‚·‚é‚©
-            callback: null                //Ä¶I—¹Œã‚Ìˆ—
+            audioPath: SEPath.COUNT_DOWN, //å†ç”Ÿã—ãŸã„ã‚ªãƒ¼ãƒ‡ã‚£ã‚ªã®ãƒ‘ã‚¹
+            volumeRate: 1,                //éŸ³é‡ã®å€ç‡
+            delay: 0.0f,                     //å†ç”Ÿã•ã‚Œã‚‹ã¾ã§ã®é…å»¶æ™‚é–“
+            pitch: 1,                     //ãƒ”ãƒƒãƒ
+            isLoop: false,                 //ãƒ«ãƒ¼ãƒ—å†ç”Ÿã™ã‚‹ã‹
+            callback: null                //å†ç”Ÿçµ‚äº†å¾Œã®å‡¦ç†
         );
 
 
@@ -986,13 +986,13 @@ public class GameDirector : MonoBehaviour
         standByUI.SetActive(false);
         game_State = GAME_STATE.START;
 
-        Debug.Log("ƒQ[ƒ€ŠJn");
+        Debug.Log("ã‚²ãƒ¼ãƒ é–‹å§‹");
 
         gameUI.SetActive(true);
 
         isStart = true;
         Debug.Log("toutatu");
-        //ƒŠƒUƒ‹ƒg•\¦
+        //ãƒªã‚¶ãƒ«ãƒˆè¡¨ç¤º
        
     }
 
@@ -1000,80 +1000,80 @@ public class GameDirector : MonoBehaviour
     public void DeadUser(DeadData deadData,int deadNum)
     {
 
-        //ÅŒã‚ÌƒvƒŒƒCƒ„[ˆÈŠO‚ÍÄ¶
+        //æœ€å¾Œã®ãƒ—ãƒ¬ã‚¤ãƒ¤ãƒ¼ä»¥å¤–ã¯å†ç”Ÿ
         if (!deadData.IsLast)
         {
 
             SEManager.Instance.Play(
-            audioPath: SEPath.GUEST_HIT,  //Ä¶‚µ‚½‚¢ƒI[ƒfƒBƒI‚ÌƒpƒX
-            volumeRate: 1,                //‰¹—Ê‚Ì”{—¦
-            delay: 0,                     //Ä¶‚³‚ê‚é‚Ü‚Å‚Ì’x‰„ŠÔ
-            pitch: 1,                     //ƒsƒbƒ`
-            isLoop: false,                 //ƒ‹[ƒvÄ¶‚·‚é‚©
-            callback: null                //Ä¶I—¹Œã‚Ìˆ—
+            audioPath: SEPath.GUEST_HIT,  //å†ç”Ÿã—ãŸã„ã‚ªãƒ¼ãƒ‡ã‚£ã‚ªã®ãƒ‘ã‚¹
+            volumeRate: 1,                //éŸ³é‡ã®å€ç‡
+            delay: 0,                     //å†ç”Ÿã•ã‚Œã‚‹ã¾ã§ã®é…å»¶æ™‚é–“
+            pitch: 1,                     //ãƒ”ãƒƒãƒ
+            isLoop: false,                 //ãƒ«ãƒ¼ãƒ—å†ç”Ÿã™ã‚‹ã‹
+            callback: null                //å†ç”Ÿçµ‚äº†å¾Œã®å‡¦ç†
         );
 
 
             SEManager.Instance.Play(
-                audioPath: SEPath.DOWN,        //Ä¶‚µ‚½‚¢ƒI[ƒfƒBƒI‚ÌƒpƒX
-                volumeRate: 1,                //‰¹—Ê‚Ì”{—¦
-                delay: 1,                     //Ä¶‚³‚ê‚é‚Ü‚Å‚Ì’x‰„ŠÔ
-                pitch: 1,                     //ƒsƒbƒ`
-                isLoop: false,                 //ƒ‹[ƒvÄ¶‚·‚é‚©
-                callback: null                //Ä¶I—¹Œã‚Ìˆ—
+                audioPath: SEPath.DOWN,        //å†ç”Ÿã—ãŸã„ã‚ªãƒ¼ãƒ‡ã‚£ã‚ªã®ãƒ‘ã‚¹
+                volumeRate: 1,                //éŸ³é‡ã®å€ç‡
+                delay: 1,                     //å†ç”Ÿã•ã‚Œã‚‹ã¾ã§ã®é…å»¶æ™‚é–“
+                pitch: 1,                     //ãƒ”ãƒƒãƒ
+                isLoop: false,                 //ãƒ«ãƒ¼ãƒ—å†ç”Ÿã™ã‚‹ã‹
+                callback: null                //å†ç”Ÿçµ‚äº†å¾Œã®å‡¦ç†
             );
         }
 
         if (deadData.ConnectionId == roomModel.ConnectionId)
         {
-            //€–S”»’è
+            //æ­»äº¡åˆ¤å®š
             isDead = true;
         }
 
-        //€–Sƒ†[ƒU[‚Ìƒ^ƒO•ÏX
+        //æ­»äº¡ãƒ¦ãƒ¼ã‚¶ãƒ¼ã®ã‚¿ã‚°å¤‰æ›´
         characterList[deadData.ConnectionId].tag = "Dead";
 
-        //€–Sl”XV
+        //æ­»äº¡äººæ•°æ›´æ–°
         this.deadNum = deadNum;
 
-        //c‹@ƒŠƒXƒg
+        //æ®‹æ©Ÿãƒªã‚¹ãƒˆ
         GameObject lifeList = scoreUIList[deadData.ConnectionId].transform.GetChild(5).gameObject;
-        //€–SÒ‚Ìc‹@ƒŠƒXƒgíœ
+        //æ­»äº¡è€…ã®æ®‹æ©Ÿãƒªã‚¹ãƒˆå‰Šé™¤
         Destroy(lifeList);
 
 
-        //€–SÒ‚ÌƒŠƒUƒ‹ƒgUI¶¬
+        //æ­»äº¡è€…ã®ãƒªã‚¶ãƒ«ãƒˆUIç”Ÿæˆ
         GameObject resultUI = Instantiate(resultUIPrefab, Vector3.zero, Quaternion.identity, resultUIPos.gameObject.transform);
-        //ƒŠƒUƒ‹ƒgUI‚ÌImageƒRƒ“ƒ|[ƒlƒ“ƒgæ“¾
+        //ãƒªã‚¶ãƒ«ãƒˆUIã®Imageã‚³ãƒ³ãƒãƒ¼ãƒãƒ³ãƒˆå–å¾—
         Image UIColor = resultUI.GetComponent<Image>();
 
-        resultUIList[deadData.ConnectionId] = resultUI;        //ƒtƒB[ƒ‹ƒh‚Å•Û
+        resultUIList[deadData.ConnectionId] = resultUI;        //ãƒ•ã‚£ãƒ¼ãƒ«ãƒ‰ã§ä¿æŒ
 
-        //ƒvƒŒƒCƒ„[Noæ“¾(UI)
+        //ãƒ—ãƒ¬ã‚¤ãƒ¤ãƒ¼Noå–å¾—(UI)
         Image number = resultUI.transform.GetChild(4).gameObject.GetComponent<Image>();
 
-        //ƒŠƒUƒ‹ƒgÚ×î•ñæ“¾
+        //ãƒªã‚¶ãƒ«ãƒˆè©³ç´°æƒ…å ±å–å¾—
         GameObject detailList = resultUI.transform.GetChild(5).gameObject;
 
-        //ƒvƒŒƒCƒ„[–¼æ“¾
+        //ãƒ—ãƒ¬ã‚¤ãƒ¤ãƒ¼åå–å¾—
         Text name = resultUI.transform.GetChild(3).gameObject.GetComponent<Text>();
         name.text = deadData.Name;
 
-        //Ú×î•ñ
+        //è©³ç´°æƒ…å ±
         
-        //ƒ|ƒCƒ“ƒg
+        //ãƒã‚¤ãƒ³ãƒˆ
         Text pointText = detailList.transform.GetChild(0).transform.GetChild(1).gameObject.GetComponent<Text>();
         pointText.text = deadData.Point.ToString();
 
-        //¶‘¶ŠÔ
+        //ç”Ÿå­˜æ™‚é–“
         Text timeText = detailList.transform.GetChild(1).transform.GetChild(1).gameObject.GetComponent<Text>();
-        int minutes = 0;  //•ª
-        int seccond = 0;  //•b
+        int minutes = 0;  //åˆ†
+        int seccond = 0;  //ç§’
 
-        //ÅŒã‚©
+        //æœ€å¾Œã‹
         Debug.Log(deadData.IsLast);
        
-        //ÅŒã‚ÌƒvƒŒƒCƒ„[‚¾‚Á‚½ê‡
+        //æœ€å¾Œã®ãƒ—ãƒ¬ã‚¤ãƒ¤ãƒ¼ã ã£ãŸå ´åˆ
         if(deadData.IsLast)
         {
 
@@ -1090,27 +1090,27 @@ public class GameDirector : MonoBehaviour
             }
             seccond = deadData.Time;
 
-            //ƒeƒLƒXƒg¶0‹l‚ß
+            //ãƒ†ã‚­ã‚¹ãƒˆå·¦0è©°ã‚
             var minutesText = minutes.ToString("D2");
             var seccondText = seccond.ToString("D2");
 
             timeText.text = minutesText + ":" + seccondText;
         }
         
-        //“Š‚°‚½‰ñ”
+        //æŠ•ã’ãŸå›æ•°
         Text throwText = detailList.transform.GetChild(2).transform.GetChild(1).gameObject.GetComponent<Text>();
         throwText.text = deadData.ThrowNum.ToString();
 
-        //“–‚Ä‚½‰ñ”
+        //å½“ã¦ãŸå›æ•°
         Text hitText = detailList.transform.GetChild(3).transform.GetChild(1).gameObject.GetComponent<Text>();
         hitText.text = deadData.HitNum.ToString();
 
-        //ƒLƒƒƒbƒ`‰ñ”
+        //ã‚­ãƒ£ãƒƒãƒå›æ•°
         Text catchText = detailList.transform.GetChild(4).transform.GetChild(1).gameObject.GetComponent<Text>();
         catchText.text = deadData.CatchNum.ToString();
 
 
-        //ƒvƒŒƒCƒ„[ƒiƒ“ƒo[‰æ‘œ·‚µ‘Ö‚¦
+        //ãƒ—ãƒ¬ã‚¤ãƒ¤ãƒ¼ãƒŠãƒ³ãƒãƒ¼ç”»åƒå·®ã—æ›¿ãˆ
         switch (deadData.JoinOrder)
         {
             case 1:
@@ -1138,7 +1138,7 @@ public class GameDirector : MonoBehaviour
 
                 break;
             default:
-                Debug.Log("•s“’B“_");
+                Debug.Log("ä¸åˆ°é”ç‚¹");
                 break;
         }
 
@@ -1146,32 +1146,32 @@ public class GameDirector : MonoBehaviour
 
     public void FinishGameUser()
     {
-        Debug.Log("ƒQ[ƒ€I—¹’Ê’m");
+        Debug.Log("ã‚²ãƒ¼ãƒ çµ‚äº†é€šçŸ¥");
 
-        // CoroutineiƒRƒ‹[ƒ`ƒ“j‚ğŠJn
+        // Coroutineï¼ˆã‚³ãƒ«ãƒ¼ãƒãƒ³ï¼‰ã‚’é–‹å§‹
         StartCoroutine(FinishGame());
     }
     IEnumerator FinishGame()
     {
-        yield return new WaitForSeconds(1f);//‚P•b‘Ò‚Â
+        yield return new WaitForSeconds(1f);//ï¼‘ç§’å¾…ã¤
 
         Debug.Log("toutatu");
-        //ƒŠƒUƒ‹ƒg•\¦
+        //ãƒªã‚¶ãƒ«ãƒˆè¡¨ç¤º
         resultObj.SetActive(true);
     }
    
     public async void OnClickHome()
     {
-        //“¯Šú’ÊM‰ğœ
+        //åŒæœŸé€šä¿¡è§£é™¤
         CancelInvoke();
 
-        //‘Şoˆ—
+        //é€€å‡ºå‡¦ç†
         await roomModel.LeaveAsync();
 
-        //MagicOnionØ’fˆ—
+        //MagicOnionåˆ‡æ–­å‡¦ç†
         await roomModel.DisConnectAsync();
 
-        //ƒV[ƒ“Ä“Ç‚İ‚İ
+        //ã‚·ãƒ¼ãƒ³å†èª­ã¿è¾¼ã¿
         SceneManager.LoadScene(SceneManager.GetActiveScene().name);
     }
 

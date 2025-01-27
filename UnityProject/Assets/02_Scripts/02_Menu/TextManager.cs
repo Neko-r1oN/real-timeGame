@@ -4,13 +4,13 @@ using UnityEngine;
 using UnityEngine.UI;
 public class TextManager : MonoBehaviour
 {
-    private float _repeatSpan;    //ŒJ‚è•Ô‚·ŠÔŠu
-    private float _timeElapsed;   //Œo‰ßŠÔ
+    private float _repeatSpan;    //ç¹°ã‚Šè¿”ã™é–“éš”
+    private float _timeElapsed;   //çµŒéæ™‚é–“
 
     // Start is called before the first frame update
     void Start()
     {
-        //•\¦Ø‚è‘Ö‚¦ŠÔ‚ğw’è
+        //è¡¨ç¤ºåˆ‡ã‚Šæ›¿ãˆæ™‚é–“ã‚’æŒ‡å®š
         _repeatSpan = 0.5f;
         _timeElapsed = 0;
     }
@@ -18,24 +18,24 @@ public class TextManager : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        _timeElapsed += Time.deltaTime;     //ŠÔ‚ğƒJƒEƒ“ƒg‚·‚é
+        _timeElapsed += Time.deltaTime;     //æ™‚é–“ã‚’ã‚«ã‚¦ãƒ³ãƒˆã™ã‚‹
 
         if (_timeElapsed >= _repeatSpan)
-        {//ŠÔŒo‰ß‚ÅƒeƒLƒXƒg•\¦
-            GetComponent<Text>().text = "ƒ}ƒbƒ`ƒ“ƒO’†";
+        {//æ™‚é–“çµŒéã§ãƒ†ã‚­ã‚¹ãƒˆè¡¨ç¤º
+            GetComponent<Text>().text = "ãƒãƒƒãƒãƒ³ã‚°ä¸­";
         }
         if (_timeElapsed >= _repeatSpan + 0.5f)
-        {//ŠÔŒo‰ß‚ÅƒeƒLƒXƒg•\¦(–ğE)
-            GetComponent<Text>().text = "ƒ}ƒbƒ`ƒ“ƒO’†.";
+        {//æ™‚é–“çµŒéã§ãƒ†ã‚­ã‚¹ãƒˆè¡¨ç¤º(å½¹è·)
+            GetComponent<Text>().text = "ãƒãƒƒãƒãƒ³ã‚°ä¸­.";
         }
         if (_timeElapsed >= _repeatSpan + 1.0f)
-        {//ŠÔŒo‰ß‚ÅƒeƒLƒXƒg•\¦(–ğE)
-            GetComponent<Text>().text = "ƒ}ƒbƒ`ƒ“ƒO’†..";
+        {//æ™‚é–“çµŒéã§ãƒ†ã‚­ã‚¹ãƒˆè¡¨ç¤º(å½¹è·)
+            GetComponent<Text>().text = "ãƒãƒƒãƒãƒ³ã‚°ä¸­..";
         }
         if (_timeElapsed >= _repeatSpan + 1.5f)
-        {//ŠÔŒo‰ß‚ÅƒeƒLƒXƒg•\¦(–ğE)
-            GetComponent<Text>().text = "ƒ}ƒbƒ`ƒ“ƒO’†...";
-            _timeElapsed = 0;   //Œo‰ßŠÔ‚ğƒŠƒZƒbƒg‚·‚é
+        {//æ™‚é–“çµŒéã§ãƒ†ã‚­ã‚¹ãƒˆè¡¨ç¤º(å½¹è·)
+            GetComponent<Text>().text = "ãƒãƒƒãƒãƒ³ã‚°ä¸­...";
+            _timeElapsed = 0;   //çµŒéæ™‚é–“ã‚’ãƒªã‚»ãƒƒãƒˆã™ã‚‹
         }
 
     }
