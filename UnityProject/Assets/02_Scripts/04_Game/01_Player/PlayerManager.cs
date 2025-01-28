@@ -1078,7 +1078,7 @@ public class PlayerManager : MonoBehaviour
     //ダウン処理
     private async void DownUser()
     {
-        SEManager.Instance.Play(
+       /*SEManager.Instance.Play(
                    audioPath: SEPath.PIYOPIYO,      //再生したいオーディオのパス
                    volumeRate: 1,                //音量の倍率
                    delay: 0.0f,                     //再生されるまでの遅延時間
@@ -1086,7 +1086,7 @@ public class PlayerManager : MonoBehaviour
                    isLoop: false,                 //ループ再生するか
                    callback: null                //再生終了後の処理
                );
-
+       */
 
         isDown = true;
         await roomModel.DownUserAsync(roomModel.ConnectionId);   //ダウン状態通知

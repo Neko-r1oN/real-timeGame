@@ -914,20 +914,21 @@ public class GameDirector : MonoBehaviour
 
         yield return new WaitForSeconds(0.7f);//１秒待つ
 
-        SEManager.Instance.Play(
-                audioPath: SEPath.PIYOPIYO,        //再生したいオーディオのパス
-                volumeRate: 1,                //音量の倍率
-                delay: 1,                     //再生されるまでの遅延時間
-                pitch: 1,                     //ピッチ
-                isLoop: false,                 //ループ再生するか
-                callback: null                //再生終了後の処理
-            );
-
+       
         GameObject piyo = characterList[id].gameObject.transform.GetChild(2).gameObject;   //コライダー取得
 
         MeshRenderer rend = piyo.GetComponent<MeshRenderer>();
         rend.enabled = true;
-        //piyo.SetActive(true);
+
+        SEManager.Instance.Play(
+              audioPath: SEPath.PIYOPIYO,        //再生したいオーディオのパス
+              volumeRate: 1,                //音量の倍率
+              delay: 1,                     //再生されるまでの遅延時間
+              pitch: 1,                     //ピッチ
+              isLoop: false,                 //ループ再生するか
+              callback: null                //再生終了後の処理
+          );
+
     }
     //ダウン復帰処理
     public async void DownBackUser(Guid downUserId)
