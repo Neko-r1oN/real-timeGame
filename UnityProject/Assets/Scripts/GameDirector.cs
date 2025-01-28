@@ -37,6 +37,8 @@ public class GameDirector : MonoBehaviour
     [SerializeField] Text roomName;
     [SerializeField] Text userId;
 
+    [SerializeField] GameObject matchBtn;
+
     //プレイヤー生成親オブジェクト
     [SerializeField] private GameObject spawnObj;
     //プレイヤー生成位置
@@ -332,8 +334,8 @@ public class GameDirector : MonoBehaviour
 
     //入室処理
     public async void JoinLobby()
-    {   
-
+    {
+        matchBtn.SetActive(false);
         menuCanvas.SetActive(true);
          cursor.SetActive(true);
 
@@ -542,7 +544,7 @@ public class GameDirector : MonoBehaviour
     public async void DisConnectRoom()
     {
         Array.Clear(joinedId, 0, joinedId.Length);
-
+        matchBtn.SetActive(true);
         //同期通信解除
         CancelInvoke();
 
