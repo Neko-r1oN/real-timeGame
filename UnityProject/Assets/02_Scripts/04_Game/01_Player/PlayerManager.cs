@@ -43,7 +43,7 @@ public class PlayerManager : MonoBehaviour
     private bool isDead;           //死亡状態
 
     public float velosity = 13f;              //ジャンプの強さ
-    public float ballSpeed = 23.0f;           //ボールの速さ
+    public float ballSpeed = 24.0f;           //ボールの速さ
     public float knockBack = 12.0f;           //
     public float catchDelay = 0.6f;           //キャッチ有効時間
     public float haveCatchDelay = 0.6f;
@@ -55,7 +55,7 @@ public class PlayerManager : MonoBehaviour
 
 
     [SerializeField] private Vector3 velocity;              // 移動方向
-    [SerializeField] private float moveSpeed = 6.0f;        // 移動速度
+    [SerializeField] private float moveSpeed = 4.5f;        // 移動速度
 
     //UI関連
     Button jumpButton;
