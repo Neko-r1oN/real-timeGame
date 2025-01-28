@@ -12,9 +12,10 @@ using System.Xml.Serialization;
 using System.Threading.Tasks;
 using Cysharp.Threading.Tasks.Triggers;
 using KanKikuchi.AudioManager;
-using static GameDirector;
 using UnityEngine.InputSystem.XR;
 using MessagePack.Resolvers;
+using Newtonsoft.Json.Linq;
+
 
 
 public class GameDirector : MonoBehaviour
@@ -540,6 +541,8 @@ public class GameDirector : MonoBehaviour
     //切断処理
     public async void DisConnectRoom()
     {
+        Array.Clear(joinedId, 0, joinedId.Length);
+
         //同期通信解除
         CancelInvoke();
 
