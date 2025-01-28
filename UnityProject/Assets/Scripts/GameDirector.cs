@@ -923,7 +923,7 @@ public class GameDirector : MonoBehaviour
         SEManager.Instance.Play(
               audioPath: SEPath.PIYOPIYO,        //再生したいオーディオのパス
               volumeRate: 1,                //音量の倍率
-              delay: 1,                     //再生されるまでの遅延時間
+              delay: 0,                     //再生されるまでの遅延時間
               pitch: 1,                     //ピッチ
               isLoop: false,                 //ループ再生するか
               callback: null                //再生終了後の処理

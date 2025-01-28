@@ -10,6 +10,7 @@ using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.UI;
 using KanKikuchi.AudioManager;
+using UnityEngine.ProBuilder.MeshOperations;
 
 
 public class PlayerManager : MonoBehaviour
@@ -65,6 +66,7 @@ public class PlayerManager : MonoBehaviour
 
     GameObject catchbtn;    //表示切替用
     GameObject throwbtn;    //表示切替用
+    GameObject feintbtn;    //表示切替用
 
     FixedJoystick fixedJoystick;    //JoyStick
     Rigidbody rigidbody;
@@ -75,7 +77,7 @@ public class PlayerManager : MonoBehaviour
     private bool isLeft;     //画像の向き
 
     //HP変数
-    public int maxHp = 5;    //HP最大値
+    public int maxHp = 3;    //HP最大値
     public int hp;           //HP現在値
 
     public int damage = 1;   //ダメージ量(現状固定)
@@ -157,6 +159,7 @@ public class PlayerManager : MonoBehaviour
 
         catchbtn = GameObject.Find("CatchButton");
         throwbtn = GameObject.Find("ThrowButton");
+        feintbtn = GameObject.Find("FeintButton");
 
         //ルームモデルの取得
         roomModel = GameObject.Find("RoomModel").GetComponent<RoomModel>();
@@ -313,29 +316,6 @@ public class PlayerManager : MonoBehaviour
 
     void Update()
     {
-        /*
-        if (!isInit)
-        {
-            init();
-            isInit = true;
-        }*/
-        //HPがなくなった場合
-        /*if (!isDead && hp <= 0)
-        {
-            isLast = false;
-            Debug.Log("デッティ");
-            //死亡処理
-            //playerAnim.SetAnim(PlayerAnimation.ANIM_STATE.DEAD);
-            playerAnim.SetAnim(PlayerAnimation.ANIM_STATE.DOWN);
-
-            //操作不能
-            Destroy(fixedJoystick);
-            //プレイヤー死亡通知
-            DeadUser();
-
-            isDead = true;
-
-        }*/
         if (!isDead && hp <= 0)
         {
             StopAllCoroutines();
@@ -365,25 +345,22 @@ public class PlayerManager : MonoBehaviour
 
         if (searchNearEnemy)
         {
-            if (isHaveBall)
-            {
-                //Debug.Log("向き補正中");
-                transform.LookAt(searchNearEnemy.transform);
-            }
+            
+            if (isHaveBall) transform.LookAt(searchNearEnemy.transform);  //向きロックオン
+
+            else this.gameObject.transform.eulerAngles = Vector3.zero;    //向き平行
+
         }
 
         //ボールタグ取得
         searchNearBall = EnemySerch(ballTag);
+
         //ボールが無かったら
         if (searchNearBall = null)
         {
             //ボール所持者を取得
             searchNearBall = EnemySerch(enemyBallTag);
         }
-
-
-
-        
 
         //向きチェック
         Move();
@@ -394,11 +371,14 @@ public class PlayerManager : MonoBehaviour
         if (isHaveBall)
         {
             catchbtn.SetActive(false);
+            throwbtn.SetActive(true);
+            feintbtn.SetActive(true);
 
         } else if (!isHaveBall)
         {
             catchbtn.SetActive(true);
-
+            throwbtn.SetActive(false);
+            feintbtn.SetActive(false);
         }
        
 
@@ -420,14 +400,6 @@ public class PlayerManager : MonoBehaviour
             //cursor.SetActive(false);
             //カーソルを見えない位置に移動
             //cursor.transform.DOMove(new Vector3(10.714f, -1.94f, 12.87f), 0.1f).SetEase(Ease.Linear);
-        }
-
-
-        if (roomModel.isMaster)
-        {
-            //ロックオンカーソル送信
-
-
         }
 
         if (isDead) return;
@@ -872,7 +844,7 @@ public class PlayerManager : MonoBehaviour
                 SEManager.Instance.Play(
                     audioPath: SEPath.CATCH,      //再生したいオーディオのパス
                     volumeRate: 1,                //音量の倍率
-                    delay: 0.2f,                     //再生されるまでの遅延時間
+                    delay: 0.0f,                     //再生されるまでの遅延時間
                     pitch: 1,                     //ピッチ
                     isLoop: false,                 //ループ再生するか
                     callback: null                //再生終了後の処理
