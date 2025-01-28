@@ -400,34 +400,7 @@ public class PlayerManager : MonoBehaviour
             catchbtn.SetActive(true);
 
         }
-        //死んでいない場合
-        /*if (!isDead)
-        {
-            if (!isDown)
-            {
-                if (!isCatch)
-                {
-                    //キャッチ状態か投げ状態でない場合のみ移動できる
-                    if (!isThrow)
-                    {
-                        // 速度ベクトルの長さを1秒でmoveSpeedだけ進むように調整します
-                        velocity = velocity.normalized * moveSpeed * Time.deltaTime;
-
-                        // いずれかの方向に移動している場合
-                        if (velocity.magnitude > 0)
-                        {
-
-                            // プレイヤーの位置(transform.position)の更新
-                            // 移動方向ベクトル(velocity)を足し込みます
-                            transform.position += velocity;
-
-                        }
-
-                    }
-                }
-            }
-
-        }*/
+       
 
         //フィールドに敵プレイヤーが存在している場合
         if (searchNearEnemy != null)
@@ -1105,6 +1078,16 @@ public class PlayerManager : MonoBehaviour
     //ダウン処理
     private async void DownUser()
     {
+        SEManager.Instance.Play(
+                   audioPath: SEPath.PIYOPIYO,      //再生したいオーディオのパス
+                   volumeRate: 1,                //音量の倍率
+                   delay: 0.0f,                     //再生されるまでの遅延時間
+                   pitch: 1,                     //ピッチ
+                   isLoop: false,                 //ループ再生するか
+                   callback: null                //再生終了後の処理
+               );
+
+
         isDown = true;
         await roomModel.DownUserAsync(roomModel.ConnectionId);   //ダウン状態通知
 
@@ -1134,6 +1117,7 @@ public class PlayerManager : MonoBehaviour
     /// </summary>
     private async void DeadUser()
     {
+
         isDead = true;
         this.gameObject.tag = "Dead";
 

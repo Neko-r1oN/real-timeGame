@@ -7,6 +7,7 @@ using UnityEngine.UI;
 using UnityEngine.UIElements;
 using UnityEngine.SceneManagement;
 using Unity.VisualScripting;
+using KanKikuchi.AudioManager;
 
 
 
@@ -103,6 +104,15 @@ public class TitleManager : MonoBehaviour
     }
     public async void TapScreen()
     {
+
+        SEManager.Instance.Play(
+                  audioPath: SEPath.TAP,      //再生したいオーディオのパス
+                  volumeRate: 1,                //音量の倍率
+                  delay: 0.0f,                     //再生されるまでの遅延時間
+                  pitch: 1,                     //ピッチ
+                  isLoop: false,                 //ループ再生するか
+                  callback: null                //再生終了後の処理
+              );
         //デバッグだったら
         if (debug.text != "")
         {
@@ -130,6 +140,15 @@ public class TitleManager : MonoBehaviour
     }
     public async void OnClickRegist()
     {
+        SEManager.Instance.Play(
+                  audioPath: SEPath.TAP,      //再生したいオーディオのパス
+                  volumeRate: 1,                //音量の倍率
+                  delay: 0.0f,                     //再生されるまでの遅延時間
+                  pitch: 1,                     //ピッチ
+                  isLoop: false,                 //ループ再生するか
+                  callback: null                //再生終了後の処理
+              );
+
         isConnecting = true;
         ConnnectText.SetActive(true);
         startButton.SetActive(false);

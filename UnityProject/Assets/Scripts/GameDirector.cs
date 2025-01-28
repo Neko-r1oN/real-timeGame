@@ -308,12 +308,14 @@ public class GameDirector : MonoBehaviour
     //入室処理
     public async void JoinRoom()
     {
-        //isJoinFirst = false;
-
-        /*if (!userId)
-        {
-            return;
-        }*/
+        SEManager.Instance.Play(
+                  audioPath: SEPath.TAP,      //再生したいオーディオのパス
+                  volumeRate: 1,                //音量の倍率
+                  delay: 0.0f,                     //再生されるまでの遅延時間
+                  pitch: 1,                     //ピッチ
+                  isLoop: false,                 //ループ再生するか
+                  callback: null                //再生終了後の処理
+              );
 
         Debug.Log("ルーム名:" + roomName.text);
         Debug.Log("ユーザーID;" + userModel.userId);
@@ -335,6 +337,15 @@ public class GameDirector : MonoBehaviour
     //入室処理
     public async void JoinLobby()
     {
+        SEManager.Instance.Play(
+                  audioPath: SEPath.TAP,      //再生したいオーディオのパス
+                  volumeRate: 1,                //音量の倍率
+                  delay: 0.0f,                     //再生されるまでの遅延時間
+                  pitch: 1,                     //ピッチ
+                  isLoop: false,                 //ループ再生するか
+                  callback: null                //再生終了後の処理
+              );
+
         matchBtn.SetActive(false);
         menuCanvas.SetActive(true);
          cursor.SetActive(true);
@@ -349,8 +360,16 @@ public class GameDirector : MonoBehaviour
     //マッチングが成立したときの処理
     private async void MatchedUser(string roomName)
     {
-      
-            await roomModel.LeaveAsync();
+        SEManager.Instance.Play(
+                    audioPath: SEPath.MATCHED,      //再生したいオーディオのパス
+                    volumeRate: 1,                //音量の倍率
+                    delay: 0.0f,                     //再生されるまでの遅延時間
+                    pitch: 1,                     //ピッチ
+                    isLoop: false,                 //ループ再生するか
+                    callback: null                //再生終了後の処理
+                );
+
+        await roomModel.LeaveAsync();
 
 
             Debug.Log("マッチ:" + roomName);
@@ -371,6 +390,15 @@ public class GameDirector : MonoBehaviour
     //ユーザーが入室したときの処理
     private void OnJoinedUser(JoinedUser user)
     {
+        SEManager.Instance.Play(
+                  audioPath: SEPath.JOIN,      //再生したいオーディオのパス
+                  volumeRate: 1,                //音量の倍率
+                  delay: 0.0f,                     //再生されるまでの遅延時間
+                  pitch: 1,                     //ピッチ
+                  isLoop: false,                 //ループ再生するか
+                  callback: null                //再生終了後の処理
+              );
+
         bool isJoined = false;
 
         if (joinedId != null)
@@ -543,6 +571,16 @@ public class GameDirector : MonoBehaviour
     //切断処理
     public async void DisConnectRoom()
     {
+        SEManager.Instance.Play(
+                  audioPath: SEPath.TAP,      //再生したいオーディオのパス
+                  volumeRate: 1,                //音量の倍率
+                  delay: 0.0f,                     //再生されるまでの遅延時間
+                  pitch: 1,                     //ピッチ
+                  isLoop: false,                 //ループ再生するか
+                  callback: null                //再生終了後の処理
+              );
+
+
         Array.Clear(joinedId, 0, joinedId.Length);
         matchBtn.SetActive(true);
         //同期通信解除
@@ -638,10 +676,9 @@ public class GameDirector : MonoBehaviour
         //プレイヤーがいなかったら
         if (!characterList.ContainsKey(roomModel.ConnectionId))
         {
-            Debug.Log("いないよ");
             return;
         }
-        Debug.Log("いるよ");
+        
         //コンポーネント付与
         //characterList[roomModel.ConnectionId].transform.GetChild(0).gameObject.GetComponent<PlayerAnimation>().Init();
 
@@ -770,6 +807,15 @@ public class GameDirector : MonoBehaviour
     //ボール取得処理
     private async void GetBall(Guid getUserId)
     {
+        SEManager.Instance.Play(
+                  audioPath: SEPath.GET,      //再生したいオーディオのパス
+                  volumeRate: 1,                //音量の倍率
+                  delay: 0.0f,                     //再生されるまでの遅延時間
+                  pitch: 1,                     //ピッチ
+                  isLoop: false,                 //ループ再生するか
+                  callback: null                //再生終了後の処理
+              );
+
         Debug.Log(getUserId);
 
         //タグ変更
@@ -1019,6 +1065,14 @@ public class GameDirector : MonoBehaviour
                 isLoop: false,                 //ループ再生するか
                 callback: null                //再生終了後の処理
             );
+            SEManager.Instance.Play(
+                  audioPath: SEPath.DEAD,      //再生したいオーディオのパス
+                  volumeRate: 1,                //音量の倍率
+                  delay: 0.0f,                     //再生されるまでの遅延時間
+                  pitch: 1,                     //ピッチ
+                  isLoop: false,                 //ループ再生するか
+                  callback: null                //再生終了後の処理
+              );
         }
 
         if (deadData.ConnectionId == roomModel.ConnectionId)
