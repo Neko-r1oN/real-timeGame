@@ -15,6 +15,7 @@ using KanKikuchi.AudioManager;
 using UnityEngine.InputSystem.XR;
 using MessagePack.Resolvers;
 using Newtonsoft.Json.Linq;
+using System.Linq;
 
 
 
@@ -74,6 +75,9 @@ public class GameDirector : MonoBehaviour
     [SerializeField] GameObject spawnStandUIObj;
 
     [SerializeField] GameObject controller;
+
+    //切断UI
+    [SerializeField] GameObject disconnectUI;
     public bool isStart;
     public float time;              //生存時間
 
@@ -139,9 +143,12 @@ public class GameDirector : MonoBehaviour
         READY = 2,            //準備完了中
         COUNTDOWN = 3,        //開始カウント中
         START = 4,            //ゲーム中
+        FINISH = 5,           //終了
+        ERROR,                //エラー(切断)
     }
 
     GAME_STATE game_State = GAME_STATE.STOP;
+    private int MAX_PLAYER = 4;
 
     Color RedColor = new Color32(247, 33, 73, 255);
     Color BlueColor = new Color32(33, 112, 247, 255);
@@ -411,6 +418,19 @@ public class GameDirector : MonoBehaviour
                 if (id == user.ConnectionId) return;
             }
         }
+
+
+        if (user.JoinOrder > MAX_PLAYER)
+        {
+            return;
+            /*joinUI.SetActive(false);
+            standByUI.SetActive(false);
+            controller.SetActive(false);
+
+            game_State = GAME_STATE.START;*/
+        }
+        
+      
         //マスターチェック
         roomModel.OnMasterCheck(user);
 
@@ -550,7 +570,7 @@ public class GameDirector : MonoBehaviour
             isPlayer = true;
 
             //入室番号
-            Debug.Log("入室番号:"+user.JoinOrder);
+            Debug.Log("入室番号:" + user.JoinOrder);
 
         }
         else
@@ -561,7 +581,7 @@ public class GameDirector : MonoBehaviour
 
             characterObject.tag = "Enemy";
 
-            
+
         }
        
         child.SetActive(true);
@@ -637,7 +657,44 @@ public class GameDirector : MonoBehaviour
         {
            return;
         }
-       
+
+        //エラー状態以外の場合のみ
+        if (game_State != GAME_STATE.ERROR)
+        {
+            // 新しい配列を作成して、要素を移動する
+            Guid[] newArray = new Guid[joinedId.Length - 1];
+            int newIndex = 0;
+
+            int loop = 0;
+
+            joinedId = Array.FindAll(joinedId, i => i != connnectionId).ToArray();
+
+            /*
+            foreach (Guid id in joinedId)
+            {
+                if (id != connnectionId)
+                {
+                    newArray[newIndex] = joinedId[loop];
+                    newIndex++;
+                    loop++;
+                }
+            }
+
+            Array.Clear(joinedId, 0, joinedId.Length);
+
+            //取得したIDを再保存
+            joinedId = newArray;
+            foreach (Guid id in joinedId)
+            {
+                Debug.Log(id);
+            }*/
+        }
+
+        if (game_State == GAME_STATE.START)
+        {
+            game_State = GAME_STATE.ERROR;
+            disconnectUI.SetActive(true);
+        }
 
         //退出したプレイヤーのオブジェクト削除
         Destroy(characterList[connnectionId]);
@@ -662,7 +719,7 @@ public class GameDirector : MonoBehaviour
         //プレイヤー判定をリセット
         isPlayer = false;
 
-        game_State = GAME_STATE.STOP;
+        //game_State = GAME_STATE.STOP;
 
         Debug.Log("退出ユーザーオブジェクト削除");
 
@@ -977,19 +1034,10 @@ public class GameDirector : MonoBehaviour
 
     
 
-    public void  GameCount()
-    {
-        
-        game_State = GAME_STATE.START;
-        gameUI.SetActive(true);
-       
-        Debug.Log("カウントダウン開始");
-
-        Invoke("GameStart", 4.0f);
-    }
-
     public async void GameStart()
     {
+        //game_State = GAME_STATE.START;
+
         Text text = matchText.GetComponent<Text>();    
         matchText.GetComponent<TextManager>().enabled = false;
 
@@ -1198,6 +1246,8 @@ public class GameDirector : MonoBehaviour
 
     public void FinishGameUser()
     {
+        game_State = GAME_STATE.FINISH;
+
         Debug.Log("ゲーム終了通知");
 
         // Coroutine（コルーチン）を開始

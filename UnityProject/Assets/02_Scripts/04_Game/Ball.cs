@@ -53,6 +53,9 @@ public class Ball : MonoBehaviour
                 isLoop: false,                 //ƒ‹[ƒvÄ¶‚·‚é‚©
                 callback: null                //Ä¶I—¹Œã‚Ìˆ—
             );
+            GameObject fire = this.gameObject.transform.GetChild(2).gameObject;
+
+            fire.SetActive(false);
 
             this.gameObject.tag = "EasyBall";
 
