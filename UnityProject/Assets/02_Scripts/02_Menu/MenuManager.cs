@@ -17,6 +17,8 @@ public class MenuManager : MonoBehaviour
 
     [SerializeField] GameObject optionCanvas;
 
+    [SerializeField] GameObject tutorialCanvas;
+
     [SerializeField] GameObject roomMenu;
 
     [SerializeField] GameObject controller;
@@ -33,6 +35,7 @@ public class MenuManager : MonoBehaviour
         roomMenu.SetActive(false);
         //controller.SetActive(false);
         optionCanvas.SetActive(false);
+        tutorialCanvas.SetActive(false);
     }
 
     // Update is called once per frame
@@ -48,6 +51,14 @@ public class MenuManager : MonoBehaviour
     public void OnClickOptionBack()
     {
         optionCanvas.SetActive(false);
+    }
+    public void OnClickTutorial()
+    {
+        tutorialCanvas.SetActive(true);
+    }
+    public void OnClickTutorialBack()
+    {
+        tutorialCanvas.SetActive(false);
     }
 
     public void OnClickCharaChange()
