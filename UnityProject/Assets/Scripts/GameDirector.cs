@@ -866,6 +866,25 @@ public class GameDirector : MonoBehaviour
     //ボール取得処理
     private async void GetBall(Guid getUserId)
     {
+        bool isDelete = false;
+
+        //フィールド上のボール検索
+        while (!isDelete)
+        {
+            ballObj = GameObject.Find("Ball");
+
+            if (ballObj)
+            {
+                Destroy(ballObj.gameObject);    //ボール削除
+
+            }
+            else
+            {
+                isDelete = true;
+            }
+        }
+
+
         SEManager.Instance.Play(
                   audioPath: SEPath.GET,      //再生したいオーディオのパス
                   volumeRate: 1,                //音量の倍率
@@ -886,21 +905,9 @@ public class GameDirector : MonoBehaviour
         Debug.Log(this.getUserId);
        
         Debug.Log("取得者ID更新");
-        bool isDelete = false;
-        //フィールド上のボール検索
-        while (isDelete)
-        {
-            ballObj = GameObject.Find("Ball");
-
-            if (ballObj)
-            {
-                Destroy(ballObj.gameObject);    //ボール削除
-                isDelete = true;
-            }
-        }
-
+        
+        //保健用
         ballObj = GameObject.Find("Ball");
-
         if (ballObj) Destroy(ballObj.gameObject);    //ボール削除
 
         //マスタークライアントリセット
