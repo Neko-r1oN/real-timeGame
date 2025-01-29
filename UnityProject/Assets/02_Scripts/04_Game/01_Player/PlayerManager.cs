@@ -148,6 +148,7 @@ public class PlayerManager : MonoBehaviour
         catchButton = GameObject.Find("CatchButton").GetComponent<Button>();
         catchButton.onClick.AddListener(() => OnClickCatch());
 
+        feintbtn.SetActive(true);
         //フェイントボタン
         feintButton = GameObject.Find("FeintButton").GetComponent<Button>();
         feintButton.onClick.AddListener(() => OnClickFeint());
