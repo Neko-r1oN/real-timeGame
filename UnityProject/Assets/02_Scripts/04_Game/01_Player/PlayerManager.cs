@@ -148,7 +148,7 @@ public class PlayerManager : MonoBehaviour
         catchButton = GameObject.Find("CatchButton").GetComponent<Button>();
         catchButton.onClick.AddListener(() => OnClickCatch());
 
-        feintbtn.SetActive(true);
+        
         //フェイントボタン
         feintButton = GameObject.Find("FeintButton").GetComponent<Button>();
         feintButton.onClick.AddListener(() => OnClickFeint());
@@ -162,6 +162,7 @@ public class PlayerManager : MonoBehaviour
         throwbtn = GameObject.Find("ThrowButton");
         feintbtn = GameObject.Find("FeintButton");
 
+        //feintbtn.SetActive(true);
         //ルームモデルの取得
         roomModel = GameObject.Find("RoomModel").GetComponent<RoomModel>();
 
@@ -372,14 +373,14 @@ public class PlayerManager : MonoBehaviour
         if (isHaveBall)
         {
             catchbtn.SetActive(false);
-            throwbtn.SetActive(true);
-            feintbtn.SetActive(true);
+            //throwbtn.SetActive(true);
+            //feintbtn.SetActive(true);
 
         } else if (!isHaveBall)
         {
             catchbtn.SetActive(true);
-            throwbtn.SetActive(false);
-            feintbtn.SetActive(false);
+            //throwbtn.SetActive(false);
+            //feintbtn.SetActive(false);
         }
        
 
@@ -571,18 +572,16 @@ public class PlayerManager : MonoBehaviour
         }
 
         //移動処理
-        if (!isCatch || !isDown || !isThrow || isDead)
-        {
-            if (isDown) return;
-            if (isThrow) return;
-            if(isFeint) return;
-            if(isCatch) return;
+        if (isCatch || isDown || isThrow || isDead || isFeint ) return;
+        
+
+
             Vector3 move = (Camera.main.transform.forward * fixedJoystick.Vertical + Camera.main.transform.right * fixedJoystick.Horizontal) * moveSpeed;
 
             move.y = rigidbody.velocity.y;
 
             rigidbody.velocity = move;
-        }
+        
     }
 
 
@@ -676,7 +675,8 @@ public class PlayerManager : MonoBehaviour
 
     public void OnClickJump()
     {
-        if(!isJump)
+        if(isJump || isDown)return;
+
         SEManager.Instance.Play(
            audioPath: SEPath.JUMP,      //再生したいオーディオのパス
            volumeRate: 1,                //音量の倍率
@@ -692,6 +692,8 @@ public class PlayerManager : MonoBehaviour
 
     public void OnClickCatch()
     {
+        if (isDown || isDead) return;
+
         isDash = false;
         isCatch = true;
 
@@ -711,22 +713,23 @@ public class PlayerManager : MonoBehaviour
     }
     void OnClickThrow()
     {
-      
-        if (!isDead)
-        {
-            if (!isHaveBall) return;
-            if (isFeint) StopAllCoroutines();
 
-            throwbtn.SetActive(false);
+        if (isDown || isDead) return;
 
-            isFeint = false;
-            isThrow = true;
+        if (!isHaveBall) return;
+
+        if (isFeint) StopAllCoroutines();
+
+        throwbtn.SetActive(false);
+
+        isFeint = false;
+        isThrow = true;
 
 
 
-            StartCoroutine(IsThrowOut());
-            StartCoroutine(Shot());
-        }
+        StartCoroutine(IsThrowOut());
+        StartCoroutine(Shot());
+
     }
 
     //フェイント(投げるふり)処理
@@ -1001,8 +1004,6 @@ public class PlayerManager : MonoBehaviour
 
         }
 
-       
-
         //ジャンプの方向を上向きのベクトルに設定
         Vector3 jump_vector = Vector3.up;
         //ジャンプの速度を計算
@@ -1051,16 +1052,7 @@ public class PlayerManager : MonoBehaviour
     //ダウン処理
     private async void DownUser()
     {
-       /*SEManager.Instance.Play(
-                   audioPath: SEPath.PIYOPIYO,      //再生したいオーディオのパス
-                   volumeRate: 1,                //音量の倍率
-                   delay: 0.0f,                     //再生されるまでの遅延時間
-                   pitch: 1,                     //ピッチ
-                   isLoop: false,                 //ループ再生するか
-                   callback: null                //再生終了後の処理
-               );
-       */
-
+       
         isDown = true;
         await roomModel.DownUserAsync(roomModel.ConnectionId);   //ダウン状態通知
 
