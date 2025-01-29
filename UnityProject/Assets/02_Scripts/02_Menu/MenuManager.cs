@@ -15,6 +15,8 @@ public class MenuManager : MonoBehaviour
 
     [SerializeField] GameObject menuCanvas;
 
+    [SerializeField] GameObject optionCanvas;
+
     [SerializeField] GameObject roomMenu;
 
     [SerializeField] GameObject controller;
@@ -30,12 +32,22 @@ public class MenuManager : MonoBehaviour
         menuCanvas.SetActive(false);
         roomMenu.SetActive(false);
         //controller.SetActive(false);
+        optionCanvas.SetActive(false);
     }
 
     // Update is called once per frame
     void Update()
     {
         
+    }
+
+    public void OnClickOption()
+    {
+        optionCanvas.SetActive(true);
+    }
+    public void OnClickOptionBack()
+    {
+        optionCanvas.SetActive(false);
     }
 
     public void OnClickCharaChange()
