@@ -22500,6 +22500,7 @@ MonoBehaviour:
   standUIPrefab: {fileID: 5234659539687981313, guid: b30281bc05ec6b342ac4dc03c4a7da87, type: 3}
   spawnStandUIObj: {fileID: 684249700}
   controller: {fileID: 257428615}
+  reaveButton: {fileID: 7825085943147166590}
   disconnectUI: {fileID: 2028548118}
   isStart: 0
   time: 0

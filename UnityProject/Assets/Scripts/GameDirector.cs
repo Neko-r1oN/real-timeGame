@@ -77,6 +77,8 @@ public class GameDirector : MonoBehaviour
     [SerializeField] GameObject controller;
 
     //切断UI
+    [SerializeField] GameObject reaveButton;
+
     [SerializeField] GameObject disconnectUI;
     public bool isStart;
     public float time;              //生存時間
@@ -1037,6 +1039,7 @@ public class GameDirector : MonoBehaviour
     public async void GameStart()
     {
         //game_State = GAME_STATE.START;
+        reaveButton.SetActive(false);
 
         Text text = matchText.GetComponent<Text>();    
         matchText.GetComponent<TextManager>().enabled = false;
