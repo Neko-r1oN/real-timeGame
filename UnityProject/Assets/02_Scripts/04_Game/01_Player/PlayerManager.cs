@@ -165,7 +165,7 @@ public class PlayerManager : MonoBehaviour
         throwButton = GameObject.Find("ThrowButton").GetComponent<Button>();
         throwButton.onClick.AddListener(() => OnClickThrow());
         
-        gameDirector.Error();
+       
 
         throwbtn = GameObject.Find("ThrowButton");
 
