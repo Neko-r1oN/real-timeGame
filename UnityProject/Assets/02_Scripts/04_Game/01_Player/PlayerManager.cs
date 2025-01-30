@@ -138,48 +138,33 @@ public class PlayerManager : MonoBehaviour
         rigidbody = GetComponent<Rigidbody>();
         hitBox = GetComponent<CapsuleCollider>();
 
-       
 
-        if (fixedJoystick = GameObject.Find("Fixed Joystick").GetComponent<FixedJoystick>()) 
-        {
-            fixedJoystick = GameObject.Find("Fixed Joystick").GetComponent<FixedJoystick>();
-        }
-        else gameDirector.Error();
+        fixedJoystick = GameObject.Find("Fixed Joystick").GetComponent<FixedJoystick>();
+        if (fixedJoystick == null)  gameDirector.Error();
 
         //ジャンプボタン
-        if (jumpButton = GameObject.Find("JumpButton").GetComponent<Button>())
-        {
-            jumpButton = GameObject.Find("JumpButton").GetComponent<Button>();
-            jumpButton.onClick.AddListener(() => OnClickJump());
-        }
-        else gameDirector.Error();
-        
+        jumpButton = GameObject.Find("JumpButton").GetComponent<Button>();
+        if (jumpButton == null) gameDirector.Error();
+        else jumpButton.onClick.AddListener(() => OnClickJump());
+
         //キャッチボタン
-        if (catchButton = GameObject.Find("CatchButton").GetComponent<Button>())
-        {
-            catchButton = GameObject.Find("CatchButton").GetComponent<Button>();
-            catchButton.onClick.AddListener(() => OnClickCatch());
-        }
+        catchButton = GameObject.Find("CatchButton").GetComponent<Button>();
+        if (catchButton == null) catchButton.onClick.AddListener(() => OnClickCatch());
         else gameDirector.Error();
 
         catchbtn = GameObject.Find("CatchButton");
 
         //フェイントボタン
-        if (feintButton = GameObject.Find("FeintButton").GetComponent<Button>())
-        {
-            feintButton = GameObject.Find("FeintButton").GetComponent<Button>();
-            feintButton.onClick.AddListener(() => OnClickFeint());
-        }
+        feintButton = GameObject.Find("FeintButton").GetComponent<Button>();
+        if (feintButton == null) feintButton.onClick.AddListener(() => OnClickFeint());
         else gameDirector.Error();
 
         feintbtn = GameObject.Find("FeintButton");
 
         //投げるボタン
-        if (throwButton = GameObject.Find("ThrowButton").GetComponent<Button>())
-        {
-            throwButton = GameObject.Find("ThrowButton").GetComponent<Button>();
-            throwButton.onClick.AddListener(() => OnClickThrow());
-        }
+        throwButton = GameObject.Find("ThrowButton").GetComponent<Button>();
+        if (throwButton == null) throwButton.onClick.AddListener(() => OnClickThrow());
+        
         else gameDirector.Error();
 
         throwbtn = GameObject.Find("ThrowButton");
