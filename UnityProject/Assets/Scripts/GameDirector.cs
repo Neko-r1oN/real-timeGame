@@ -413,7 +413,7 @@ public class GameDirector : MonoBehaviour
 
         Debug.Log("マッチ:" + roomName);
 
-        game_State = GAME_STATE.READY;
+        
 
         if (!isMatch)
         {
@@ -461,7 +461,8 @@ public class GameDirector : MonoBehaviour
 
             game_State = GAME_STATE.START;*/
         }
-        
+
+        if(game_State != GAME_STATE.MATCHING)
       
         //マスターチェック
         roomModel.OnMasterCheck(user);
@@ -1084,7 +1085,8 @@ public class GameDirector : MonoBehaviour
         yield return new WaitForSeconds(3.0f);//5秒待つ
         Debug.Log("自動レディ");
 
-        Ready();
+        //自身のキャラクターが生成されていたら
+        if(characterList.ContainsKey(roomModel.ConnectionId)) Ready();
     }
 
     public async void Ready()
