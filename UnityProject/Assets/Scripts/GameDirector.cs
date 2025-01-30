@@ -1116,7 +1116,10 @@ public class GameDirector : MonoBehaviour
         Ready.SetActive(true);
 
     }
-
+    public void Error()
+    {
+        errorUI.SetActive(true );
+    }
     
 
     public async void GameStart()
