@@ -336,7 +336,7 @@ public class GameDirector : MonoBehaviour
             //ボール取得
             ballObj = GameObject.Find("Ball");
             //ボールが存在したら
-            if (ballObj) Destroy(ballObj.gameObject);    //ボール削除
+            if (ballObj) Destroy(ballObj.gameObject);    //ボール削除(保健用)
         }
     }
 
@@ -900,11 +900,8 @@ public class GameDirector : MonoBehaviour
     {
 
         isBallElsePlayer = true;
-             
-        bool isDelete = false;
-
-
-        //保健用
+         
+        //ボール削除
         ballObj = GameObject.Find("Ball");
 
         if (ballObj) Destroy(ballObj.gameObject);    //ボール削除
