@@ -145,11 +145,11 @@ public class GameDirector : MonoBehaviour
     public enum GAME_STATE
     {
         STOP = 0,             //停止中
-        MATCHING = 1,         //マッチング中
-        READY = 2,            //準備中
-        READYED = 3,          //準備完了中
-        START = 4,            //ゲーム中
-        FINISH = 5,           //終了
+        MATCHING ,         //マッチング中
+        READY ,            //準備中
+        READYED ,          //準備完了中
+        START ,            //ゲーム中
+        FINISH ,           //終了
         ERROR,                //エラー(切断)
     }
 
@@ -314,10 +314,16 @@ public class GameDirector : MonoBehaviour
             case GAME_STATE.READY:
                 standByUI.SetActive(true);
                 break;
+            case GAME_STATE.MATCHING:
+                standByUI.SetActive(true);
+                break;
+            case GAME_STATE.READYED:
+                standByUI.SetActive(true);
+                break;
             case GAME_STATE.START:
                 standByUI.SetActive(false);
                 break;
-            case GAME_STATE.STOP:
+            default:
                 standByUI.SetActive(false);
                 break;
         }
