@@ -722,7 +722,7 @@ public class GameDirector : MonoBehaviour
             }*/
         }
 
-        if (game_State == GAME_STATE.MATCHING || game_State == GAME_STATE.READY || game_State == GAME_STATE.READYED || game_State == GAME_STATE.START)
+        if (game_State == GAME_STATE.READY || game_State == GAME_STATE.READYED || game_State == GAME_STATE.START)
         {
             game_State = GAME_STATE.ERROR;
             disconnectUI.SetActive(true);
