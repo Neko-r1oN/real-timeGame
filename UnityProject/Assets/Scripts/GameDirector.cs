@@ -1065,7 +1065,7 @@ public class GameDirector : MonoBehaviour
 
         Debug.Log("準備フェーズ");
         leaveButton.SetActive(false);
-        ReadyButton.SetActive(true);
+        //ReadyButton.SetActive(true);
 
         //コルーチンをスタートさせる
         autoReady = StartCoroutine(AutoReady());
@@ -1081,7 +1081,7 @@ public class GameDirector : MonoBehaviour
 
     IEnumerator AutoReady()
     {
-        yield return new WaitForSeconds(5.0f);//5秒待つ
+        yield return new WaitForSeconds(3.0f);//5秒待つ
         Debug.Log("自動レディ");
 
         Ready();
