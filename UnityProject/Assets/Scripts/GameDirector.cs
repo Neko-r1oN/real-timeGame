@@ -77,9 +77,13 @@ public class GameDirector : MonoBehaviour
     [SerializeField] GameObject controller;
 
     //切断UI
-    [SerializeField] GameObject reaveButton;
+    [SerializeField] GameObject leaveButton;
+    //切断UI
+    [SerializeField] GameObject ReadyButton;
 
     [SerializeField] GameObject disconnectUI;
+
+    [SerializeField] GameObject errorUI;
     public bool isStart;
     public float time;              //生存時間
 
@@ -141,9 +145,9 @@ public class GameDirector : MonoBehaviour
     public enum GAME_STATE
     {
         STOP = 0,             //停止中
-        PREPARATION = 1,      //準備中
-        READY = 2,            //準備完了中
-        COUNTDOWN = 3,        //開始カウント中
+        MATCHING = 1,         //マッチング中
+        READY = 2,            //準備中
+        READYED = 3,          //準備完了中
         START = 4,            //ゲーム中
         FINISH = 5,           //終了
         ERROR,                //エラー(切断)
@@ -167,6 +171,11 @@ public class GameDirector : MonoBehaviour
     Dictionary<Guid, GameObject> scoreUIList = new Dictionary<Guid, GameObject>();
     //リザルトUIリスト
     Dictionary<Guid, GameObject> resultUIList = new Dictionary<Guid, GameObject>();
+
+    //コルーチン
+    Coroutine autoReady;
+
+    Coroutine timeOut;
 
     void Awake()
     {
@@ -232,7 +241,10 @@ public class GameDirector : MonoBehaviour
         roomModel.MoveCursor += this.MovedCursor;
 
         roomModel.DownUser += this.DownUser;             //ボールヒット
+
         roomModel.DownBackUser += this.DownBackUser;             //ボールヒット
+
+        roomModel.StandUser += this.Stand;         //ユーザー準備完了
 
         roomModel.ReadyUser += this.ReadyUser;         //ユーザー準備完了
 
@@ -331,7 +343,7 @@ public class GameDirector : MonoBehaviour
 
         cursor.SetActive(true);
 
-        game_State = GAME_STATE.READY;
+        game_State = GAME_STATE.MATCHING;
 
 
         await roomModel.JoinAsync(roomName.text, userModel.userId);     //ルーム名とユーザーIDを渡して入室
@@ -359,7 +371,9 @@ public class GameDirector : MonoBehaviour
         menuCanvas.SetActive(true);
          cursor.SetActive(true);
 
-         await roomModel.JoinLobbyAsync(userModel.userId);     //ルーム名とユーザーIDを渡して入室
+        game_State = GAME_STATE.MATCHING;
+
+        await roomModel.JoinLobbyAsync(userModel.userId);     //ルーム名とユーザーIDを渡して入室
 
         game_State = GAME_STATE.READY;
 
@@ -381,9 +395,9 @@ public class GameDirector : MonoBehaviour
         await roomModel.LeaveAsync();
 
 
-            Debug.Log("マッチ:" + roomName);
+        Debug.Log("マッチ:" + roomName);
 
-
+        game_State = GAME_STATE.READY;
 
         if (!isMatch)
         {
@@ -692,7 +706,7 @@ public class GameDirector : MonoBehaviour
             }*/
         }
 
-        if (game_State == GAME_STATE.START)
+        if (game_State == GAME_STATE.MATCHING || game_State == GAME_STATE.READY || game_State == GAME_STATE.READYED || game_State == GAME_STATE.START)
         {
             game_State = GAME_STATE.ERROR;
             disconnectUI.SetActive(true);
@@ -1033,25 +1047,81 @@ public class GameDirector : MonoBehaviour
         //await roomModel.UpdateStateUser(connectionId,userState);
     }
     //ユーザー準備完了処理
-    public async void ReadyUser(bool isReady)
+    public async void Stand()
     {
-        isReady = true;
-        await roomModel.ReadyAsync(isReady);
-        Debug.Log("準備完了");
+        Text text = matchText.GetComponent<Text>();
+        matchText.GetComponent<TextManager>().enabled = false;
+
+        text.text = "レディ?";
+
         game_State = GAME_STATE.READY;
+
+        Debug.Log("準備フェーズ");
+        leaveButton.SetActive(false);
+        ReadyButton.SetActive(true);
+
+        //コルーチンをスタートさせる
+        autoReady = StartCoroutine(AutoReady());
+        timeOut = StartCoroutine(TimeOutError());
+
+    }
+    IEnumerator TimeOutError()
+    {
+        yield return new WaitForSeconds(7.0f);//5秒待つ
+        errorUI.SetActive(true);
+        
+    }
+
+    IEnumerator AutoReady()
+    {
+        yield return new WaitForSeconds(5.0f);//5秒待つ
+        Debug.Log("自動レディ");
+
+        Ready();
+    }
+
+    public async void Ready()
+    {
+        //準備ボタン非表示
+        ReadyButton.SetActive(false);
+
+        bool isReady = true;
+        await roomModel.ReadyAsync(roomModel.ConnectionId, isReady);
+        Debug.Log("準備完了");
+    }
+
+    //ユーザー準備完了通知処理
+    public async void ReadyUser(Guid id, bool isReady)
+    {
+        SEManager.Instance.Play(
+            audioPath: SEPath.READY,        //再生したいオーディオのパス
+            volumeRate: 1,                //音量の倍率
+            delay: 0,                     //再生されるまでの遅延時間
+            pitch: 1,                     //ピッチ
+            isLoop: false,                 //ループ再生するか
+            callback: null                //再生終了後の処理
+        );
+
+        //受け取ったプレイヤーのUI更新
+        GameObject Ready = standUIList[id].transform.GetChild(4).gameObject;
+        Ready.SetActive(true);
+
     }
 
     
 
     public async void GameStart()
     {
-        //game_State = GAME_STATE.START;
-        reaveButton.SetActive(false);
+        //コルーチンを止める
+        StopCoroutine(timeOut);
+
+        game_State = GAME_STATE.READYED;
+        leaveButton.SetActive(false);
 
         Text text = matchText.GetComponent<Text>();    
         matchText.GetComponent<TextManager>().enabled = false;
 
-        text.text = "マッチング成立";
+        text.text = "試合決定！";
 
         StartCoroutine(StartCount());
     }

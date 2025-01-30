@@ -18,6 +18,7 @@ public static class SEPath{
 	public const string JUMPED     = "SE/01_Player/jumped";
 	public const string MATCHED    = "SE/00_System/Matched";
 	public const string PIYOPIYO   = "SE/piyopiyo";
+	public const string READY      = "SE/00_System/Ready";
 	public const string TAP        = "SE/00_System/Tap";
 	public const string THROW      = "SE/01_Player/throw";
 

@@ -8,6 +8,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.Playables;
 using static UnityEngine.UIElements.UxmlAttributeDescription;
@@ -52,8 +53,11 @@ public class RoomModel : BaseModel, IRoomHubReceiver
     //ユーザーダウン復帰
     public Action<Guid> DownBackUser { get; set; }
 
+    //準備遷移通知
+    public Action StandUser { get; set; }
+
     //ユーザー準備状態確認通知
-    public Action<bool> ReadyUser { get; set; }
+    public Action<Guid,bool> ReadyUser { get; set; }
 
     //ゲームカウント開始通知
     public Action StartGameCount { get; set; }
@@ -321,15 +325,21 @@ public class RoomModel : BaseModel, IRoomHubReceiver
         DownBackUser(downUserId);
     }
 
-    //準備完了処理
-    public async Task ReadyAsync(bool isReady)
+    //準備状態遷移
+    public void OnStand()
     {
-        await roomHub.ReadyAsync(isReady);
+        StandUser();
     }
 
-    public void Ready(bool isStart)
+    //準備完了処理
+    public async Task ReadyAsync(Guid id ,bool isReady)
     {
-        ReadyUser(isStart);
+        await roomHub.ReadyAsync(id,isReady);
+    }
+    //通知
+    public void Ready(Guid id, bool isStart)
+    {
+        ReadyUser(id, isStart);
     }
     //準備完了通知
    

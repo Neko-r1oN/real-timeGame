@@ -98,11 +98,11 @@ namespace StreamingHubs
 
                     Console.WriteLine("プラべ:" + roomName);
                     Console.WriteLine("ゲーム開始");
+
+                    //準備確認フェーズ
+                    this.Broadcast(room).OnStand();
                     //ゲーム開始通知
-                    this.Broadcast(room).StartGame();
-
-
-
+                    //this.Broadcast(room).StartGame();
                 }
 
                 return joinedUserList;
@@ -211,7 +211,11 @@ namespace StreamingHubs
 
         }
 
-
+        public async Task StandAcync()
+        {
+            //準備状態通知
+            this.Broadcast(room).OnStand();
+        }
         /// <summary>
         /// 移動処理
         /// </summary>
@@ -357,7 +361,7 @@ namespace StreamingHubs
         /// </summary>
         /// <param name="isReady">準備状態</param>
         /// <returns></returns>
-        public async Task ReadyAsync(bool isReady)
+        public async Task ReadyAsync(Guid id ,bool isReady)
         {
             //準備できたことを自分のRoomDataに保存
             var roomDataStrage = this.room.GetInMemoryStorage<RoomData>();
@@ -365,19 +369,25 @@ namespace StreamingHubs
             roomData.UserState.isReady = isReady;
 
             Console.WriteLine("準備完了");
+            this.Broadcast(room).Ready(id,isReady);
 
-            bool isAllReady = true;
-
-            RoomData[] roomDataList = roomDataStrage.AllValues.ToArray<RoomData>();
-            //参加ユーザー分準備チェック
-            foreach (var data in roomDataList)
+            //排他制御
+            lock (roomDataStrage)
             {
-                //準備完了していないユーザーがいた場合
-                if (!data.UserState.isReady) isAllReady = false;
-            }
 
-            if (isAllReady)//ルーム参加者全員に準備状態通知を送信
-            this.BroadcastExceptSelf(room).Ready(isAllReady);
+                bool isAllReady = true;
+                RoomData[] roomDataList = roomDataStrage.AllValues.ToArray<RoomData>();
+                //参加ユーザー分準備チェック
+                foreach (var data in roomDataList)
+                {
+                    //準備完了していないユーザーがいた場合
+                    if (!data.UserState.isReady) isAllReady = false;
+                }
+
+                //ルーム参加者全員に準備状態通知を送信
+                if (isAllReady) this.Broadcast(room).StartGame();
+
+            }
             
         }
 
@@ -438,7 +448,7 @@ namespace StreamingHubs
 
         public async Task FinishGameAsync()
         {
-            //接続IDが1番のクライアントのみ実行
+            //終了通知
             this.Broadcast(room).FinishGame();
         }
 

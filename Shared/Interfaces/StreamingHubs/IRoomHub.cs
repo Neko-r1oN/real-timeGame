@@ -99,11 +99,12 @@ namespace Shared.Interfaces.StreamingHubs
 
 
         /// <summary>
-        /// 全ユーザー準備状態確認関数
+        ///  全ユーザー準備状態確認関数
         /// </summary>
-        /// <param name="isAllUserReady"></param>
+        /// <param name="id">準備完了ユーザー</param>
+        /// <param name="isAllUserReady">全員行けるか</param>
         /// <returns></returns>
-        Task ReadyAsync(bool isAllUserReady);
+        Task ReadyAsync(Guid id, bool isAllUserReady);
 
         /// <summary>
         /// ユーザー状態更新関数

@@ -24,6 +24,9 @@ namespace Shared.Interfaces.StreamingHubs
         //マッチング成立通知
         void OnMatch(string roomName);
 
+        //指定人数集合通知
+        void OnStand();
+
         //サーバーの退出通知
         void Leave(Guid connectionId);
 
@@ -55,7 +58,7 @@ namespace Shared.Interfaces.StreamingHubs
         void UpdateUserState(Guid connectionId, UserState state);
 
         //全ユーザー準備完了通知
-        void Ready(bool isAllUserReady);
+        void Ready(Guid id ,bool isAllUserReady);
 
         //ゲーム内カウント開始通知
         //void StartGame();

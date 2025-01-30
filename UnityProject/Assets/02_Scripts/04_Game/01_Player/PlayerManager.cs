@@ -977,7 +977,8 @@ public class PlayerManager : MonoBehaviour
             Debug.Log("所持に変更");
             yield break; // ここでコルーチン終了  
         }
-       
+        //isHaveBall = true;
+
     }
     //当たり判定変更
     IEnumerator ChangeThrowHitBox()
