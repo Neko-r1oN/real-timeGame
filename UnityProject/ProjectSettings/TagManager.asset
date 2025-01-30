@@ -13,6 +13,7 @@ TagManager:
   - BallPlayer
   - Down
   - Wall
+  - Warp
   layers:
   - Default
   - TransparentFX

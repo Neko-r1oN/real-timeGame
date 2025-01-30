@@ -830,10 +830,10 @@ public class PlayerManager : MonoBehaviour
             isGround = true;
         }
 
-        //クリア判定オブジェクト(デバッグ用)
-        if (other.gameObject.tag == "Clear")
+        //場外オブジェクト
+        if (other.gameObject.tag == "Warp")
         {
-            DeadUser();
+            this.gameObject.transform.position = new Vector3(0.0f,0.7f,-0.6f);
         }
 
         //ボールオブジェクト

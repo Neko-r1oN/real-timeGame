@@ -61,5 +61,10 @@ public class Ball : MonoBehaviour
 
 
         }
+        //場外オブジェクト
+        if (collision.gameObject.tag == "Warp")
+        {
+            this.gameObject.transform.position = new Vector3(0.0f, 0.7f, -0.6f);
+        }
     }
 }
