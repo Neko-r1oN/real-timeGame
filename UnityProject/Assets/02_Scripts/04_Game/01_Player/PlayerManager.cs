@@ -140,32 +140,32 @@ public class PlayerManager : MonoBehaviour
 
 
         fixedJoystick = GameObject.Find("Fixed Joystick").GetComponent<FixedJoystick>();
-        if (fixedJoystick == null)  gameDirector.Error();
+        
 
         //ジャンプボタン
         jumpButton = GameObject.Find("JumpButton").GetComponent<Button>();
-        if (jumpButton == null) gameDirector.Error();
-        else jumpButton.onClick.AddListener(() => OnClickJump());
+       
+        jumpButton.onClick.AddListener(() => OnClickJump());
 
         //キャッチボタン
         catchButton = GameObject.Find("CatchButton").GetComponent<Button>();
-        if (catchButton == null) catchButton.onClick.AddListener(() => OnClickCatch());
-        else gameDirector.Error();
+        catchButton.onClick.AddListener(() => OnClickCatch());
+       
 
         catchbtn = GameObject.Find("CatchButton");
 
         //フェイントボタン
         feintButton = GameObject.Find("FeintButton").GetComponent<Button>();
-        if (feintButton == null) feintButton.onClick.AddListener(() => OnClickFeint());
-        else gameDirector.Error();
+        feintButton.onClick.AddListener(() => OnClickFeint());
+        
 
         feintbtn = GameObject.Find("FeintButton");
 
         //投げるボタン
         throwButton = GameObject.Find("ThrowButton").GetComponent<Button>();
-        if (throwButton == null) throwButton.onClick.AddListener(() => OnClickThrow());
+        throwButton.onClick.AddListener(() => OnClickThrow());
         
-        else gameDirector.Error();
+        gameDirector.Error();
 
         throwbtn = GameObject.Find("ThrowButton");
 
