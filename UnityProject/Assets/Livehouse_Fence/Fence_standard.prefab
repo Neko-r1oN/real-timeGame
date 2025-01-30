@@ -11,6 +11,7 @@ GameObject:
   - component: {fileID: 7772593979170180485}
   - component: {fileID: 2763668323270046332}
   - component: {fileID: 1659044076164045358}
+  - component: {fileID: 5400048626289233877}
   m_Layer: 0
   m_Name: Fence_standard
   m_TagString: Wall
@@ -107,5 +108,26 @@ BoxCollider:
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3
-  m_Size: {x: 0.028352655, y: 0.005910978, z: 0.09822108}
-  m_Center: {x: 0.0010153869, y: -0.0013290596, z: 0.049000572}
+  m_Size: {x: 0.028352655, y: 0.04402724, z: 0.09822108}
+  m_Center: {x: 0.0010153846, y: 0.017729083, z: 0.049000572}
+--- !u!65 &5400048626289233877
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6959782879886251839}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 0
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Size: {x: 0.017760552, y: 0.0035803386, z: 0.008646235}
+  m_Center: {x: 0.00045765936, y: -0.001078615, z: 0.0042144577}
