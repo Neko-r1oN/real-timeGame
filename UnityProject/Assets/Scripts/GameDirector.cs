@@ -114,6 +114,8 @@ public class GameDirector : MonoBehaviour
     private bool isBall;
     private bool isMatch;
 
+    private bool isBallElsePlayer = false;
+
     GameObject ballObj;
 
     [SerializeField] GameObject ballPrefab;
@@ -297,8 +299,8 @@ public class GameDirector : MonoBehaviour
         }*/
 
         // if (!isPlayer) return;
-        
-        if(isStart)
+
+        if (isStart)
         {
 
             //生存時間更新
@@ -309,7 +311,7 @@ public class GameDirector : MonoBehaviour
         //Debug.Log(game_State);
         switch (game_State)
         {
-            
+
 
             case GAME_STATE.READY:
                 standByUI.SetActive(true);
@@ -327,13 +329,21 @@ public class GameDirector : MonoBehaviour
                 standByUI.SetActive(false);
                 break;
         }
-      
+
+        //他のプレイヤーがボールを持っていたら
+        if (isBallElsePlayer)
+        {
+            //ボール取得
+            ballObj = GameObject.Find("Ball");
+            //ボールが存在したら
+            if (ballObj) Destroy(ballObj.gameObject);    //ボール削除
+        }
     }
 
 
 
-    //入室処理
-    public async void JoinRoom()
+        //入室処理
+        public async void JoinRoom()
     {
         SEManager.Instance.Play(
                   audioPath: SEPath.TAP,      //再生したいオーディオのパス
@@ -873,6 +883,8 @@ public class GameDirector : MonoBehaviour
         //投げたユーザーのIDを保存
         enemyId = throwData.ConnectionId;
 
+        isBallElsePlayer = false;
+
         //投げた座標に玉を生成
         Vector3 pos = characterList[throwData.ConnectionId].transform.position;
         GameObject newbullet = Instantiate(ballPrefab, new Vector3(pos.x, pos.y, pos.z), Quaternion.identity); //弾を生成
@@ -886,24 +898,16 @@ public class GameDirector : MonoBehaviour
     //ボール取得処理
     private async void GetBall(Guid getUserId)
     {
+
+        isBallElsePlayer = true;
+             
         bool isDelete = false;
 
-        //フィールド上のボール検索
-        while (!isDelete)
-        {
-            ballObj = GameObject.Find("Ball");
 
-            if (ballObj)
-            {
-                Destroy(ballObj.gameObject);    //ボール削除
+        //保健用
+        ballObj = GameObject.Find("Ball");
 
-            }
-            else
-            {
-                isDelete = true;
-            }
-        }
-
+        if (ballObj) Destroy(ballObj.gameObject);    //ボール削除
 
         SEManager.Instance.Play(
                   audioPath: SEPath.GET,      //再生したいオーディオのパス
