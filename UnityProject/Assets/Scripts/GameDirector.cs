@@ -1074,7 +1074,7 @@ public class GameDirector : MonoBehaviour
     }
     IEnumerator TimeOutError()
     {
-        yield return new WaitForSeconds(7.0f);//5秒待つ
+        yield return new WaitForSeconds(5.0f);//5秒待つ
         errorUI.SetActive(true);
         
     }

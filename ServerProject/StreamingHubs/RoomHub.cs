@@ -385,7 +385,7 @@ namespace StreamingHubs
                 }
 
                 //ルーム参加者全員に準備状態通知を送信
-                if (isAllReady) this.Broadcast(room).StartGame();
+                if (isAllReady && roomDataList.Length == MAX_PLAYER) this.Broadcast(room).StartGame();
 
             }
             
