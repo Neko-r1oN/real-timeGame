@@ -1363,7 +1363,7 @@ public class GameDirector : MonoBehaviour
         await roomModel.LeaveAsync();
 
         //MagicOnion切断処理
-        await roomModel.DisConnectAsync();
+        //await roomModel.DisConnectAsync();
 
         //シーン再読み込み
         SceneManager.LoadScene(SceneManager.GetActiveScene().name);
