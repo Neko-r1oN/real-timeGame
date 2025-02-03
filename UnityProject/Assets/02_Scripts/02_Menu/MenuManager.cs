@@ -1,3 +1,10 @@
+////////////////////////////////////////////////////////////////////////////
+///
+///  メニューUIマネージャースクリプト
+///  Author : 川口京佑  2025.01/28
+///
+////////////////////////////////////////////////////////////////////////////
+
 using Cinemachine;
 using Shared.Model.Entity;
 using System.Collections;
@@ -8,23 +15,15 @@ using UnityEngine.UI;
 
 public class MenuManager : MonoBehaviour
 {
-    public CinemachineVirtualCameraBase menuCam;
-    public CinemachineVirtualCameraBase charaCam;
+    private CinemachineVirtualCameraBase menuCam;     //メニュー画面カメラ
+    private CinemachineVirtualCameraBase charaCam;    //キャラクター選択画面カメラ
 
-    [SerializeField] InputField roomName;
+    [SerializeField] private InputField roomName;     //ルーム名
+    [SerializeField] private GameObject menuCanvas;   //メニューキャンバス
+    [SerializeField] private GameObject optionCanvas; //設定キャンバス
+    [SerializeField] private GameObject tutorialCanvas; //操作説明キャンバス
+    [SerializeField] private GameObject roomMenu;     //ルームメニュー
 
-    [SerializeField] GameObject menuCanvas;
-
-    [SerializeField] GameObject optionCanvas;
-
-    [SerializeField] GameObject tutorialCanvas;
-
-    [SerializeField] GameObject roomMenu;
-
-    [SerializeField] GameObject controller;
-
-    [SerializeField] GameObject standbyUI;
-    // Start is called before the first frame update
     void Start()
     {
         //カメラ優先度設定
@@ -33,48 +32,45 @@ public class MenuManager : MonoBehaviour
 
         menuCanvas.SetActive(false);
         roomMenu.SetActive(false);
-        //controller.SetActive(false);
         optionCanvas.SetActive(false);
         tutorialCanvas.SetActive(false);
     }
 
-    // Update is called once per frame
-    void Update()
-    {
-        
-    }
-
+    //設定ボタン用関数
     public void OnClickOption()
     {
         optionCanvas.SetActive(true);
     }
+    //設定解除用関数
     public void OnClickOptionBack()
     {
         optionCanvas.SetActive(false);
     }
+    //あそびかたボタン用関数
     public void OnClickTutorial()
     {
         tutorialCanvas.SetActive(true);
     }
+    //あそびかた解除用関数
     public void OnClickTutorialBack()
     {
         tutorialCanvas.SetActive(false);
     }
-
+    //キャラクター変更用関数
     public void OnClickCharaChange()
     {
         //カメラ優先度設定
         menuCam.Priority = 0;
         charaCam.Priority = 50;
     }
+    //キャラクター変更解除用関数
     public void OnClickBack()
-    {
-        
+    { 
         //カメラ優先度設定
         menuCam.Priority = 50;
         charaCam.Priority = 0;
     }
-
+    //プライベートマッチボタン用関数
     public void OnClickButtle()
     {
         menuCanvas.SetActive(true);
@@ -87,18 +83,16 @@ public class MenuManager : MonoBehaviour
         menuCam.Priority = 0;
         charaCam.Priority = 0;
     }
-
+    //退出
     public void OnClickLeave()
     {
         Debug.Log("退出おした");
-        //standbyUI.SetActive(false);
     }
-
+    //バトル解除用変数
     public void OnClickButtleBack()
     {
         menuCanvas.SetActive(false);
         //カメラ優先度設定
-        // controller.SetActive(false);
         roomMenu.SetActive(false);
         //カメラ優先度設定
         menuCam.Priority = 50;

@@ -1,15 +1,20 @@
+////////////////////////////////////////////////////////////////////////////
+///
+///  スタートテキストスクリプト
+///  Author : 川口京佑  2025.01/28
+///
+////////////////////////////////////////////////////////////////////////////
+
 using System.Collections;
 using System.Collections.Generic;
-using UnityEngine;
 using UnityEngine;
 using UnityEngine.UI;
 
 public class StartText : MonoBehaviour
 {
-
     //インスペクターから設定するか、初期化時にGetComponentして、Imageへの参照を取得しておく。
     [SerializeField]
-    Text img;
+    Text text;
 
     [Header("1ループの長さ(秒単位)")]
     [SerializeField]
@@ -29,14 +34,11 @@ public class StartText : MonoBehaviour
     //インスペクターから設定した場合は、GetComponentする必要がなくなる為、Awakeを削除しても良い。
     void Awake()
     {
-        if (img == null)
-            img = GetComponent<Text>();
+        if (text == null) text = GetComponent<Text>();
     }
 
     void Update()
     {
-        //Color.Lerpに開始の色、終了の色、0～1までのfloatを渡すと中間の色が返される。
-        //Mathf.PingPongに経過時間を渡すと、0～1までの値が返される。
-        img.color = Color.Lerp(startColor, endColor, Mathf.PingPong(Time.time / duration, 1.0f));
+        text.color = Color.Lerp(startColor, endColor, Mathf.PingPong(Time.time / duration, 1.0f));
     }
 }

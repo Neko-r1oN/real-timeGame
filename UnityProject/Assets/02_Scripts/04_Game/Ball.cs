@@ -1,3 +1,10 @@
+////////////////////////////////////////////////////////////////////////////
+///
+///  ボール処理スクリプト
+///  Author : 川口京佑  2025.01/28
+///
+////////////////////////////////////////////////////////////////////////////
+
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -10,41 +17,28 @@ public class Ball : MonoBehaviour
     private CapsuleCollider objectCollider;
     private Rigidbody rb;
 
-
-
-    PlayerManager playerManager;
-
     void Start()
     {
-        
-        this.name = "Ball";
+        this.name = "Ball";   //オブジェクト名変更
 
-        GetComponent<Renderer>().material.color = new Color32(0, 0, 0, 1); //弾の色を黒にする
+        GetComponent<Renderer>().material.color = new Color32(0, 0, 0, 1);
         objectCollider = GetComponent<CapsuleCollider>();
-        objectCollider.isTrigger = false; //Triggerとして扱う
+        objectCollider.isTrigger = false; //当たり判定有効化
         rb = GetComponent<Rigidbody>();
         rb.useGravity = false; //重力を無効にする
-        Invoke("TriggerChange", 0.5f);
+        Invoke("GravityChange", 0.5f);
     }
 
-    private async void TriggerChange()
+    private async void GravityChange()
     {
-        //objectCollider.isTrigger = false; //Triggerとして扱う
-
         rb.useGravity = true; //重力を有効にする
-
     }
 
-    private void Update()
-    {
-        //Debug.Log(this.gameObject.tag);
-    }
     void OnCollisionEnter(Collision collision)
     {
-        if (collision.gameObject.tag == "Ground" || collision.gameObject.tag == "Wall") //タグがEnemyのオブジェクトと衝突した場合
+        //フィールドに当たった場合
+        if (collision.gameObject.tag == "Ground" || collision.gameObject.tag == "Wall") 
         {
-            //cursor.SetActive(false);
-
             SEManager.Instance.Play(
                 audioPath: SEPath.BOUND,      //再生したいオーディオのパス
                 volumeRate: 1,                //音量の倍率
@@ -53,18 +47,14 @@ public class Ball : MonoBehaviour
                 isLoop: false,                 //ループ再生するか
                 callback: null                //再生終了後の処理
             );
+
+            //無害化
             GameObject fire = this.gameObject.transform.GetChild(2).gameObject;
-
             fire.SetActive(false);
-
             this.gameObject.tag = "EasyBall";
-
-
         }
-        //場外オブジェクト
-        if (collision.gameObject.tag == "Warp")
-        {
-            this.gameObject.transform.position = new Vector3(0.0f, 0.7f, -0.6f);
-        }
+        //場外判定にあたった場合
+        if (collision.gameObject.tag == "Warp") this.gameObject.transform.position = new Vector3(0.0f, 0.7f, -0.6f);     //ステージ中央にワープ
+
     }
 }

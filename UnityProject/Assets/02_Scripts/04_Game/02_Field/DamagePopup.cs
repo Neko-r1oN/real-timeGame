@@ -13,21 +13,16 @@ public class DamagePopup : MonoBehaviour
 
     void OnCollisionEnter(Collision other)
     {
-
-        
         //クリア判定オブジェクト(デバッグ用)
         if (other.gameObject.tag == "Player")
         {
             PopDamage();
         }
-
-
     }
+
     //ダメージテキストUI生成関数
     public void PopDamage(/*GameObject target*/)
     {
-        /*targets = target;*/
-
         //コピー生成
         var obj = new GameObject("Target");
         var ui = Instantiate(damageUI);

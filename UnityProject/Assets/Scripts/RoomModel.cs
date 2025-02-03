@@ -1,3 +1,10 @@
+////////////////////////////////////////////////////////////////////////////
+///
+///  ルームモデルスクリプト
+///  Author : 川口京佑  2025.01/28
+///
+////////////////////////////////////////////////////////////////////////////
+
 using Cysharp.Net.Http;
 using Cysharp.Threading.Tasks;
 using Grpc.Net.Client;
@@ -30,7 +37,6 @@ public class RoomModel : BaseModel, IRoomHubReceiver
     public Action<Guid> LeavedUser { get; set; }
     //ユーザーマッチング通知
     public Action<string> MatchedUser { get; set; }
-
     //マスターチェック
     public Action MasterCheckedUser { get; set; }
 
@@ -46,40 +52,31 @@ public class RoomModel : BaseModel, IRoomHubReceiver
 
     //ボールヒット通知
     public Action<HitData> HitBall { get; set; }
-
+    //カーソル移動通知
     public Action<Vector3> MoveCursor { get; set; }
     //ユーザーダウン通知
     public Action<Guid> DownUser { get; set; }
-    //ユーザーダウン復帰
+    //ユーザーダウン復帰通知
     public Action<Guid> DownBackUser { get; set; }
 
     //準備遷移通知
     public Action StandUser { get; set; }
-
     //ユーザー準備状態確認通知
     public Action<Guid,bool> ReadyUser { get; set; }
-
     //ゲームカウント開始通知
     public Action StartGameCount { get; set; }
-
     //カウントダウン通知
     public Action<int> GameCountUser { get; set; }
-
     //ゲームカウント終了通知
     public Action FinishGameCount { get; set; }
-
     //参加者全員のゲーム内カウントダウン終了通知
     public Action FinishGameCountAllUser { get; set; }
-
     //ユーザー状態更新通知
     public Action<Guid,UserState> UpdateStateUser { get; set; }
-
     //ユーザー死亡通知
     public Action<DeadData, int> UserDead { get; set; }
-
     //ゲーム終了通知
     public Action FinishGameUser { get; set; }
-
     //ゲーム開始通知
     public Action StartGameUser { get; set; }
 
@@ -150,10 +147,8 @@ public class RoomModel : BaseModel, IRoomHubReceiver
             OnMasterCheck(user);
 
             OnJoinedUser(user);
-            
         }
 
-       
         //ユーザー状態を入室中に変更
         userState = USER_STATE.JOIN;
 
@@ -163,8 +158,6 @@ public class RoomModel : BaseModel, IRoomHubReceiver
     //入室通知
     public void OnJoin(JoinedUser user)
     {
-
-
         OnJoinedUser(user);
     }
 
@@ -175,23 +168,18 @@ public class RoomModel : BaseModel, IRoomHubReceiver
         //配列に引数で受け取った情報を追加
         await roomHub.JoinLobbyAsync(userId);
 
-       
         Debug.Log("ロビー入室");
-
     }
     //入室通知
     public void OnJoinLobby(JoinedUser user)
     {
-
         OnJoinedUser(user);
     }
 
     //マッチング通知
     public void OnMatch(string roomName)
     {
-
         MatchedUser(roomName);
-
         Debug.Log("マッチング成立:"+  roomName);
     }
 
@@ -199,11 +187,9 @@ public class RoomModel : BaseModel, IRoomHubReceiver
     //退出処理
     public async UniTask LeaveAsync()
     {
-       
         //マスター判定削除
         isMaster = false;
         await roomHub.LeaveAsync();
-
     }
 
     //退出通知
@@ -216,23 +202,13 @@ public class RoomModel : BaseModel, IRoomHubReceiver
     //マスタークライアント判定処理
     public void OnMasterCheck(JoinedUser user)
     {
-        Debug.Log("保ID:" + this.ConnectionId);
-        Debug.Log("貰ID:" + user.ConnectionId);
-
         //マスタークライアント判定
         if (user.ConnectionId == this.ConnectionId && user.JoinOrder == 1)
         {
             Debug.Log(user.UserData.Name + "マスター");
             isMaster = true;
         }
-
-        else
-        {
-            Debug.Log(user.UserData.Name + "マスターじゃない");
-            //isMaster = false;
-        }
-
-
+        else Debug.Log(user.UserData.Name + "マスターじゃない");
     }
 
     //プレイヤー移動処理

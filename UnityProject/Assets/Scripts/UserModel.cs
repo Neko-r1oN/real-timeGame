@@ -1,10 +1,9 @@
-//==============================================================
-//
-//               ユーザーAPI(クライアントサイド)
-//
-//
-//==============================================================
-
+////////////////////////////////////////////////////////////////////////////
+///
+///  ユーザーAPIスクリプト
+///  Author : 川口京佑  2025.01/28
+///
+////////////////////////////////////////////////////////////////////////////
 
 using Cysharp.Net.Http;
 using Cysharp.Threading.Tasks;
@@ -22,15 +21,12 @@ using UnityEngine;
 using Newtonsoft.Json;
 using UnityEngine.Networking;
 
-
-
-
 public class UserModel : BaseModel
 {
     public int userId { get; set; }       //登録ユーザーID
     public string userName { get; set; }   //登録ユーザー名
 
-    public string authToken { get; set; }   //登録ユーザー名
+    public string authToken { get; set; }   //登録ユーザートークン
 
     private static UserModel instance;
 
@@ -45,12 +41,10 @@ public class UserModel : BaseModel
                 instance = gameObj.AddComponent<UserModel>();
                 //シーン移動時に削除しないようにする
                 DontDestroyOnLoad(gameObj);
-
             }
             return instance;
         }
     }
-
 
     //ユーザー移動通知
     public Action<MoveData> MovedUser { get; set; }
@@ -65,20 +59,15 @@ public class UserModel : BaseModel
         var handler = new YetAnotherHttpHandler() { Http2Only = true };
         var channel = GrpcChannel.ForAddress(ServerURL, new GrpcChannelOptions() { HttpHandler = handler });
         var client = MagicOnionClient.Create<IUserService>(channel);
-
         try
         {//登録成功
             Debug.Log("サーバー接続成功");
             User user = await client.RegistUserAsync(name);
-
             //ファイルにユーザーを保存
             this.userName = name;
             this.userId = user.Id;
             this.authToken = user.Token;
-
             SaveUserData();
-          
-
             return true;
         }
         catch (Exception e)
@@ -105,17 +94,14 @@ public class UserModel : BaseModel
         writer.Write(json);
         writer.Flush();
         writer.Close();
-
     }
+
     //ユーザー情報読み込み処理
     public bool LoadUserData()
     {
         //ローカルに存在しない場合
-        if (!File.Exists(Application.persistentDataPath + "/saveData.json"))
-        {
-            return false;
-        }
-
+        if (!File.Exists(Application.persistentDataPath + "/saveData.json")) return false;
+        
         var reader = new StreamReader(Application.persistentDataPath + "/saveData.json");
         string json = reader.ReadToEnd();
         reader.Close();
@@ -128,10 +114,7 @@ public class UserModel : BaseModel
 
         //読み込み判定
         return true;
-
     }
-
-
 
     /// <summary>
     /// ユーザー取得処理
