@@ -8434,8 +8434,6 @@ MonoBehaviour:
   optionCanvas: {fileID: 1387773055}
   tutorialCanvas: {fileID: 1326968712686614936}
   roomMenu: {fileID: 1430274636}
-  controller: {fileID: 257428615}
-  standbyUI: {fileID: 1932873277}
 --- !u!1 &891584968
 GameObject:
   m_ObjectHideFlags: 0
@@ -21953,7 +21951,6 @@ MonoBehaviour:
   roomNameText: {fileID: 0}
   userName: {fileID: 1529245022}
   roomName: {fileID: 4308063517374188667}
-  userId: {fileID: 0}
   matchBtn: {fileID: 1285903651}
   spawnObj: {fileID: 618572594}
   spawnPosList:
@@ -21977,19 +21974,12 @@ MonoBehaviour:
   ReadyButton: {fileID: 1173331879}
   disconnectUI: {fileID: 2028548118}
   errorUI: {fileID: 1736991820}
-  isStart: 0
   time: 0
   gameUI: {fileID: 515404071}
-  player1: {fileID: 21300000, guid: 6cfe8ba1a497f6f408e5773367844aa3, type: 3}
-  player2: {fileID: 21300000, guid: 7ceb9361d680a4041a3be20ae8a27806, type: 3}
-  player3: {fileID: 21300000, guid: 302d0d2ccf8241c45a77968d29b11fd5, type: 3}
-  player4: {fileID: 21300000, guid: 419f92e85e6bff84eabf62451999490e, type: 3}
-  you: {fileID: 21300000, guid: 27f15b56367a8a04babd6a2cad96e5ea, type: 3}
   resultUIPrefab: {fileID: 8141010891727563034, guid: 5b30fd264cd35c447962d46b356404ce, type: 3}
   resultUIPos: {fileID: 1948673796}
   resultObj: {fileID: 594414696}
   ballPrefab: {fileID: 5839582734758495781, guid: f0fafca8199e73e45813f86c78479e3e, type: 3}
-  enemyPoint: 0
   point: 0
   hitNum: 0
   deadNum: 0

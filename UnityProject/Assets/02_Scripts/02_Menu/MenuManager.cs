@@ -15,8 +15,8 @@ using UnityEngine.UI;
 
 public class MenuManager : MonoBehaviour
 {
-    private CinemachineVirtualCameraBase menuCam;     //メニュー画面カメラ
-    private CinemachineVirtualCameraBase charaCam;    //キャラクター選択画面カメラ
+    public CinemachineVirtualCameraBase menuCam;     //メニュー画面カメラ
+    public CinemachineVirtualCameraBase charaCam;    //キャラクター選択画面カメラ
 
     [SerializeField] private InputField roomName;     //ルーム名
     [SerializeField] private GameObject menuCanvas;   //メニューキャンバス

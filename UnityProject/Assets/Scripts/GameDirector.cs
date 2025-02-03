@@ -423,12 +423,12 @@ public class GameDirector : MonoBehaviour
         //プレイヤースコアUI生成
         GameObject charaInfoUI = Instantiate(playerUIPrefab, Vector3.zero, Quaternion.identity, spawnPlayerUIObj.gameObject.transform);
 
-        //コンポーネント付与
-        characterList[user.ConnectionId].transform.GetChild(0).GetComponent<PlayerAnimation>().Init();
+       
 
 
         characterList[user.ConnectionId] = characterObject;     //フィールドで保持
-
+                                                            
+        characterList[user.ConnectionId].transform.GetChild(0).GetComponent<PlayerAnimation>().Init();    //コンポーネント付与
         standUIList[user.ConnectionId] = standByCharaUI;        //フィールドで保持
 
         scoreUIList[user.ConnectionId] = charaInfoUI;           //フィールドで保持
