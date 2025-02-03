@@ -251,28 +251,51 @@ public class PlayerManager : MonoBehaviour
                     playerAnim.SetAnim(PlayerAnimation.ANIM_STATE.AIRFEINT);
                 }
                 //通常フェイント
-                else playerAnim.SetAnim(PlayerAnimation.ANIM_STATE.FEINT);
+                else
+                {
+                    playerAnim.SetAnim(PlayerAnimation.ANIM_STATE.FEINT);
+                }
             }
             else
             {
                 //投げる
                 if (isThrow)
                 {
-                    //ジャンプ投げ
-                    if (isJump) playerAnim.SetAnim(PlayerAnimation.ANIM_STATE.AIRTHROW);
-                    //通常投げ
-                    else playerAnim.SetAnim(PlayerAnimation.ANIM_STATE.THROW);
+                    //ジャンプ状態だったら
+                    if (isJump)
+                    {
+                        //ジャンプ投げアニメーション
+                        playerAnim.SetAnim(PlayerAnimation.ANIM_STATE.AIRTHROW);
+                    }
+                    else
+                    {
+                        //投げアニメーション
+                        playerAnim.SetAnim(PlayerAnimation.ANIM_STATE.THROW);
+                    }
                 }
                 else
                 {
-                    //接地かつジャンプ状態でないときのみ 所持ダッシュ
-                    if (isDash && isGround && !isJump) if (isHaveBall) playerAnim.SetAnim(PlayerAnimation.ANIM_STATE.HAVE_DASH);
-                        //キャッチ(ボール)
-                        else if (isCatch) if (isHaveBall) playerAnim.SetAnim(PlayerAnimation.ANIM_STATE.HAVE_CATCH);
-                            //待機(ボール)
-                            else if (!isFeint) if (isHaveBall) playerAnim.SetAnim(PlayerAnimation.ANIM_STATE.HAVE_IDLE);
-                    //ジャンプ(ボール)
-                    if (isJump && !isDash && !isFeint) if (isHaveBall) playerAnim.SetAnim(PlayerAnimation.ANIM_STATE.HAVE_JUMP);
+                    //接地かつジャンプ状態でないときのみ移動
+                    if (isDash && isGround && !isJump)
+                    {
+                        //ダッシュアニメーション
+                        if (isHaveBall) playerAnim.SetAnim(PlayerAnimation.ANIM_STATE.HAVE_DASH);
+                    }
+                    else if (isCatch)
+                    {
+                        //キャッチアニメーション
+                        if (isHaveBall) playerAnim.SetAnim(PlayerAnimation.ANIM_STATE.HAVE_CATCH);
+                    }
+                    else if (!isFeint)
+                    {
+                        //アイドル(待機)アニメーション
+                        if (isHaveBall) playerAnim.SetAnim(PlayerAnimation.ANIM_STATE.HAVE_IDLE);
+                    }
+                    //ジャンプ
+                    if (isJump && !isDash && !isFeint)
+                    {
+                        if (isHaveBall) playerAnim.SetAnim(PlayerAnimation.ANIM_STATE.HAVE_JUMP);
+                    }
                 }
             }
         }
@@ -281,10 +304,15 @@ public class PlayerManager : MonoBehaviour
         {
             if (isDown)
             {
-                //死亡
-                if (isDead) playerAnim.SetAnim(PlayerAnimation.ANIM_STATE.DEAD);
-                //ダウン
-                else playerAnim.SetAnim(PlayerAnimation.ANIM_STATE.DOWN);
+                //ジャンプ状態だったら
+                if (isDead)
+                {
+                    playerAnim.SetAnim(PlayerAnimation.ANIM_STATE.DEAD);
+                }
+                else
+                {
+                    playerAnim.SetAnim(PlayerAnimation.ANIM_STATE.DOWN);
+                }
             }
             else
             {
@@ -297,25 +325,45 @@ public class PlayerManager : MonoBehaviour
                         playerAnim.SetAnim(PlayerAnimation.ANIM_STATE.AIRFEINT);
                     }
                     //通常フェイント
-                    else playerAnim.SetAnim(PlayerAnimation.ANIM_STATE.FEINT);
+                    else
+                    {
+                        playerAnim.SetAnim(PlayerAnimation.ANIM_STATE.FEINT);
+                    }
                 }
                 if (isThrow)
                 {
-                    //ジャンプ投げ
-                    if (isJump) playerAnim.SetAnim(PlayerAnimation.ANIM_STATE.AIRTHROW);
-                    //通常投げ
-                    else playerAnim.SetAnim(PlayerAnimation.ANIM_STATE.THROW);
+                    //ジャンプ状態だったら
+                    if (isJump)
+                    {
+                        //ジャンプ投げアニメーション
+                        playerAnim.SetAnim(PlayerAnimation.ANIM_STATE.AIRTHROW);
+                    }
+                    else
+                    {
+                        //投げアニメーション
+                        playerAnim.SetAnim(PlayerAnimation.ANIM_STATE.THROW);
+                    }
                 }
                 else
                 {
-                    //接地かつジャンプ状態でないときのみ ダッシュ
-                    if (isDash && isGround && !isJump) playerAnim.SetAnim(PlayerAnimation.ANIM_STATE.DASH);
-                    //キャッチ
-                    else if (isCatch) playerAnim.SetAnim(PlayerAnimation.ANIM_STATE.CATCH);
-                    //待機
-                    else playerAnim.SetAnim(PlayerAnimation.ANIM_STATE.IDLE);
-                    //ジャンプ
-                    if (isJump && !isDash) playerAnim.SetAnim(PlayerAnimation.ANIM_STATE.JUMP);
+                    //接地かつジャンプ状態でないときのみ移動
+                    if (isDash && isGround && !isJump)
+                    {
+                        playerAnim.SetAnim(PlayerAnimation.ANIM_STATE.DASH);
+                    }
+                    else if (isCatch)
+                    {
+                        playerAnim.SetAnim(PlayerAnimation.ANIM_STATE.CATCH);
+                    }
+                    else
+                    {
+                        //アイドル(待機)アニメーション
+                        playerAnim.SetAnim(PlayerAnimation.ANIM_STATE.IDLE);
+                    }
+                    if (isJump && !isDash)
+                    {
+                        playerAnim.SetAnim(PlayerAnimation.ANIM_STATE.JUMP);
+                    }
                 }
             }
         }
