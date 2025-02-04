@@ -5,7 +5,7 @@
   * クラウドサービスはMicrosoft Azureを使用しており、双方向で通信を行うリアルタイムゲームとなっております。
   * 
 * ### 実際の画面
-　![実際の画面](../example/home.PNG)
+　![実際の画面](example/home.PNG)
 
 ## マッチング機能
 * MajicOnionで開発したサーバーをMicrosoft AzureのVMで起動することで、
