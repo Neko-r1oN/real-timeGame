@@ -8,7 +8,7 @@
 　![実際の画面](example/home.PNG)
 
 ## マッチング機能
-* MajicOnionで開発したサーバーをMicrosoft AzureのVMで起動することで、
+* MajicOnionで開発したサーバーをMicrosoft AzureのVMで常時起動しています。
   * ランダムマッチは全国のユーザーを対戦することが出来ます。
   * プレイベートマッチはルーム名を友達と共有することで特定のユーザーと対戦することが出来ます。
 
@@ -16,10 +16,10 @@
 * マッチボタンを押すと自動的に募集が開始され、人数が集まると自動的にゲームが始まります。
   
 * ### マッチング待機画面
-　![実際の画面](Assets/example/success.png)
+　![実際の画面](example/inmatch.PNG)
 
 * ### マッチング成功画面
-　![実際の画面](Assets/example/accountant.png)
+　![実際の画面](example/match.PNG)
 
 
 
