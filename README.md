@@ -4,8 +4,8 @@
   * サーバーサイドをMajicOnionで開発し、クライアントサイドをUnityで制作いたしました。
   * クラウドサービスはMicrosoft Azureを使用しており、双方向で通信を行うリアルタイムゲームとなっております。
   * 
-* ### 実際の画面
-　![実際の画面](example/home.PNG)
+* ### システム構成図
+　![システム構成図](example/system.png)
 
 ## マッチング機能
 * MajicOnionで開発したサーバーをMicrosoft AzureのVMで常時起動しています。
