@@ -1,4 +1,3 @@
-
 @startuml
 
 'botシーケンス図'
@@ -27,6 +26,6 @@ hnote over サーバー : No2退出
 hnote over サーバー : No3退出
 クライアント3 <- サーバー:接続解除
 サーバー -> サーバー:接続数が0になったら
-hnote over サーバー : ルーム解体
+hnote over サーバー : ルーム破棄
 
 @enduml
