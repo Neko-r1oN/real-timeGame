@@ -1,4 +1,11 @@
-﻿using MagicOnion.Server.Hubs;
+﻿////////////////////////////////////////////////////////////////////////////
+///
+///  ルーム処理スクリプト
+///  Author : 川口京佑  2025.01/28
+///
+////////////////////////////////////////////////////////////////////////////
+
+using MagicOnion.Server.Hubs;
 using MagicOnionServer.Model.Context;
 using Newtonsoft.Json.Linq;
 using ServerProject.StreamingHubs;
@@ -58,23 +65,17 @@ namespace StreamingHubs
                 //ルームデータにユーザーとゲーム状態を挿入
                 var roomData = new RoomData() { JoinedUser = joinedUser, UserState = new UserState(), MoveData = new MoveData() };
 
-
-
+                //ストレージに保存
                 roomStorage.Set(this.ConnectionId, roomData);
-
-                //await Task.Delay(1000);
 
                 //プライベートマッチで入室した際
                 if (roomName != "Lobby")
                 {
-                    //ルーム参加者全員にユーザーの入室通知を送信
-
                     //通常通り通知
                     this.BroadcastExceptSelf(room).OnJoin(joinedUser);
                 }
 
                 Console.WriteLine("参加者名:" + joinedUser.UserData.Name);
-                //Console.WriteLine("スコア:" + joinedUser.UserState.Score);
 
 
                 RoomData[] roomDataList = roomStorage.AllValues.ToArray<RoomData>();
@@ -82,7 +83,7 @@ namespace StreamingHubs
                 //参加中のユーザー情報を流す
                 JoinedUser[] joinedUserList = new JoinedUser[roomDataList.Length];
 
-                Debug.WriteLine("接続ID" + this.ConnectionId);
+                Debug.WriteLine("接続ID:" + this.ConnectionId);
 
                 //RoomDataList内のJoinedUserを格納
                 for (int i = 0; i < joinedUserList.Length; i++)
@@ -93,33 +94,32 @@ namespace StreamingHubs
                 //参加者が上限に
                 if (roomDataList.Length == MAX_PLAYER && roomName != "Lobby")
                 {
-
-
-
-                    Console.WriteLine("プラべ:" + roomName);
+                    Console.WriteLine("ルーム名:" + roomName);
                     Console.WriteLine("ゲーム開始");
 
-                    //準備確認フェーズ
+                    //準備確認を通知
                     this.Broadcast(room).OnStand();
-                    //ゲーム開始通知
-                    //this.Broadcast(room).StartGame();
                 }
-
                 return joinedUserList;
             }
         }
 
+        /// <summary>
+        /// マスタークライアント確認処理
+        /// </summary>
+        /// <param name="user">送信元ユーザー</param>
+        /// <returns></returns>
         public async Task MastaerCheckAsync(JoinedUser user)
         {
             this.Broadcast(room).OnMasterCheck(user);
         }
 
         /// <summary>
-        /// 
+        /// ロビー入室処理
         /// </summary>
         /// <param name="userId">参加ユーザーID</param>
         /// <returns></returns>
-        public async Task/*<JoinedUser[]>*/ JoinLobbyAsync(int userId)
+        public async Task JoinLobbyAsync(int userId)
         {
             JoinedUser[] joinedUserList = await JoinAsync("Lobby", userId);
 
@@ -130,14 +130,9 @@ namespace StreamingHubs
             //参加人数が４人になったら
             if (joinedUserList.Length == MAX_PLAYER)
             {
-               
                 //書式を桁無し指定にして再入室
                 this.Broadcast(room).OnMatch(Guid.NewGuid().ToString("N"));
-
-                
-
             }
-            //return joinedUserList;
         }
 
 
@@ -171,7 +166,6 @@ namespace StreamingHubs
 
             //ルーム参加者全員にユーザーの退出通知を送信
             this.BroadcastExceptSelf(room).Leave(this.ConnectionId);
-
         }
 
         /// <summary>
@@ -208,7 +202,6 @@ namespace StreamingHubs
         {
             //ルーム参加者全員にマッチング通知を送信
            this.BroadcastExceptSelf(room).OnMatch(roomName);
-
         }
 
         public async Task StandAcync()
@@ -216,13 +209,13 @@ namespace StreamingHubs
             //準備状態通知
             this.Broadcast(room).OnStand();
         }
+
         /// <summary>
         /// 移動処理
         /// </summary>
         /// <returns></returns>
         public async Task MoveAsync(MoveData moveData)
         {
-
             //移動情報を自分のRoomDataに保存
             var roomStrage = this.room.GetInMemoryStorage<RoomData>();
             var roomData = roomStrage.Get(this.ConnectionId);
@@ -230,7 +223,6 @@ namespace StreamingHubs
 
             //ルーム参加者全員にユーザーの移動通知を送信
             this.BroadcastExceptSelf(room).OnMove(moveData);
-
         }
 
         /// <summary>
@@ -239,7 +231,6 @@ namespace StreamingHubs
         /// <returns></returns>
         public async Task MoveBallAsync(MoveData moveData)
         {
-
             //ボール移動情報を自分のRoomDataに保存
             var roomStrage = this.room.GetInMemoryStorage<RoomData>();
             var roomData = roomStrage.Get(this.ConnectionId);
@@ -256,42 +247,39 @@ namespace StreamingHubs
         /// <returns></returns>
         public async Task ThrowBallAsync(ThrowData throwData)
         {
-
-            //ボール座標情報を自分のRoomDataに保存
+            //ボールを投げた情報を自分のRoomDataに保存
             var roomStrage = this.room.GetInMemoryStorage<RoomData>();
             var roomData = roomStrage.Get(this.ConnectionId);
             roomData.UserState.isHaveBall = false;
-            //roomData = new RoomData() { ThrowData = throwData };
 
 
             //自分以外のルーム参加者全員にボールの座標通知を送信
             this.BroadcastExceptSelf(room).OnThrowBall(throwData);
-
         }
 
         /// <summary>
-        /// ボール発射処理
+        /// ボール獲得処理
         /// </summary>
         /// <param name="getUserId">取得したユーザーID</param>
         /// <returns></returns>
         public async Task GetBallAsync(Guid getUserId)
         {
-
             //準備できたことを自分のRoomDataに保存
             var roomDataStrage = this.room.GetInMemoryStorage<RoomData>();
 
             RoomData[] roomDataList = roomDataStrage.AllValues.ToArray<RoomData>();
 
-            //参加ユーザー分所持チェック
+            //ボール所持者が重複していないか確認
             foreach (var data in roomDataList)
             {
-                //所持状況が重複していた場合
+                //重複していた場合
                 if (data.UserState.isHaveBall)
                 {
                     Console.WriteLine("ボール重複検知");
                     return;
                 }
             }
+
             //排他制御
             lock (roomDataStrage)
             {
@@ -302,9 +290,7 @@ namespace StreamingHubs
 
                 //自分以外のルーム参加者全員にボール取得通知を送信
                 this.BroadcastExceptSelf(room).OnGetBall(getUserId);
-                //this.Broadcast(room).OnGetBall();
             }
-
         }
 
         public async Task HitBallAsync(HitData hitData)
@@ -327,10 +313,8 @@ namespace StreamingHubs
         /// <returns></returns>
         public async Task MoveCursorAsync(Vector3 cursorPos)
         {
-
             //自分以外のルーム参加者全員にユーザーの移動通知を送信
             this.BroadcastExceptSelf(room).OnMoveCursor(cursorPos);
-
         }
 
         /// <summary>
@@ -341,7 +325,6 @@ namespace StreamingHubs
         public async Task DownUserAsync(Guid downUserId)
         {
             //自分含め全員にダウンを通知
-            //this.BroadcastExceptSelf(room).OnDownUser(downUserId);
             this.Broadcast(room).OnDownUser(downUserId);
         }
 
@@ -374,7 +357,6 @@ namespace StreamingHubs
             //排他制御
             lock (roomDataStrage)
             {
-
                 bool isAllReady = true;
                 RoomData[] roomDataList = roomDataStrage.AllValues.ToArray<RoomData>();
                 //参加ユーザー分準備チェック
@@ -386,9 +368,7 @@ namespace StreamingHubs
 
                 //ルーム参加者全員に準備状態通知を送信
                 if (isAllReady && roomDataList.Length == MAX_PLAYER) this.Broadcast(room).StartGame();
-
-            }
-            
+            }          
         }
 
         /// <summary>
@@ -439,13 +419,21 @@ namespace StreamingHubs
             }
         }
 
-        //ゲーム内時間同期処理
+        /// <summary>
+        /// ゲーム内時間同期処理
+        /// </summary>
+        /// <param name="currentTime">送信時間</param>
+        /// <returns></returns>
         public async Task GameCountAsync(int currentTime)
         {
             //接続IDが1番のクライアントのみ実行
             this.Broadcast(room).GameCount(currentTime);
         }
 
+        /// <summary>
+        /// ゲーム終了処理
+        /// </summary>
+        /// <returns></returns>
         public async Task FinishGameAsync()
         {
             //終了通知
@@ -484,18 +472,10 @@ namespace StreamingHubs
                 //一人以外やられた場合
                 if(dead >= MAX_PLAYER)
                 {
-                    Console.WriteLine("全員でっでぃ");
+                    Console.WriteLine("生存者が祭儀の一人のためゲーム終了");
                     //ルーム参加者全員にゲーム終了通知を送信
                     this.Broadcast(room).FinishGame();
-                }
-
-                //全員がゲーム終了したかチェック
-                /*bool isAllGameFinish = true;
-                foreach (var roomData in roomDataList)
-                {
-                    if (!roomData.UserState.isGameFinish) isAllGameFinish = false;
-                }*/
-               
+                }              
             }
         }
 
