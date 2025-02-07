@@ -21976,6 +21976,10 @@ MonoBehaviour:
   errorUI: {fileID: 1736991820}
   time: 0
   gameUI: {fileID: 515404071}
+  player1: {fileID: 21300000, guid: 6cfe8ba1a497f6f408e5773367844aa3, type: 3}
+  player2: {fileID: 21300000, guid: 7ceb9361d680a4041a3be20ae8a27806, type: 3}
+  player3: {fileID: 21300000, guid: 302d0d2ccf8241c45a77968d29b11fd5, type: 3}
+  player4: {fileID: 21300000, guid: 419f92e85e6bff84eabf62451999490e, type: 3}
   resultUIPrefab: {fileID: 8141010891727563034, guid: 5b30fd264cd35c447962d46b356404ce, type: 3}
   resultUIPos: {fileID: 1948673796}
   resultObj: {fileID: 594414696}

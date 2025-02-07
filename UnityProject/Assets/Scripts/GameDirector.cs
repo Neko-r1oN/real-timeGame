@@ -93,10 +93,10 @@ public class GameDirector : MonoBehaviour
     //ゲームUI
     [SerializeField] GameObject gameUI;
 
-    private Sprite player1;
-    private Sprite player2;
-    private Sprite player3;
-    private Sprite player4;
+    [SerializeField] Sprite player1;
+    [SerializeField] Sprite player2;
+    [SerializeField] Sprite player3;
+    [SerializeField] Sprite player4;
 
     //リザルトUIプレハブ
     [SerializeField] GameObject resultUIPrefab;
