@@ -18,6 +18,9 @@ using UnityEngine;
 
 namespace StreamingHubs
 {
+    /// <summary>
+    /// ルーム(内部処理)クラス
+    /// </summary>
     public class RoomHub : StreamingHubBase<IRoomHub,IRoomHubReceiver>,IRoomHub
     {
         private IGroup room;

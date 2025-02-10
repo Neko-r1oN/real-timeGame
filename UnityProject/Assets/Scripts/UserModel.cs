@@ -21,6 +21,9 @@ using UnityEngine;
 using Newtonsoft.Json;
 using UnityEngine.Networking;
 
+/// <summary>
+/// ユーザー処理クラス
+/// </summary>
 public class UserModel : BaseModel
 {
     public int userId { get; set; }       //登録ユーザーID

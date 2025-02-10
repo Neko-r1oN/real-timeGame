@@ -9,6 +9,9 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
+/// <summary>
+/// 接続先設定クラス
+/// </summary>
 public class BaseModel : MonoBehaviour
 {
     //ローカル用

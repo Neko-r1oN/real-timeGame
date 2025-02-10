@@ -20,6 +20,9 @@ using UnityEngine;
 using UnityEngine.Playables;
 using static UnityEngine.UIElements.UxmlAttributeDescription;
 
+/// <summary>
+/// ルーム処理クラス
+/// </summary>
 public class RoomModel : BaseModel, IRoomHubReceiver
 {
     private GrpcChannel channel;
@@ -146,6 +149,7 @@ public class RoomModel : BaseModel, IRoomHubReceiver
             }
             OnMasterCheck(user);
 
+            //
             OnJoinedUser(user);
         }
 
@@ -158,7 +162,8 @@ public class RoomModel : BaseModel, IRoomHubReceiver
     //入室通知
     public void OnJoin(JoinedUser user)
     {
-        OnJoinedUser(user);
+        //nullじゃなかったら実行(null条件演算子)
+        OnJoinedUser?.Invoke(user);
     }
 
    

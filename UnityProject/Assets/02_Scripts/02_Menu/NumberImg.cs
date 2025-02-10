@@ -9,6 +9,9 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
+/// <summary>
+/// ‰æ‘œ“Š‰eƒNƒ‰ƒX
+/// </summary>
 public class NumberImg : MonoBehaviour
 {
     GameObject cam;

@@ -25,7 +25,9 @@ using Newtonsoft.Json.Linq;
 using System.Linq;
 
 
-
+/// <summary>
+/// ゲームの流れを処理するクラス
+/// </summary>
 public class GameDirector : MonoBehaviour
 {
     //プレイヤー生成用プレハブ
@@ -540,16 +542,38 @@ public class GameDirector : MonoBehaviour
         child.SetActive(true);
     }
 
+    private void OnDestroy()
+    {
+        //紐づけを解除
+        roomModel.OnJoinedUser -= this.OnJoinedUser;       //ユーザー入室
+        roomModel.MatchedUser -= this.MatchedUser;         //マッチング
+        roomModel.LeavedUser -= this.LeavedUser;           //ユーザー退出
+        roomModel.MovedUser -= this.MovedUser;             //ユーザー移動情報
+        roomModel.MovedBall -= this.MovedBall;             //ボール移動情報
+        roomModel.ThrowedBall -= this.ThrowedBall;         //ボール投げ
+        roomModel.GetBall -= this.GetBall;                 //ボール取得
+        roomModel.HitBall -= this.HitBall;                 //ボールヒット
+        roomModel.MoveCursor -= this.MovedCursor;          //カーソル移動
+        roomModel.DownUser -= this.DownUser;               //プレイヤーダウン
+        roomModel.DownBackUser -= this.DownBackUser;       //ダウン復帰
+        roomModel.StandUser -= this.Stand;                 //ユーザー準備スタンバイ
+        roomModel.ReadyUser -= this.ReadyUser;             //ユーザー準備完了
+        roomModel.StartGameUser -= this.GameStart;         //ゲーム開始
+        roomModel.UserDead -= this.DeadUser;               //ユーザー死亡
+        roomModel.FinishGameUser -= this.FinishGameUser;   //ゲーム終了
+
+    }
+
     //切断処理
     public async void DisConnectRoom()
     {
         SEManager.Instance.Play(
                   audioPath: SEPath.TAP,      //再生したいオーディオのパス
-                  volumeRate: 1,                //音量の倍率
-                  delay: 0.0f,                     //再生されるまでの遅延時間
-                  pitch: 1,                     //ピッチ
-                  isLoop: false,                 //ループ再生するか
-                  callback: null                //再生終了後の処理
+                  volumeRate: 1,              //音量の倍率
+                  delay: 0.0f,                //再生されるまでの遅延時間
+                  pitch: 1,                   //ピッチ
+                  isLoop: false,              //ループ再生するか
+                  callback: null              //再生終了後の処理
         );
 
         //入室ユーザーID破棄
