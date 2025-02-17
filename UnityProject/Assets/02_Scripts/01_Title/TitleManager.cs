@@ -77,7 +77,7 @@ public class TitleManager : MonoBehaviour
             if (!isConnecting)
             {
                 //–¢‹L“ü‚Ìê‡
-                if (nameText.text.Length < 1 || nameText.text.Length >= 8)
+                if (nameText.text.Length < 3 || nameText.text.Length >= 8)
                 {
                     dummyButton.SetActive(true);
                     startButton.SetActive(false);
