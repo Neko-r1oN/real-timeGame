@@ -217,7 +217,7 @@ public class RoomModel : BaseModel, IRoomHubReceiver
     }
 
     //プレイヤー移動処理
-    public async Task MoveAsync(MoveData moveData)
+    public async UniTask MoveAsync(MoveData moveData)
     {
         await roomHub.MoveAsync(moveData);
     }
@@ -228,7 +228,7 @@ public class RoomModel : BaseModel, IRoomHubReceiver
     }
 
     //ボール座標同期処理
-    public async Task MoveBallAsync(MoveData moveBallData)
+    public async UniTask MoveBallAsync(MoveData moveBallData)
     {
         await roomHub.MoveBallAsync(moveBallData);
     }
@@ -239,7 +239,7 @@ public class RoomModel : BaseModel, IRoomHubReceiver
     }
 
     //ボール発射処理
-    public async Task ThrowBallAsync(ThrowData ThrowData)
+    public async UniTask ThrowBallAsync(ThrowData ThrowData)
     {
         await roomHub.ThrowBallAsync(ThrowData);
     }
@@ -251,7 +251,7 @@ public class RoomModel : BaseModel, IRoomHubReceiver
     }
 
     //ボール取得処理
-    public async Task GetBallAsync(Guid getUserId)
+    public async UniTask GetBallAsync(Guid getUserId)
     {
         //自身の接続IDを通知
         await roomHub.GetBallAsync(getUserId); 
@@ -264,7 +264,7 @@ public class RoomModel : BaseModel, IRoomHubReceiver
     }
 
     //ヒット処理
-    public async Task HitBallAsync(HitData hitData)
+    public async UniTask HitBallAsync(HitData hitData)
     {
         await roomHub.HitBallAsync(hitData);
     }
@@ -275,7 +275,7 @@ public class RoomModel : BaseModel, IRoomHubReceiver
     }
 
     //標準カーソル座標同期処理
-    public async Task MoveCursorAsync(Vector3 cursorPos)
+    public async UniTask MoveCursorAsync(Vector3 cursorPos)
     {
         await roomHub.MoveCursorAsync(cursorPos);
     }
@@ -286,7 +286,7 @@ public class RoomModel : BaseModel, IRoomHubReceiver
     }
 
     //ダウン処理
-    public async Task DownUserAsync(Guid downUserId)
+    public async UniTask DownUserAsync(Guid downUserId)
     {
         await roomHub.DownUserAsync(downUserId);
     }
@@ -296,7 +296,7 @@ public class RoomModel : BaseModel, IRoomHubReceiver
         DownUser(downUserId);
     }
     //ダウン復帰処理
-    public async Task DownBackUserAsync(Guid downUserId)
+    public async UniTask DownBackUserAsync(Guid downUserId)
     {
         await roomHub.DownBackUserAsync(downUserId);
     }
@@ -313,7 +313,7 @@ public class RoomModel : BaseModel, IRoomHubReceiver
     }
 
     //準備完了処理
-    public async Task ReadyAsync(Guid id ,bool isReady)
+    public async UniTask ReadyAsync(Guid id ,bool isReady)
     {
         await roomHub.ReadyAsync(id,isReady);
     }
